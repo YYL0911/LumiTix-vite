@@ -12,7 +12,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      input: path.resolve(__dirname, 'src/main.js'),
+      input: path.resolve(__dirname, 'src/main.jsx'),
     },
   },
 })
