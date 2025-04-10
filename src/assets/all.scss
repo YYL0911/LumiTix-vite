@@ -1,0 +1,52 @@
+// 在這裡你可以使用 Bootstrap 提供的 mixins 和變數
+@import "../node_modules/bootstrap/scss/functions"; // 必要的方法
+@import "./variables"; //客製化的變數檔
+@import "./variables-dark"; //客製化的變數檔
+@import "../node_modules/bootstrap/scss/mixins"; // 必要的方法
+@import "../node_modules/bootstrap/scss/bootstrap"; // 必要的方法Bootstrap 完整原始碼
+
+// $breadcrumb-divider: quote(">");
+
+
+
+:root {
+    --bs-breadcrumb-divider: '>';
+}
+.breadcrumb a {
+    text-decoration: none;
+    color: #000000; 
+}
+
+.navbar-nav .dropdown-menu{
+    position: absolute;
+}
+
+ul.footer-list{
+    margin: 0;
+}
+
+
+.copyText{
+    text-align: end;
+}
+
+
+  
+  /* 媒體查詢：當螢幕寬度小於 px 時， */
+  @media (max-width: 992px) {
+    .copyText{
+        text-align: start;
+    }
+  }
+  
+
+
+  .page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .page-main {
+    flex-grow: 1;
+  }
+  
