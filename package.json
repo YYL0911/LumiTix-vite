@@ -1,5 +1,6 @@
 {
   "name": "my-vite-app",
+  "homepage": "https://yyl0911.github.io/LumTix-vite",
   "version": "0.1.0",
   "private": true,
   "type": "module",

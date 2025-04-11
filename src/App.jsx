@@ -17,6 +17,7 @@ function App() {
     <div className="page">
       <Navbar />
       <div className='container my-3 page-main'>
+      {/* <Router > */}
         <Routes>
           <Route path='/' element = {<Test></Test>}></Route>
           <Route path='/Register' element = {<Register></Register>}></Route>
@@ -29,6 +30,7 @@ function App() {
       <Footer />
         
     </div>
+    // </HashRouter>
   );
 }
 
