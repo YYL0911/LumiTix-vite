@@ -5,48 +5,61 @@
 @import "../node_modules/bootstrap/scss/mixins"; // 必要的方法
 @import "../node_modules/bootstrap/scss/bootstrap"; // 必要的方法Bootstrap 完整原始碼
 
-// $breadcrumb-divider: quote(">");
+ // 資訊要撐到完整頁面
+ .page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.page-main {
+  flex-grow: 1;
+}
 
-
-
+// 麵包屑圖示
 :root {
     --bs-breadcrumb-divider: '>';
 }
+// 麵包屑文字顏色
 .breadcrumb a {
     text-decoration: none;
     color: #000000; 
 }
 
+// 標頭下拉選單位置
 .navbar-nav .dropdown-menu{
     position: absolute;
 }
 
+// 下拉選單不要箭頭
+.customNavbar-dropdown .dropdown-toggle::after {
+  display: none !important;
+}
+
+.bg-login{
+  background-color: #E7E7E7;
+}
+
+
+// 頁尾間距
 ul.footer-list{
     margin: 0;
 }
 
-
+// 權利說明文字桌機對齊
 .copyText{
     text-align: end;
 }
-
-
-  
-  /* 媒體查詢：當螢幕寬度小於 px 時， */
+  /* 當螢幕寬度小於 px 時， */
   @media (max-width: 992px) {
+    // 權利說明文字桌機對齊
     .copyText{
         text-align: start;
     }
   }
+
+
+
+
   
 
-
-  .page {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-  .page-main {
-    flex-grow: 1;
-  }
   

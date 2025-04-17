@@ -1,4 +1,5 @@
 import '../assets/all.scss'
+import { useAuth } from '../contexts/AuthContext';
 
 import Input from '../conponents/Input';
 import Breadcrumb from '../conponents/Breadcrumb';
@@ -8,6 +9,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
 function Login() {
+  const { login } = useAuth();
+
   const breadcrumb = [
     { name: '首頁', path: "/" },
     { name: '登入', path: "/Login" },
@@ -32,6 +35,7 @@ function Login() {
       setShowErrorInfo(true)
     }
     else{
+      login("member")
       navigate("/");
     }
   };

@@ -2,6 +2,7 @@ import './assets/all.scss'
 
 import Navbar from './conponents/Navbar';
 import Footer from './conponents/Footer';
+import Top from './conponents/Top';
 import {Routes, Route} from 'react-router-dom'
 
 import Test from './pages/test'
@@ -28,6 +29,7 @@ function App() {
         </Routes>
       </div>
       <Footer />
+      <Top />
         
     </div>
     // </HashRouter>
