@@ -1,19 +1,20 @@
-import '../assets/all.scss';
+import '../../assets/all.scss';
 import { Modal } from "bootstrap";
-import Input from '../conponents/Input';
-import ButtonTipModal from "../conponents/TipModal";
-import Breadcrumb from '../conponents/Breadcrumb';
+import Input from '../../conponents/Input';
+import ButtonTipModal from "../../conponents/TipModal";
+import Breadcrumb from '../../conponents/Breadcrumb';
 
 import { useForm, useWatch } from "react-hook-form";
 import { useEffect, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 
-function Personal() {
-  const breadcrumb = [
-    { name: '首頁', path: "/" },
-    { name: '會員資訊', path: "/Personal" },
-  ];
 
+const breadcrumb = [
+  { name: '首頁', path: "/" },
+  { name: '會員資訊', path: "/Personal" },
+];
+
+function Personal() {
   const navigate = useNavigate();
   const successModalRef = useRef();
   const passwordModalRef = useRef();

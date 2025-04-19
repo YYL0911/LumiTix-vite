@@ -8,13 +8,14 @@ import { useForm, useWatch } from "react-hook-form";
 import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
+const breadcrumb = [
+  { name: '首頁', path: "/" },
+  { name: '登入', path: "/Login" },
+];
+
 function Login() {
   const { login } = useAuth();
 
-  const breadcrumb = [
-    { name: '首頁', path: "/" },
-    { name: '登入', path: "/Login" },
-  ];
   const [showErrorInfo, setShowErrorInfo] = useState(false);
   const navigate = useNavigate();
 
@@ -35,8 +36,18 @@ function Login() {
       setShowErrorInfo(true)
     }
     else{
-      login("member")
-      navigate("/");
+      if(data.password === "666666"){
+        login("organizer")
+        navigate("/Events");
+      }
+      else if(data.password === "999999"){
+        login("admin")
+        navigate("/");
+      }
+      else {
+        login("member")
+        navigate("/");
+      }
     }
   };
 

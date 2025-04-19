@@ -9,7 +9,6 @@ function Footer() {
         <div className="my-4">
             <div className="container">
                 <div className="row">
-                    {/* 第一列，四個欄位 */}
                     <div className="col-lg-3 my-2 my-lg-0">
                         <h5>票務服務單位</h5>
                         <ul className="footer-list list-unstyled">
@@ -43,18 +42,16 @@ function Footer() {
             </div>
         </div>
 
-
+        {/* 權利說明 */}
         <div className="bg-dark text-white py-3">
-            
-        <div className="container">
+            <div className="container">
                 <div className="row">
-                {/* 第二列 */}
-                <div className="col-lg-4 col-12 text-left">
-                    &copy; 權利說明 LumiTix Copyright
-                </div>
-                <div className="col-lg-8  col-12 copyText">
-                    <div>使用本網站即表示接受條款和條件以及隱私政策以及程式餅乾政策以及行動隱私政策</div>
-                </div>
+                    <div className="col-lg-4 col-12 text-left">
+                        &copy; 權利說明 LumiTix Copyright
+                    </div>
+                    <div className="col-lg-8  col-12 copyText">
+                        <div>使用本網站即表示接受條款和條件以及隱私政策以及程式餅乾政策以及行動隱私政策</div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,21 +1,19 @@
-import '../assets/all.scss'
+import '../../assets/all.scss'
 
-import Input from '../conponents/Input';
-import ButtonTipModal from "../conponents/TipModal";
-import Breadcrumb from '../conponents/Breadcrumb';
+import Input from '../../conponents/Input';
+import ButtonTipModal from "../../conponents/TipModal";
+import Breadcrumb from '../../conponents/Breadcrumb';
 
 // import React from 'react';
 import { useForm, useWatch } from "react-hook-form";
 import { useEffect, useRef } from 'react';
 
+const breadcrumb = [
+  { name: '首頁', path: "/" },
+  { name: '註冊', path: "/Register" },
+];
+
 function Register() {
-  const breadcrumb = [
-    { name: '首頁', path: "/" },
-    { name: '註冊', path: "/Register" },
-  ];
-
-  
-
   const modalRef = useRef();
   const {
     register : formRegister,
