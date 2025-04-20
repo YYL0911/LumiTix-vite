@@ -12,7 +12,8 @@ import Test from './pages/test'
 import Login from './pages/Login';
 import Register from './pages/User/Register';
 import Personal from './pages/User/Personal';
-import Events from './pages/Organizer/Events'
+import Events from './pages/Organizer/Events';
+import ActiveInfo from './pages/Organizer/ActiveInfo';
 
 const NotFound = () => <h1>404 - 頁面不存在</h1>;
 
@@ -35,12 +36,13 @@ function App() {
               </PrivateRoute>}>
           </Route>
 
-
           <Route path='/Events' element = {
               <PrivateRoute roles={['organizer']}>
                 <Events />
               </PrivateRoute>}>
           </Route>
+
+          <Route path="/ActiveInfo/:id" element={<ActiveInfo />} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>

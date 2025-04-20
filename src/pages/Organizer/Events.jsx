@@ -63,9 +63,9 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
     <table className="table table-striped text-center align-middle">
       <colgroup>
         <col style={{ width: '30%' }} />
-        <col style={{ width: '25%' }} />
         <col style={{ width: '20%' }} />
-        <col style={{ width: '25%' }} />
+        <col style={{ width: '20%' }} />
+        <col style={{ width: '30%' }} />
       </colgroup>
       <thead>
         <tr>
@@ -87,16 +87,16 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
               <button
                 type="button"
                 className="btn btn-dark mx-1 "
-                onClick={() => handleNavigate("/")}
+                onClick={() => handleNavigate(`/ActiveInfo/${product.id}`)}
               >
-                註冊
+                編輯資訊
               </button>
               <button
                 type="button"
                 className="btn btn-outline-secondary mx-1"
-                onClick={() => handleNavigate("/")}
+                onClick={() => handleNavigate(`/ActiveInfo/${product.id}`)}
               >
-                詳細
+                詳細內容
               </button>
             </td>
           </tr>

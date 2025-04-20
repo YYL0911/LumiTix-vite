@@ -28,10 +28,10 @@ export default function Navbar() {
                   <a className=" icon-link nav-link dropdown-toggle bg-login px-3 border border-2 border-black"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     
                     <img src={organizerIcon} alt="icon" />
-                    名稱
+                    活動方
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end">
-                    <li className="nav-item ps-3"><Link className="nav-link"  to=''>活動新增/管理</Link></li>
+                    <li className="nav-item ps-3"><Link className="nav-link"  to='/ActiveInfo/0'>活動新增/管理</Link></li>
                     <li className="nav-item ps-3"><Link className="nav-link"  to='/Events'>活動清單</Link></li>
                     <li className="nav-item ps-3"><Link className="nav-link"  to=''>驗票</Link></li>
                   </ul>
@@ -44,7 +44,7 @@ export default function Navbar() {
                   <a className=" icon-link nav-link dropdown-toggle bg-login px-3 border border-2 border-black"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     
                     <img src={adminIcon} alt="icon" />
-                    名稱
+                    平台方
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end">
                     <li className="nav-item ps-3"><Link className="nav-link"  to=''>一般會員管理</Link></li>

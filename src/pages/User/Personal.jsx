@@ -5,7 +5,7 @@ import ButtonTipModal from "../../conponents/TipModal";
 import Breadcrumb from '../../conponents/Breadcrumb';
 
 import { useForm, useWatch } from "react-hook-form";
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect  } from 'react';
 import { useNavigate } from "react-router-dom";
 
 
@@ -50,9 +50,10 @@ function Personal() {
   const watchMain = useWatch({ control: mainControl });
   const watchPassword = useWatch({ control: passwordControl });
 
-  // 初始化 Bootstrap Modal
-  useEffect(() => {
-    passwordModal.current = new Modal(passwordModalRef.current);
+
+   // 初始化 Bootstrap Modal
+   useEffect(() => {
+      passwordModal.current = new Modal(passwordModalRef.current);
   }, []);
 
   return (
@@ -125,9 +126,6 @@ function Personal() {
         </div>
 
       </form>
-
-      
-
 
       <ButtonTipModal ref={successModalRef} title="提示標題" info="修改成功" />
 
