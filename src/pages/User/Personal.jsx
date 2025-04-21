@@ -1,5 +1,7 @@
 import '../../assets/all.scss';
 import { Modal } from "bootstrap";
+import { useAuth } from '../../contexts/AuthContext';
+
 import Input from '../../conponents/Input';
 import ButtonTipModal from "../../conponents/TipModal";
 import Breadcrumb from '../../conponents/Breadcrumb';
@@ -15,10 +17,41 @@ const breadcrumb = [
 ];
 
 function Personal() {
+  const { setUserName, userToken } = useAuth();
   const navigate = useNavigate();
   const successModalRef = useRef();
   const passwordModalRef = useRef();
   const passwordModal = useRef();
+
+
+  const [data, setData] = useState(null); // 存使用者資料
+  const isFirstRender = useRef(true); // 記錄是否是第一次渲染
+  //取得使用者資料
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false; // 更新為 false，代表已執行過
+      // console.log("✅ useEffect 只執行一次");
+      fetch("https://n7-backend.onrender.com/api/v1/users/profile",{
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${userToken}`, // token 放這
+        }}) 
+        .then(res => res.json())
+        .then(result => {
+          if(!result.status){
+            if(result.message == "尚未登入") navigate("/Login");
+          }
+          else{
+            setData(result);    // 資料設進 state
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
+  }, []);
+
 
   // 主表單
   const {
@@ -46,6 +79,7 @@ function Personal() {
     passwordModal.current.hide(); // 提交成功關閉 Modal
   };
 
+
   // 監看表單狀態
   const watchMain = useWatch({ control: mainControl });
   const watchPassword = useWatch({ control: passwordControl });
@@ -59,7 +93,6 @@ function Personal() {
   return (
     <div>
       <Breadcrumb breadcrumbs={breadcrumb} />
-
       <form onSubmit={mainHandleSubmit(onMainSubmit)}>
         <div className="mb-3 w-100" style={{ maxWidth: "600px" }}>
           <Input
@@ -68,7 +101,7 @@ function Personal() {
             errors={mainErrors}
             labelText="會員編號"
             register={mainRegister}
-            placeholderTet="使用者名稱"
+            placeholderTet={data==null?"": data.data.serialNo}
             disabled={true}
           />
         </div>
@@ -80,7 +113,7 @@ function Personal() {
             labelText="Email(帳號)"
             errors={mainErrors}
             register={mainRegister}
-            placeholderTet="Email"
+            placeholderTet={data==null?"":data.data.email}
             disabled={true}
           />
         </div>
@@ -100,7 +133,7 @@ function Personal() {
                   message: '使用者名稱長度不超過 10',
                 },
               }}
-              placeholderTet = "使用者名稱"
+              placeholderTet = { data==null?"":data.data.name}
           />
         </div>
 

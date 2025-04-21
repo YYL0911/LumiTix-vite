@@ -6,7 +6,7 @@ import Breadcrumb from '../../conponents/Breadcrumb';
 
 // import React from 'react';
 import { useForm, useWatch } from "react-hook-form";
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const breadcrumb = [
   { name: '首頁', path: "/" },
@@ -14,6 +14,9 @@ const breadcrumb = [
 ];
 
 function Register() {
+  const [showErrorInfo, setShowErrorInfo] = useState(false);
+  const [errMessage, setErrMessage] = useState(null);
+
   const modalRef = useRef();
   const {
     register : formRegister,
@@ -25,11 +28,45 @@ function Register() {
   });
 
   const onSubmit = (data) => {
-    console.log(errors);
-    console.log(data);
+    // console.log(errors);
+    // console.log(data);
 
-    modalRef.current.open();
+    // 註冊api
+    fetch("https://n7-backend.onrender.com/api/v1/users/signup",{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: data.username,
+        email: data.email,
+        password: data.password,
+        confirm_password: data.confirmPassword,
+      })
+    }) 
+    .then(res => res.json())
+    .then(result => {
+      if(!result.status){
+        setErrMessage(result.message) 
+        setShowErrorInfo(true)
+      }
+      else{
+        modalRef.current.open();
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    });
+
   };
+
+  // 模擬 API 回傳資料
+  const fetchData = async () => {
+    const userData = { username: "John Doe" }; // 從 API 獲取
+    reset(userData); // 設定預設值
+  };
+  
+
 
   //確認當前表單狀態
   const watchForm = useWatch({
@@ -54,6 +91,10 @@ function Register() {
               rules={{
                 //必填
                 required: '使用者名稱為必填', 
+                minLength: {
+                  value: 2,
+                  message: '使用者名稱不少於 2'
+                },
                 maxLength: {
                   value: 10,
                   message: '使用者名稱長度不超過 10',
@@ -89,19 +130,19 @@ function Register() {
               rules={{
                 required: '密碼為必填',
                 minLength: {
-                  value: 6,
-                  message: '密碼不少於 6 碼'
+                  value: 8,
+                  message: '密碼不少於 8 碼'
                 },
                 maxLength: {
-                  value: 12,
-                  message: '密碼不超過 12 碼'
+                  value: 32,
+                  message: '密碼不超過 32 碼'
                 }
               }}
               placeholderTet = "密碼"
             ></Input>
 
             <Input
-              id='repassword'
+              id='confirmPassword'
               labelText=''
               type='password'
               errors={errors}
@@ -109,18 +150,19 @@ function Register() {
               rules={{
                 required: '密碼為必填',
                 minLength: {
-                  value: 6,
-                  message: '密碼不少於 6 碼'
+                  value: 8,
+                  message: '密碼不少於 8 碼'
                 },
                 maxLength: {
-                  value: 12,
-                  message: '密碼不超過 12 碼'
+                  value: 32,
+                  message: '密碼不超過 32 碼'
                 }
               }}
               placeholderTet = "再次輸入密碼"
             ></Input>
           </div>
           
+          {showErrorInfo && <div className='mt-4 text-danger'>{errMessage}</div>}
 
           <button type='submit' className='btn btn-dark mt-3'>
             註冊
@@ -134,7 +176,6 @@ function Register() {
           </ButtonTipModal>
           
         </form>
-        
     </div>
   );
 }

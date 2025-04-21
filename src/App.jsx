@@ -31,13 +31,13 @@ function App() {
           <Route path='/Register' element = {<Register></Register>}></Route>
 
           <Route path='/Personal' element = {
-              <PrivateRoute roles={['member']}>
+              <PrivateRoute roles={['General Member']}>
                 <Personal />
               </PrivateRoute>}>
           </Route>
 
           <Route path='/Events' element = {
-              <PrivateRoute roles={['organizer']}>
+              <PrivateRoute roles={['Customer']}>
                 <Events />
               </PrivateRoute>}>
           </Route>

@@ -17,6 +17,8 @@ function Login() {
   const { login } = useAuth();
 
   const [showErrorInfo, setShowErrorInfo] = useState(false);
+  const [errMessage, setErrMessage] = useState(null);
+
   const navigate = useNavigate();
 
   const {
@@ -29,26 +31,45 @@ function Login() {
   });
 
   const onSubmit = (data) => {
-    console.log(errors);
-    console.log(data);
+    // console.log(errors);
+    // console.log(data);
 
-    if(data.password === "123456"){
-      setShowErrorInfo(true)
-    }
-    else{
-      if(data.password === "666666"){
-        login("organizer")
-        navigate("/Events");
+    // 登入api
+    fetch("https://n7-backend.onrender.com/api/v1/users/signin",{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: data.email,
+        password: data.password
+      })
+    }) 
+    .then(res => res.json())
+    .then(result => {
+      if(!result.status){
+        setErrMessage(result.message) 
+        setShowErrorInfo(true)
       }
-      else if(data.password === "999999"){
-        login("admin")
-        navigate("/");
+      else{
+        if(result.data.user.role == "General Member"){
+          login("General Member", result.data.user.name, result.data.token)
+          navigate("/");
+        } 
+        else if(result.data.user.role == "Customer"){
+          login("organizer", result.data.user.name, result.data.token)
+          navigate("/Events");
+        } 
+        else if(result.data.user.role == "Admin"){
+          login("admin", result.data.user.name, result.data.token)
+          navigate("/");
+        } 
       }
-      else {
-        login("member")
-        navigate("/");
-      }
-    }
+    })
+    .catch(err => {
+      console.log(err);
+    });
+
   };
 
   //確認當前表單狀態
@@ -91,19 +112,19 @@ function Login() {
               rules={{
                 required: '密碼為必填',
                 minLength: {
-                  value: 6,
-                  message: '密碼不少於 6 碼'
+                  value: 8,
+                  message: '密碼不少於 8 碼'
                 },
                 maxLength: {
-                  value: 12,
-                  message: '密碼不超過 12 碼'
+                  value: 32,
+                  message: '密碼不超過 32 碼'
                 }
               }}
               placeholderTet = "密碼"
             ></Input>
           </div>
 
-          {showErrorInfo && <div className='mt-4 text-danger'>錯誤訊息</div>}
+          {showErrorInfo && <div className='mt-4 text-danger'>{errMessage}</div>}
           
           <button type=' button' className='btn btn-dark mt-3' onClick={() => navigate("/Register")}>
             註冊

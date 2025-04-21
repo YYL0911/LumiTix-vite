@@ -8,7 +8,7 @@ import adminIcon from "../assets/img/adminIcon.png"
 
 
 export default function Navbar() { 
-  const { userRole, logout } = useAuth();
+  const { userRole, userName, logout } = useAuth();
   return (
     <>
       <nav className="navbar  bg-white  px-lg-5 d-flex align-items-center">
@@ -23,7 +23,7 @@ export default function Navbar() {
               </li>
 
               {/* 活動方 */}
-              {userRole === 'organizer' && 
+              {userRole === 'Customer' && 
                 <li className="nav-item dropdown customNavbar-dropdown">
                   <a className=" icon-link nav-link dropdown-toggle bg-login px-3 border border-2 border-black"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     
@@ -39,7 +39,7 @@ export default function Navbar() {
               }
 
               {/* 平台方 */}
-              {userRole === 'admin' && 
+              {userRole === 'Admin' && 
                 <li className="nav-item dropdown customNavbar-dropdown">
                   <a className=" icon-link nav-link dropdown-toggle bg-login px-3 border border-2 border-black"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     
@@ -57,12 +57,12 @@ export default function Navbar() {
               }
 
               {/* 使用者 */}
-              {userRole === 'member' && 
+              {userRole === 'General Member' && 
                   <li className="nav-item dropdown customNavbar-dropdown">
                     <a className=" icon-link nav-link dropdown-toggle bg-login px-3 border border-2 border-black"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       
                       <img src={userIcon} alt="icon" />
-                      名稱
+                      {userName}
                     </a>
                     <ul className="dropdown-menu dropdown-menu-end">
                       <li className="nav-item ps-3"><Link className="nav-link"  to='/Personal'>會員資料</Link></li>
