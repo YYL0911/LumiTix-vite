@@ -1,4 +1,5 @@
 import '../../assets/all.scss'
+import { useAuth } from '../../contexts/AuthContext';
 
 import Input from '../../conponents/Input';
 import ButtonTipModal from "../../conponents/TipModal";
@@ -14,7 +15,9 @@ const breadcrumb = [
 ];
 
 function Register() {
+  const { login } = useAuth();
   const [showErrorInfo, setShowErrorInfo] = useState(false);
+  const [loading, setloading] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
 
   const modalRef = useRef();
@@ -30,7 +33,7 @@ function Register() {
   const onSubmit = (data) => {
     // console.log(errors);
     // console.log(data);
-
+    setloading(true)
     // 註冊api
     fetch("https://n7-backend.onrender.com/api/v1/users/signup",{
       method: "POST",
@@ -47,11 +50,12 @@ function Register() {
     .then(res => res.json())
     .then(result => {
       if(!result.status){
+        setloading(false)
         setErrMessage(result.message) 
         setShowErrorInfo(true)
       }
       else{
-        modalRef.current.open();
+        callLoginApi(data)
       }
     })
     .catch(err => {
@@ -60,10 +64,33 @@ function Register() {
 
   };
 
-  // 模擬 API 回傳資料
-  const fetchData = async () => {
-    const userData = { username: "John Doe" }; // 從 API 獲取
-    reset(userData); // 設定預設值
+  const callLoginApi = (data) => {
+    // 登入api
+    fetch("https://n7-backend.onrender.com/api/v1/users/signin",{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: data.email,
+        password: data.password
+      })
+    }) 
+    .then(res => res.json())
+    .then(result => {
+      setloading(false)
+      if(!result.status){
+        setErrMessage(result.message) 
+        setShowErrorInfo(true)
+      }
+      else{
+        login("General Member", result.data.user.name, result.data.token)
+        modalRef.current.open();
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    });
   };
   
 
@@ -176,6 +203,14 @@ function Register() {
           </ButtonTipModal>
           
         </form>
+
+        {loading && (
+          <div className="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1050 }}>
+            <div className="spinner-border text-light" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        )}
     </div>
   );
 }
