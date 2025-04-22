@@ -10,6 +10,8 @@ import PrivateRoute from './conponents/PrivateRoute';
 import Test from './pages/test'
 
 import Login from './pages/Login';
+import AllEvents from './pages/AllEvents';
+import EventInfo from './pages/EventInfo';
 import Register from './pages/User/Register';
 import Personal from './pages/User/Personal';
 import Events from './pages/Organizer/Events';
@@ -29,6 +31,7 @@ function App() {
           <Route path='/' element = {<Test></Test>}></Route>
           <Route path='/Login' element = {<Login></Login>}></Route>
           <Route path='/Register' element = {<Register></Register>}></Route>
+          <Route path='/AllEvents' element = {<AllEvents></AllEvents>}></Route>
 
           <Route path='/Personal' element = {
               <PrivateRoute roles={['General Member']}>
@@ -43,7 +46,7 @@ function App() {
           </Route>
 
           <Route path="/ActiveInfo/:id" element={<ActiveInfo />} />
-
+          <Route path="/evevtInfo/:id" element={<EventInfo />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

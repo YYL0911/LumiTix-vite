@@ -19,7 +19,7 @@ export default function Navbar() {
             <ul className="navbar-nav flex-row gap-4">
 
               <li className="nav-item ">
-                <Link className="nav-link"  to='/'>所有活動</Link>
+                <Link className="nav-link"  to='/AllEvents'>所有活動</Link>
               </li>
 
               {/* 活動方 */}
