@@ -1,4 +1,4 @@
-const Input = ({ id, labelText, register, type, errors, rules, placeholderTet, disabled = false }) => {
+const Input = ({ id, labelText, register, type, errors, rules, placeholderTet, disabled = false}) => {
   
     return (
       <>

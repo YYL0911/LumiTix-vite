@@ -7,7 +7,7 @@ import ButtonTipModal from "../../conponents/TipModal";
 import Breadcrumb from '../../conponents/Breadcrumb';
 
 import { useForm, useWatch } from "react-hook-form";
-import { useState, useEffect, useRef, useLayoutEffect  } from 'react';
+import { useState, useEffect, useRef  } from 'react';
 import { useNavigate } from "react-router-dom";
 
 
@@ -29,6 +29,8 @@ function Personal() {
   //取得使用者資料
   useEffect(() => {
     if (isFirstRender.current) {
+      
+
       isFirstRender.current = false; // 更新為 false，代表已執行過
       // console.log("✅ useEffect 只執行一次");
       fetch("https://n7-backend.onrender.com/api/v1/users/profile",{
@@ -44,6 +46,14 @@ function Personal() {
           }
           else{
             setData(result);    // 資料設進 state
+            // ✅ 用 reset 動態設定預設值
+            reset({
+              userID: result.data.serialNo,
+              email: result.data.email,
+              name: result.data.name,
+            });
+
+           
           }
         })
         .catch(err => {
@@ -58,7 +68,9 @@ function Personal() {
     register: mainRegister,
     handleSubmit: mainHandleSubmit,
     control: mainControl,
+    reset,
     formState: { errors: mainErrors },
+    
   } = useForm({ mode: 'onTouched' });
 
   const onMainSubmit = (data) => {
@@ -101,7 +113,7 @@ function Personal() {
             errors={mainErrors}
             labelText="會員編號"
             register={mainRegister}
-            placeholderTet={data==null?"": data.data.serialNo}
+            // defaultValue={data==null?"": data.data.serialNo}
             disabled={true}
           />
         </div>
@@ -113,7 +125,7 @@ function Personal() {
             labelText="Email(帳號)"
             errors={mainErrors}
             register={mainRegister}
-            placeholderTet={data==null?"":data.data.email}
+            // defaultValue={data==null?"":data.data.email}
             disabled={true}
           />
         </div>
@@ -133,7 +145,7 @@ function Personal() {
                   message: '使用者名稱長度不超過 10',
                 },
               }}
-              placeholderTet = { data==null?"":data.data.name}
+              // defaultValue={ data==null?"":data.data.name}
           />
         </div>
 

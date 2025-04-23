@@ -93,8 +93,6 @@ function Register() {
     });
   };
   
-
-
   //確認當前表單狀態
   const watchForm = useWatch({
     control,
@@ -167,23 +165,16 @@ function Register() {
               }}
               placeholderTet = "密碼"
             ></Input>
-
+          </div>
+          <div className='mb-3 w-100' style={{maxWidth: 600+"px"}}>
             <Input
               id='confirmPassword'
-              labelText=''
+              labelText='確認密碼'
               type='password'
               errors={errors}
               register={formRegister}
               rules={{
-                required: '密碼為必填',
-                minLength: {
-                  value: 8,
-                  message: '密碼不少於 8 碼'
-                },
-                maxLength: {
-                  value: 32,
-                  message: '密碼不超過 32 碼'
-                }
+                required: '確認密碼為必填',
               }}
               placeholderTet = "再次輸入密碼"
             ></Input>

@@ -34,6 +34,7 @@ export default function Navbar() {
                     <li className="nav-item ps-3"><Link className="nav-link"  to='/ActiveInfo/0'>活動新增/管理</Link></li>
                     <li className="nav-item ps-3"><Link className="nav-link"  to='/Events'>活動清單</Link></li>
                     <li className="nav-item ps-3"><Link className="nav-link"  to=''>驗票</Link></li>
+                    <li className="nav-item ps-3" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
                   </ul>
                 </li>
               }
@@ -52,6 +53,7 @@ export default function Navbar() {
                     <li className="nav-item ps-3"><Link className="nav-link"  to=''>活動管理</Link></li>
                     <li className="nav-item ps-3"><Link className="nav-link"  to=''>活動提案</Link></li>
                     <li className="nav-item ps-3"><Link className="nav-link"  to=''>營收狀況</Link></li>
+                    <li className="nav-item ps-3" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
                   </ul>
                 </li>
               }
@@ -67,6 +69,7 @@ export default function Navbar() {
                     <ul className="dropdown-menu dropdown-menu-end">
                       <li className="nav-item ps-3"><Link className="nav-link"  to='/Personal'>會員資料</Link></li>
                       <li className="nav-item ps-3"><Link className="nav-link"  to=''>票卷管理</Link></li>
+                      <li className="nav-item ps-3" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
                     </ul>
                 </li>
               }

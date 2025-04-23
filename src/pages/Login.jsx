@@ -15,6 +15,7 @@ const breadcrumb = [
 
 function Login() {
   const { login } = useAuth();
+  const [loading, setloading] = useState(false);
 
   const [showErrorInfo, setShowErrorInfo] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
@@ -34,6 +35,7 @@ function Login() {
     // console.log(errors);
     // console.log(data);
 
+    setloading(true)
     // 登入api
     fetch("https://n7-backend.onrender.com/api/v1/users/signin",{
       method: "POST",
@@ -47,6 +49,7 @@ function Login() {
     }) 
     .then(res => res.json())
     .then(result => {
+      setloading(false)
       if(!result.status){
         setErrMessage(result.message) 
         setShowErrorInfo(true)
@@ -126,15 +129,21 @@ function Login() {
 
           {showErrorInfo && <div className='mt-4 text-danger'>{errMessage}</div>}
           
-          <button type=' button' className='btn btn-dark mt-3' onClick={() => navigate("/Register")}>
-            註冊
-          </button>
 
-          <button type='submit' className='btn btn-outline-dark mt-3 mx-3'>
-            登入
-          </button>
+          <div class="d-flex align-items-center mt-4">
+            <p href="#" class="my-auto" onClick={() => navigate("/Register")}>註冊</p>
+            <button type="submit" class="btn btn-dark me-2 px-3 mx-4">登入</button>
+          </div>
 
         </form>
+
+        {loading && (
+          <div className="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1050 }}>
+            <div className="spinner-border text-light" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        )}
         
     </div>
   );
