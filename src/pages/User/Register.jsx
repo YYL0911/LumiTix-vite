@@ -19,16 +19,35 @@ function Register() {
   const [showErrorInfo, setShowErrorInfo] = useState(false);
   const [loading, setloading] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
+  const [checkOk, setCheckOk] = useState(true);
 
   const modalRef = useRef();
   const {
     register : formRegister,
     handleSubmit,
     control, // 了解當前運作的哪一個register
-    formState: { errors }, //
+    getValues,
+    watch,
+    trigger,
+    formState: { errors, isValid }, //
   } = useForm({
     mode: 'onTouched',
   });
+
+  const password = watch("password");
+  const confirmPassword = watch("confirmPassword");
+
+  const [isPasswordTouched, setIsPasswordTouched] = useState(false);
+  const [isConfirmTouched, setIsConfirmTouched] = useState(false);
+
+
+  const passwordValue = watch("password"); // 監看 password
+  useEffect(() => {
+    if (isPasswordTouched && isConfirmTouched){
+      // 當 password 改變時，重新驗證 confirmPassword
+      trigger("confirmPassword");
+    }
+  }, [passwordValue, trigger]);
 
   const onSubmit = (data) => {
     // console.log(errors);
@@ -53,6 +72,7 @@ function Register() {
         setloading(false)
         setErrMessage(result.message) 
         setShowErrorInfo(true)
+        setCheckOk(false)
       }
       else{
         callLoginApi(data)
@@ -100,7 +120,16 @@ function Register() {
 
   //表單變更
   useEffect(() => {
-  }, [watchForm]); // 將新變數傳入
+    //有錯誤
+    if(Object.keys(errors).length > 0) setCheckOk(false)
+    else if(showErrorInfo) setCheckOk(true)
+  }, [watchForm, errors]); // 將新變數傳入
+  // 即時更新錯誤狀態
+  useEffect(() => {
+    if(Object.keys(errors).length > 0 || getValues("password") !== getValues("confirmPassword")) setCheckOk(false)
+    else setCheckOk(true)
+  }, [isValid]);
+
 
   return (
     <div>
@@ -161,7 +190,8 @@ function Register() {
                 maxLength: {
                   value: 32,
                   message: '密碼不超過 32 碼'
-                }
+                },
+                onChange: () => setIsPasswordTouched(true)
               }}
               placeholderTet = "密碼"
             ></Input>
@@ -175,6 +205,11 @@ function Register() {
               register={formRegister}
               rules={{
                 required: '確認密碼為必填',
+                validate: (value) => {
+                  if (!isPasswordTouched && !isConfirmTouched) return true;
+                  return value === getValues("password") || "兩次密碼不一致";
+                },
+                onChange: () => setIsConfirmTouched(true)
               }}
               placeholderTet = "再次輸入密碼"
             ></Input>
@@ -182,7 +217,8 @@ function Register() {
           
           {showErrorInfo && <div className='mt-4 text-danger'>{errMessage}</div>}
 
-          <button type='submit' className='btn btn-dark mt-3'>
+          
+          <button type='submit' className={`btn btn-dark mt-3 ${checkOk ? "" : "disabled"}`} >
             註冊
           </button>
 

@@ -12,7 +12,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="navbar  bg-white  px-lg-5 d-flex align-items-center">
-        <div className="container-fluid container px-lg-5">
+        <div className="container-fluid container">
           <Link className="navbar-brand" to='/'>
             <img src={logo} alt="Logo" className="d-inline-block align-text-top"  />
           </Link>

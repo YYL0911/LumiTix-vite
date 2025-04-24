@@ -16,6 +16,7 @@ const breadcrumb = [
 function Login() {
   const { login } = useAuth();
   const [loading, setloading] = useState(false);
+  const [checkOk, setCheckOk] = useState(true);
 
   const [showErrorInfo, setShowErrorInfo] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
@@ -26,15 +27,14 @@ function Login() {
     register : formRegister,
     handleSubmit,
     control, // 了解當前運作的哪一個register
-    formState: { errors }, //
+    formState: { errors, isValid}, //
   } = useForm({
-    mode: 'onTouched',
+    mode: "onTouched",         // 初次觸發驗證的時機
   });
 
   const onSubmit = (data) => {
     // console.log(errors);
     // console.log(data);
-
     setloading(true)
     // 登入api
     fetch("https://n7-backend.onrender.com/api/v1/users/signin",{
@@ -53,6 +53,7 @@ function Login() {
       if(!result.status){
         setErrMessage(result.message) 
         setShowErrorInfo(true)
+        setCheckOk(false)
       }
       else{
         if(result.data.user.role == "General Member"){
@@ -80,9 +81,19 @@ function Login() {
     control,
   });
 
+
   //表單變更
   useEffect(() => {
-  }, [watchForm]); // 將新變數傳入
+    //有錯誤
+    if(Object.keys(errors).length > 0) setCheckOk(false)
+    else if(showErrorInfo) setCheckOk(true)
+  }, [watchForm, errors]); // 將新變數傳入
+
+  // 即時更新錯誤狀態
+  useEffect(() => {
+    if(Object.keys(errors).length > 0) setCheckOk(false)
+    else setCheckOk(true)
+  }, [isValid]); 
 
   return (
     <div>
@@ -130,10 +141,15 @@ function Login() {
           {showErrorInfo && <div className='mt-4 text-danger'>{errMessage}</div>}
           
 
-          <div class="d-flex align-items-center mt-4">
-            <p href="#" class="my-auto" onClick={() => navigate("/Register")}>註冊</p>
-            <button type="submit" class="btn btn-dark me-2 px-3 mx-4">登入</button>
+          
+          <button type="submit" className={`btn btn-dark me-2 px-3 my-3 ${checkOk ? "" : "disabled"}`} >登入</button>
+          
+
+          <div className="d-flex align-items-center">
+            <span className="me-2">還沒有帳號嗎？</span>
+            <a  className="my-auto text-black" onClick={() => navigate("/Register")}>立即註冊</a>
           </div>
+
 
         </form>
 
