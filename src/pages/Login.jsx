@@ -6,7 +6,7 @@ import Breadcrumb from '../conponents/Breadcrumb';
 
 import { useForm, useWatch } from "react-hook-form";
 import { useEffect, useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const breadcrumb = [
   { name: '首頁', path: "/" },
@@ -147,7 +147,7 @@ function Login() {
 
           <div className="d-flex align-items-center">
             <span className="me-2">還沒有帳號嗎？</span>
-            <a  className="my-auto text-black" onClick={() => navigate("/Register")}>立即註冊</a>
+            <Link to='/Register' className="my-auto text-black">立即註冊</Link>
           </div>
 
 

@@ -11,8 +11,8 @@ export default function Navbar() {
   const { userRole, userName, logout } = useAuth();
   return (
     <>
-      <nav className="navbar  bg-white  px-lg-5 d-flex align-items-center">
-        <div className="container-fluid container">
+      <nav className="navbar  bg-white container d-flex align-items-center">
+        <div className="container-fluid ">
           <Link className="navbar-brand" to='/'>
             <img src={logo} alt="Logo" className="d-inline-block align-text-top"  />
           </Link>
