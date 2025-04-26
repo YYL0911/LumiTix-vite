@@ -27,25 +27,24 @@ function App() {
       <div className='container my-3 page-main'>
       {/* <Router > */}
         <Routes>
-          <Route path='/Unauthorized' element = {<h1>您沒有訪問此頁面權限，請先登入</h1>}></Route>
           <Route path='/' element = {<Test></Test>}></Route>
-          <Route path='/Login' element = {<Login></Login>}></Route>
-          <Route path='/Register' element = {<Register></Register>}></Route>
-          <Route path='/AllEvents' element = {<AllEvents></AllEvents>}></Route>
+          <Route path='/login' element = {<Login></Login>}></Route>
+          <Route path='/register' element = {<Register></Register>}></Route>
+          <Route path='/allEvents' element = {<AllEvents></AllEvents>}></Route>
 
-          <Route path='/Personal' element = {
-              <PrivateRoute roles={['General Member']}>
+          <Route path='/personal' element = {
+              <PrivateRoute roles={['General']}>
                 <Personal />
               </PrivateRoute>}>
           </Route>
 
-          <Route path='/Events' element = {
-              <PrivateRoute roles={['Customer']}>
+          <Route path='/events' element = {
+              <PrivateRoute roles={['Organizer']}>
                 <Events />
               </PrivateRoute>}>
           </Route>
 
-          <Route path="/ActiveInfo/:id" element={<ActiveInfo />} />
+          <Route path="/activeInfo/:id" element={<ActiveInfo />} />
           <Route path="/evevtInfo/:id" element={<EventInfo />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -124,7 +124,7 @@ const DataTable = memo(({handleNavigate}) => {
 
 const breadcrumb = [
   { name: '首頁', path: "/" },
-  { name: '活動列表', path: "/AllEvents" },
+  { name: '活動列表', path: "/allEvents" },
 ];
 
 

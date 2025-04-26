@@ -11,7 +11,7 @@ import { useState, useEffect, useRef } from 'react';
 
 const breadcrumb = [
   { name: '首頁', path: "/" },
-  { name: '註冊', path: "/Register" },
+  { name: '註冊', path: "/register" },
 ];
 
 function Register() {
@@ -104,7 +104,7 @@ function Register() {
         setShowErrorInfo(true)
       }
       else{
-        login("General Member", result.data.user.name, result.data.token)
+        login("General", result.data.user.name, result.data.token)
         modalRef.current.open();
       }
     })
@@ -120,12 +120,20 @@ function Register() {
 
   //表單變更
   useEffect(() => {
+    console.log(Object.keys(errors).length )
+    console.log(errors )
+    console.log(showErrorInfo )
+    console.log("******************************")
     //有錯誤
     if(Object.keys(errors).length > 0) setCheckOk(false)
     else if(showErrorInfo) setCheckOk(true)
   }, [watchForm, errors]); // 將新變數傳入
   // 即時更新錯誤狀態
   useEffect(() => {
+    console.log(Object.keys(errors).length )
+    console.log(errors )
+    console.log("------------------------------")
+
     if(Object.keys(errors).length > 0 || getValues("password") !== getValues("confirmPassword")) setCheckOk(false)
     else setCheckOk(true)
   }, [isValid]);
@@ -150,7 +158,7 @@ function Register() {
                   message: '使用者名稱不少於 2'
                 },
                 maxLength: {
-                  value: 10,
+                  value: 50,
                   message: '使用者名稱長度不超過 10',
                 },
               }}

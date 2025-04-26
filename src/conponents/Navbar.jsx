@@ -19,11 +19,11 @@ export default function Navbar() {
             <ul className="navbar-nav flex-row gap-4">
 
               <li className="nav-item ">
-                <Link className="nav-link"  to='/AllEvents'>所有活動</Link>
+                <Link className="nav-link"  to='/allEvents'>所有活動</Link>
               </li>
 
               {/* 活動方 */}
-              {userRole === 'Customer' && 
+              {userRole === 'Organizer' && 
                 <li className="nav-item dropdown customNavbar-dropdown">
                   <a className=" icon-link nav-link dropdown-toggle bg-login px-3 border border-2 border-black"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     
@@ -31,8 +31,8 @@ export default function Navbar() {
                     活動方
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end">
-                    <li className="nav-item ps-3"><Link className="nav-link"  to='/ActiveInfo/0'>活動新增/管理</Link></li>
-                    <li className="nav-item ps-3"><Link className="nav-link"  to='/Events'>活動清單</Link></li>
+                    <li className="nav-item ps-3"><Link className="nav-link"  to='/activeInfo/0'>活動新增/管理</Link></li>
+                    <li className="nav-item ps-3"><Link className="nav-link"  to='/events'>活動清單</Link></li>
                     <li className="nav-item ps-3"><Link className="nav-link"  to=''>驗票</Link></li>
                     <li className="nav-item ps-3" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
                   </ul>
@@ -59,7 +59,7 @@ export default function Navbar() {
               }
 
               {/* 使用者 */}
-              {userRole === 'General Member' && 
+              {userRole === 'General' && 
                   <li className="nav-item dropdown customNavbar-dropdown">
                     <a className=" icon-link nav-link dropdown-toggle bg-login px-3 border border-2 border-black"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       
@@ -67,7 +67,7 @@ export default function Navbar() {
                       {userName}
                     </a>
                     <ul className="dropdown-menu dropdown-menu-end">
-                      <li className="nav-item ps-3"><Link className="nav-link"  to='/Personal'>會員資料</Link></li>
+                      <li className="nav-item ps-3"><Link className="nav-link"  to='/personal'>會員資料</Link></li>
                       <li className="nav-item ps-3"><Link className="nav-link"  to=''>票卷管理</Link></li>
                       <li className="nav-item ps-3" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
                     </ul>
@@ -77,7 +77,7 @@ export default function Navbar() {
               
               {userRole ? ("") : (
                 <li className="nav-item  bg-danger px-3">
-                  <Link className="nav-link text-white"  to='/Login'>登入</Link>
+                  <Link className="nav-link text-white"  to='/login'>登入</Link>
                 </li>
               )}
             </ul>

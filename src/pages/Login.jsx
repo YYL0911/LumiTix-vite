@@ -56,13 +56,13 @@ function Login() {
         setCheckOk(false)
       }
       else{
-        if(result.data.user.role == "General Member"){
-          login("General Member", result.data.user.name, result.data.token)
+        if(result.data.user.role == "General"){
+          login("General", result.data.user.name, result.data.token)
           navigate("/");
         } 
-        else if(result.data.user.role == "Customer"){
+        else if(result.data.user.role == "Organizer"){
           login("organizer", result.data.user.name, result.data.token)
-          navigate("/Events");
+          navigate("/events");
         } 
         else if(result.data.user.role == "Admin"){
           login("admin", result.data.user.name, result.data.token)
@@ -147,7 +147,7 @@ function Login() {
 
           <div className="d-flex align-items-center">
             <span className="me-2">還沒有帳號嗎？</span>
-            <Link to='/Register' className="my-auto text-black">立即註冊</Link>
+            <Link to='/register' className="my-auto text-black">立即註冊</Link>
           </div>
 
 

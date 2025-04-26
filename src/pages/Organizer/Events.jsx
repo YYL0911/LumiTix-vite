@@ -87,14 +87,14 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
               <button
                 type="button"
                 className="btn btn-dark mx-1 "
-                onClick={() => handleNavigate(`/ActiveInfo/${product.id}`)}
+                onClick={() => handleNavigate(`/activeInfo/${product.id}`)}
               >
                 編輯資訊
               </button>
               <button
                 type="button"
                 className="btn btn-outline-secondary mx-1"
-                onClick={() => handleNavigate(`/ActiveInfo/${product.id}`)}
+                onClick={() => handleNavigate(`/activeInfo/${product.id}`)}
               >
                 詳細內容
               </button>
@@ -109,7 +109,7 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
 
 const breadcrumb = [
   { name: '首頁', path: "/" },
-  { name: '活動訂單', path: "/Events" },
+  { name: '活動訂單', path: "/events" },
 ];
 
 function Events() {
