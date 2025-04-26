@@ -277,7 +277,7 @@ function Personal() {
 
       </form>
 
-      <ButtonTipModal ref={successModalRef} title="修改名稱標題" info={updateNameResult} />
+      <ButtonTipModal ref={successModalRef} title="修改名稱結果" info={updateNameResult} />
 
 
       <button

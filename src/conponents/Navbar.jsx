@@ -14,9 +14,10 @@ export default function Navbar() {
       <nav className="navbar  bg-white container d-flex align-items-center">
         <div className="container-fluid ">
           <Link className="navbar-brand" to='/'>
-            <img src={logo} alt="Logo" className="d-inline-block align-text-top"  />
+          
+            <img src={logo} alt="Logo" className="d-inline-block align-text-top logo-nav-cus"/>
           </Link>
-            <ul className="navbar-nav flex-row gap-4">
+            <ul className="navbar-nav flex-row gap-4 ms-auto">
 
               <li className="nav-item ">
                 <Link className="nav-link"  to='/allEvents'>所有活動</Link>
@@ -33,7 +34,7 @@ export default function Navbar() {
                   <ul className="dropdown-menu dropdown-menu-end">
                     <li className="nav-item ps-3"><Link className="nav-link"  to='/activeInfo/0'>活動新增/管理</Link></li>
                     <li className="nav-item ps-3"><Link className="nav-link"  to='/events'>活動清單</Link></li>
-                    <li className="nav-item ps-3"><Link className="nav-link"  to=''>驗票</Link></li>
+                    <li className="nav-item ps-3"><Link className="nav-link"  to='/ticketScaner'>驗票</Link></li>
                     <li className="nav-item ps-3" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
                   </ul>
                 </li>

@@ -61,11 +61,12 @@ function Login() {
           navigate("/");
         } 
         else if(result.data.user.role == "Organizer"){
-          login("organizer", result.data.user.name, result.data.token)
+          login("Organizer", result.data.user.name, result.data.token)
           navigate("/events");
+          
         } 
         else if(result.data.user.role == "Admin"){
-          login("admin", result.data.user.name, result.data.token)
+          login("Admin", result.data.user.name, result.data.token)
           navigate("/");
         } 
       }

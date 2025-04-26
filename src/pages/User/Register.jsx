@@ -120,19 +120,12 @@ function Register() {
 
   //表單變更
   useEffect(() => {
-    console.log(Object.keys(errors).length )
-    console.log(errors )
-    console.log(showErrorInfo )
-    console.log("******************************")
     //有錯誤
     if(Object.keys(errors).length > 0) setCheckOk(false)
     else if(showErrorInfo) setCheckOk(true)
   }, [watchForm, errors]); // 將新變數傳入
   // 即時更新錯誤狀態
   useEffect(() => {
-    console.log(Object.keys(errors).length )
-    console.log(errors )
-    console.log("------------------------------")
 
     if(Object.keys(errors).length > 0 || getValues("password") !== getValues("confirmPassword")) setCheckOk(false)
     else setCheckOk(true)

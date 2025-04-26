@@ -16,6 +16,8 @@ import Register from './pages/User/Register';
 import Personal from './pages/User/Personal';
 import Events from './pages/Organizer/Events';
 import ActiveInfo from './pages/Organizer/ActiveInfo';
+import TicketScaner from './pages/Organizer/TicketScaner';
+import TicketScanerResult from './pages/Organizer/TicketScanerResult';
 
 const NotFound = () => <h1>404 - 頁面不存在</h1>;
 
@@ -33,16 +35,15 @@ function App() {
           <Route path='/allEvents' element = {<AllEvents></AllEvents>}></Route>
 
           <Route path='/personal' element = {
-              <PrivateRoute roles={['General']}>
-                <Personal />
-              </PrivateRoute>}>
+              <PrivateRoute roles={['General']}><Personal /></PrivateRoute>}>
           </Route>
 
           <Route path='/events' element = {
-              <PrivateRoute roles={['Organizer']}>
-                <Events />
-              </PrivateRoute>}>
+              <PrivateRoute roles={['Organizer']}><Events /></PrivateRoute>}>
           </Route>
+
+          <Route path='/ticketScaner' element = {<TicketScaner></TicketScaner>}></Route>
+          <Route path='/ticketScanerResult' element = {<TicketScanerResult></TicketScanerResult>}></Route>
 
           <Route path="/activeInfo/:id" element={<ActiveInfo />} />
           <Route path="/evevtInfo/:id" element={<EventInfo />} />
