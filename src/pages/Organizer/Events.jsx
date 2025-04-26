@@ -62,10 +62,10 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
     <div className="table-responsive">
     <table className="table table-striped text-center align-middle">
       <colgroup>
-        <col style={{ width: '30%' }} />
-        <col style={{ width: '20%' }} />
-        <col style={{ width: '20%' }} />
-        <col style={{ width: '30%' }} />
+        <col style={{ minWidth: '150px'}} />
+        <col style={{ minWidth: '120px'}} />
+        <col style={{ minWidth: '120px'}} />
+        <col style={{ minWidth: '220px'}} />
       </colgroup>
       <thead>
         <tr>
@@ -144,17 +144,17 @@ function Events() {
         <input type="radio" className="btn-check" name="activeState" id="option1" 
         autoComplete="off" defaultChecked = {'checked'} 
         onClick={() => setActiveState("Ing")} />
-        <label className="btn btn-light mx-3" htmlFor="option1">正在舉辦</label>
+        <label className="btn btn-light mx-lg-3 mx-2" htmlFor="option1">正在舉辦</label>
 
         <input type="radio" className="btn-check" name="activeState" id="option2"
          autoComplete="off" 
          onClick={() => setActiveState("Finish")} />
-        <label className="btn btn-light mx-3" htmlFor="option2">已經結束</label>
+        <label className="btn btn-light mx-lg-3 mx-2" htmlFor="option2">已經結束</label>
 
         <input type="radio" className="btn-check" name="activeState" id="option3" 
         autoComplete="off" 
         onClick={() => setActiveState("Check")} />
-        <label className="btn btn-light mx-3" htmlFor="option3">正在審核</label>
+        <label className="btn btn-light mx-lg-3 mx-2" htmlFor="option3">正在審核</label>
       </div>
       
 

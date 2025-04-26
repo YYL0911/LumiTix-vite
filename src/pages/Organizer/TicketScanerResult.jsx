@@ -6,7 +6,7 @@ function TicketScanerResult() {
 
   return (
     <div>
-      {result.toString()}
+      驗票結果：{result.toString()}
     </div>
   );
 }

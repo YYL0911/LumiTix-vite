@@ -29,7 +29,7 @@ export default function Navbar() {
                   <a className=" icon-link nav-link dropdown-toggle bg-login px-3 border border-2 border-black"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     
                     <img src={organizerIcon} alt="icon" />
-                    活動方
+                    {userName}
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end">
                     <li className="nav-item ps-3"><Link className="nav-link"  to='/activeInfo/0'>活動新增/管理</Link></li>
@@ -46,14 +46,11 @@ export default function Navbar() {
                   <a className=" icon-link nav-link dropdown-toggle bg-login px-3 border border-2 border-black"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     
                     <img src={adminIcon} alt="icon" />
-                    平台方
+                    {userName}
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end">
                     <li className="nav-item ps-3"><Link className="nav-link"  to=''>一般會員管理</Link></li>
-                    <li className="nav-item ps-3"><Link className="nav-link"  to=''>舉辦方管理</Link></li>
                     <li className="nav-item ps-3"><Link className="nav-link"  to=''>活動管理</Link></li>
-                    <li className="nav-item ps-3"><Link className="nav-link"  to=''>活動提案</Link></li>
-                    <li className="nav-item ps-3"><Link className="nav-link"  to=''>營收狀況</Link></li>
                     <li className="nav-item ps-3" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
                   </ul>
                 </li>
