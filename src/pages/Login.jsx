@@ -1,13 +1,17 @@
-import '../assets/all.scss'
-import { useAuth } from '../contexts/AuthContext';
-
-import Input from '../conponents/Input';
-import Breadcrumb from '../conponents/Breadcrumb';
-
+import '../assets/all.scss';
 import { useForm, useWatch } from "react-hook-form";
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from "react-router-dom";
 
+// Context
+import { useAuth } from '../contexts/AuthContext';
+
+// 元件
+import Input from '../conponents/Input';
+import Breadcrumb from '../conponents/Breadcrumb';
+import Loading from '../conponents/Loading';
+
+//麵包屑
 const breadcrumb = [
   { name: '首頁', path: "/" },
   { name: '登入', path: "/Login" },
@@ -15,13 +19,11 @@ const breadcrumb = [
 
 function Login() {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [loading, setloading] = useState(false);
   const [checkOk, setCheckOk] = useState(true);
-
   const [showErrorInfo, setShowErrorInfo] = useState(false);
   const [errMessage, setErrMessage] = useState(null);
-
-  const navigate = useNavigate();
 
   const {
     register : formRegister,
@@ -96,6 +98,7 @@ function Login() {
     else setCheckOk(true)
   }, [isValid]); 
 
+
   return (
     <div>
         <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
@@ -139,29 +142,19 @@ function Login() {
             ></Input>
           </div>
 
+          {/* 錯誤訊息 */}
           {showErrorInfo && <div className='mt-4 text-danger'>{errMessage}</div>}
-          
-
           
           <button type="submit" className={`btn btn-dark me-2 px-3 my-3 ${checkOk ? "" : "disabled"}`} >登入</button>
           
-
+          {/* 註冊文字 */}
           <div className="d-flex align-items-center">
             <span className="me-2">還沒有帳號嗎？</span>
             <Link to='/register' className="my-auto text-black">立即註冊</Link>
           </div>
-
-
         </form>
 
-        {loading && (
-          <div className="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1050 }}>
-            <div className="spinner-border text-light" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
-          </div>
-        )}
-        
+        {loading && (<Loading></Loading>)}
     </div>
   );
 }

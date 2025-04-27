@@ -1,38 +1,33 @@
 import '../../assets/all.scss';
 import { Modal } from "bootstrap";
-import { useAuth } from '../../contexts/AuthContext';
-
-import Input from '../../conponents/Input';
-import ButtonTipModal from "../../conponents/TipModal";
-import Breadcrumb from '../../conponents/Breadcrumb';
-
 import { useForm, useWatch } from "react-hook-form";
 import { useState, useEffect, useRef  } from 'react';
 import { useNavigate } from "react-router-dom";
 
+// Context
+import { useAuth } from '../../contexts/AuthContext';
 
+// 元件
+import Input from '../../conponents/Input';
+import ButtonTipModal from "../../conponents/TipModal";
+import Breadcrumb from '../../conponents/Breadcrumb';
+
+
+// 麵包屑
 const breadcrumb = [
   { name: '首頁', path: "/" },
   { name: '會員資訊', path: "/personal" },
 ];
 
 function Personal() {
-  const { setUserName, userToken } = useAuth();
-  const navigate = useNavigate();
-  const successModalRef = useRef();
-  const passwordModalRef = useRef();
-  const passwordModal = useRef();
+  const { setUserName, userToken } = useAuth(); // [變更使用者名稱, token]
+  const navigate = useNavigate(); // 跳轉頁面
 
-
-  const [updateNameResult, setUpdateNameResult] = useState("");
-
-  const [data, setData] = useState(null);
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
   //取得使用者資料
   useEffect(() => {
     if (isFirstRender.current) {
       
-
       isFirstRender.current = false; // 更新為 false，代表已執行過
       // console.log("✅ useEffect 只執行一次");
       fetch("https://n7-backend.onrender.com/api/v1/users/profile",{
@@ -47,7 +42,6 @@ function Personal() {
             if(result.message == "尚未登入") navigate("/login");
           }
           else{
-            setData(result);    // 資料設進 state
             // ✅ 用 reset 動態設定預設值
             mainReset({
               userID: result.data.serialNo,
@@ -65,7 +59,11 @@ function Personal() {
   }, []);
 
 
-  // 主表單
+  const successModalRef = useRef(); // 修改名稱成功後彈窗
+  const [updateNameResult, setUpdateNameResult] = useState(""); // 修改名稱api回傳訊息
+  
+
+  // 修改名稱-表單
   const {
     register: mainRegister,
     handleSubmit: mainHandleSubmit,
@@ -91,27 +89,25 @@ function Personal() {
     }) 
     .then(res => res.json())
     .then(result => {
-      setUpdateNameResult(result.message)
       if(result.status){
-        setUserName(data.name)
-        setUpdateNameResult(`成功修改名稱為${data.name}`)
+        setUserName(data.name);
+        setUpdateNameResult(`成功修改名稱為${data.name}`);
         localStorage.setItem("name", data.name);
       }
+      else setUpdateNameResult(result.message)
       successModalRef.current.open();
-      
     })
     .catch(err => {
       console.log(err);
     });
   };
 
-  // 監看表單狀態
-  const watchMain = useWatch({ control: mainControl });
-  const [checkNameOk, setCheckNameOk] = useState(true);
+  const watchMain = useWatch({ control: mainControl }); // 監看表單狀態
+  const [checkNameOk, setCheckNameOk] = useState(true); // 是否可以發送修改名稱api
   //表單變更
   useEffect(() => {
     if(Object.keys(mainErrors).length > 0) setCheckNameOk(false)
-  }, [watchMain, mainErrors]); // 將新變數傳入
+  }, [watchMain, mainErrors]);
   // 即時更新錯誤狀態
   useEffect(() => {
     if(Object.keys(mainErrors).length > 0 || mainGetValues("name").length < 2 || mainGetValues("name").length > 10) setCheckNameOk(false)
@@ -119,6 +115,13 @@ function Personal() {
   }, [mainValid]);
 
 
+
+  const passwordModalRef = useRef(); // 修改密碼彈窗
+  const passwordModal = useRef(); // 修改密碼彈窗操作(關閉/顯示)
+  const [showErrorInfo, setShowErrorInfo] = useState(false); // 修改密碼api事後有誤
+  const [errMessage, setErrMessage] = useState(null); // 修改密碼api錯誤訊息
+  const [isPasswordTouched, setIsPasswordTouched] = useState(false); // 是否有輸入過密碼欄
+  const [isConfirmTouched, setIsConfirmTouched] = useState(false); // 是否有輸入過確認密碼欄
 
   // 密碼表單
   const {
@@ -132,24 +135,19 @@ function Personal() {
     formState: { errors: passwordErrors, isValid: passwordValid, },
   } = useForm({ mode: 'onTouched' });
 
-
-  const [showErrorInfo, setShowErrorInfo] = useState(false);
-  const [errMessage, setErrMessage] = useState(null);
-  const [isPasswordTouched, setIsPasswordTouched] = useState(false);
-  const [isConfirmTouched, setIsConfirmTouched] = useState(false);
   const passwordValue = passwordWatch("password"); // 監看 password
   useEffect(() => {
     if (isPasswordTouched && isConfirmTouched){
-      // 當 password 改變時，重新驗證
-      passwordTrigger("reassword");
+      passwordTrigger("confirmPassword"); // 當 password 改變時，重新驗證
     }
   }, [passwordValue, passwordTrigger]);
 
+  // 修改密碼api
   const onPasswordSubmit = (data) => {
     // console.log("密碼表單資料", data);
     
     fetch("https://n7-backend.onrender.com/api/v1/users/password",{
-      method: "PATCH",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${userToken}`, // token 放這
@@ -164,6 +162,8 @@ function Personal() {
     .then(result => {
       if(result.status){
         passwordModal.current.hide(); // 提交成功關閉 Modal
+        passwordReset();
+        setShowErrorInfo(false)
       }
       else{
         if(result.message == "尚未登入"){
@@ -178,10 +178,9 @@ function Personal() {
     })
     .catch(err => {
       setErrMessage("伺服器錯誤")
-        setShowErrorInfo(true)
+      setShowErrorInfo(true)
       console.log(err);
     });
-
   };
 
   // 監看表單狀態
@@ -207,6 +206,7 @@ function Personal() {
 
   return (
     <div>
+      {/* 麵包屑 */}
       <Breadcrumb breadcrumbs={breadcrumb} />
       <form onSubmit={mainHandleSubmit(onMainSubmit)}>
         <div className="mb-3 w-100" style={{ maxWidth: "600px" }}>
@@ -220,7 +220,6 @@ function Personal() {
             disabled={true}
           />
         </div>
-
         <div className="mb-3 w-100" style={{ maxWidth: "600px" }}>
           <Input
             id="email"
@@ -231,7 +230,6 @@ function Personal() {
             disabled={true}
           />
         </div>
-
         <div className="mb-3 w-100" style={{ maxWidth: "600px" }}>
           <Input
             id="name"
@@ -284,7 +282,7 @@ function Personal() {
         type="button"
         className="btn btn-danger mt-3 w-100"
         style={{ maxWidth: "600px" }}
-        onClick={() => passwordModal.current.show()} // 提交成功關閉 Modal}
+        onClick={() => passwordModal.current.show()} 
       >
         修改密碼
       </button>
@@ -359,6 +357,7 @@ function Personal() {
                   className="btn btn-outline-dark"
                   onClick={() => {
                     passwordReset()
+                    setShowErrorInfo(false)
                     passwordModal.current.hide()
                   }}
                 >

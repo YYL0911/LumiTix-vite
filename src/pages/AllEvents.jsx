@@ -1,7 +1,19 @@
 
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo, memo } from 'react';
+
+// 元件
 import Breadcrumb from "../conponents/Breadcrumb";
+import Loading from "../conponents/Loading";
+import PaginationComponent from "../conponents/Pagination";
+
+
+//麵包屑
+const breadcrumb = [
+  { name: '首頁', path: "/" },
+  { name: '活動列表', path: "/allEvents" },
+];
+
 
 // 假資料
 const sampleData = [
@@ -80,7 +92,7 @@ const sampleData = [
   
 ];
 
-
+// 列表元件
 const CardItem = ({ id, imgSrc, title, showTime, location, handleNavigate }) => (
   <a className="card mb-3" style={{ maxWidth: '540px' }} href="#" onClick={(e) => {
     e.preventDefault();
@@ -103,7 +115,7 @@ const CardItem = ({ id, imgSrc, title, showTime, location, handleNavigate }) => 
   </a>
 );
 
-// 製造表格
+// 製造表演列表
 const DataTable = memo(({handleNavigate}) => {
   return (
     <>
@@ -122,28 +134,44 @@ const DataTable = memo(({handleNavigate}) => {
 )
 })
 
-const breadcrumb = [
-  { name: '首頁', path: "/" },
-  { name: '活動列表', path: "/allEvents" },
-];
-
-
 
 function AllEvents() {
   const navigate = useNavigate();
-
+  //跳轉頁面
   const handleNavigate = ((path) => {
     navigate(path)
   }); 
+
+  const [loading, setloading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  
   
   return (
     <>
+      {/* 麵包屑 */}
       <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
       {/* 產生活動列表 */}
       <DataTable handleNavigate={handleNavigate}></DataTable>
 
-      
+      <PaginationComponent
+        totalPages={10}
+        currentPage={currentPage}
+        onPageChange={(page) =>{
+          setCurrentPage(page)
+          window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+              });
+          } 
+        }
+      />
+
+
+
+
+      {loading && (<Loading></Loading>)}  
     </>
     
   );

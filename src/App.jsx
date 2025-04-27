@@ -33,20 +33,22 @@ function App() {
           <Route path='/login' element = {<Login></Login>}></Route>
           <Route path='/register' element = {<Register></Register>}></Route>
           <Route path='/allEvents' element = {<AllEvents></AllEvents>}></Route>
-
-          <Route path='/personal' element = {
-              <PrivateRoute roles={['General']}><Personal /></PrivateRoute>}>
-          </Route>
-
-          <Route path='/events' element = {
-              <PrivateRoute roles={['Organizer']}><Events /></PrivateRoute>}>
-          </Route>
-
-          <Route path='/ticketScaner' element = {<TicketScaner></TicketScaner>}></Route>
-          <Route path='/ticketScanerResult' element = {<TicketScanerResult></TicketScanerResult>}></Route>
-
-          <Route path="/activeInfo/:id" element={<ActiveInfo />} />
           <Route path="/evevtInfo/:id" element={<EventInfo />} />
+        
+          {/* 只有使用者可以看的頁面 */}
+          <Route element={<PrivateRoute roles={['General']} />}>
+            <Route path='/personal' element = {<Personal />}></Route>
+          </Route>
+
+          {/* 只有活動方可以看的頁面 */}
+          <Route element={<PrivateRoute roles={['Organizer']} />}>
+            <Route path='/events' element = {<Events />}></Route>
+            <Route path='/ticketScaner' element = {<TicketScaner />}></Route>
+            <Route path='/ticketScanerResult' element = {<TicketScanerResult />}></Route>
+            <Route path="/activeInfo/:id" element={<ActiveInfo />} />
+          </Route>
+
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

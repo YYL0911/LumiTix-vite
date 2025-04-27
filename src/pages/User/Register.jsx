@@ -1,27 +1,33 @@
-import '../../assets/all.scss'
-import { useAuth } from '../../contexts/AuthContext';
-
-import Input from '../../conponents/Input';
-import ButtonTipModal from "../../conponents/TipModal";
-import Breadcrumb from '../../conponents/Breadcrumb';
-
-// import React from 'react';
+import '../../assets/all.scss';
 import { useForm, useWatch } from "react-hook-form";
 import { useState, useEffect, useRef } from 'react';
 
+// Context
+import { useAuth } from '../../contexts/AuthContext';
+
+// 使用元件
+import Input from '../../conponents/Input';
+import ButtonTipModal from "../../conponents/TipModal";
+import Breadcrumb from '../../conponents/Breadcrumb';
+import Loading from '../../conponents/Loading';
+
+
+
+// 麵包屑資訊
 const breadcrumb = [
   { name: '首頁', path: "/" },
   { name: '註冊', path: "/register" },
 ];
 
 function Register() {
-  const { login } = useAuth();
-  const [showErrorInfo, setShowErrorInfo] = useState(false);
-  const [loading, setloading] = useState(false);
-  const [errMessage, setErrMessage] = useState(null);
-  const [checkOk, setCheckOk] = useState(true);
+  const { login } = useAuth(); // 註冊成功後直接登入
+  const [loading, setloading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
+  const [checkOk, setCheckOk] = useState(true); // 傳送按鈕是否開啟 => 前端鑑驗輸入是否都符合規則
+  const [showErrorInfo, setShowErrorInfo] = useState(false); // API 回傳是否有錯誤
+  const [errMessage, setErrMessage] = useState(null); // API 回傳的錯誤訊息
+  const modalRef = useRef(); // 彈窗ref
 
-  const modalRef = useRef();
+  // 註冊表單
   const {
     register : formRegister,
     handleSubmit,
@@ -29,30 +35,28 @@ function Register() {
     getValues,
     watch,
     trigger,
-    formState: { errors, isValid }, //
+    formState: { errors, isValid },
   } = useForm({
     mode: 'onTouched',
   });
 
-  const password = watch("password");
-  const confirmPassword = watch("confirmPassword");
 
-  const [isPasswordTouched, setIsPasswordTouched] = useState(false);
-  const [isConfirmTouched, setIsConfirmTouched] = useState(false);
+  // 要連動密碼與確認密碼
+  const [isPasswordTouched, setIsPasswordTouched] = useState(false); // 是否有輸入過密碼欄
+  const [isConfirmTouched, setIsConfirmTouched] = useState(false); // 是否有輸入過確認密碼欄
+  const passwordValue = watch("password"); // 監看 password 
 
-
-  const passwordValue = watch("password"); // 監看 password
   useEffect(() => {
+    // 在密碼與確認密碼都有輸入過的情況下，若有更動其中一項，確認密碼必須重新檢驗
     if (isPasswordTouched && isConfirmTouched){
-      // 當 password 改變時，重新驗證 confirmPassword
-      trigger("confirmPassword");
+      trigger("confirmPassword"); // 當 password 改變時，重新驗證 confirmPassword
     }
   }, [passwordValue, trigger]);
 
   const onSubmit = (data) => {
     // console.log(errors);
     // console.log(data);
-    setloading(true)
+    setloading(true); // 開啟loading開啟loading
     // 註冊api
     fetch("https://n7-backend.onrender.com/api/v1/users/signup",{
       method: "POST",
@@ -68,14 +72,17 @@ function Register() {
     }) 
     .then(res => res.json())
     .then(result => {
+      // 註冊失敗
       if(!result.status){
-        setloading(false)
-        setErrMessage(result.message) 
-        setShowErrorInfo(true)
-        setCheckOk(false)
+        setloading(false); // 關閉loading
+        // 顯示錯誤資訊
+        setErrMessage(result.message);
+        setShowErrorInfo(true);
+        setCheckOk(false); // 禁止再次發送 => 需有變過表單內任一資訊
       }
       else{
-        callLoginApi(data)
+        // 註冊成功 => 直接呼叫登入
+        callLoginApi(data);
       }
     })
     .catch(err => {
@@ -84,6 +91,7 @@ function Register() {
 
   };
 
+  // 呼叫登入
   const callLoginApi = (data) => {
     // 登入api
     fetch("https://n7-backend.onrender.com/api/v1/users/signin",{
@@ -98,10 +106,10 @@ function Register() {
     }) 
     .then(res => res.json())
     .then(result => {
-      setloading(false)
+      setloading(false);
       if(!result.status){
-        setErrMessage(result.message) 
-        setShowErrorInfo(true)
+        setErrMessage(result.message) ;
+        setShowErrorInfo(true);
       }
       else{
         login("General", result.data.user.name, result.data.token)
@@ -126,7 +134,6 @@ function Register() {
   }, [watchForm, errors]); // 將新變數傳入
   // 即時更新錯誤狀態
   useEffect(() => {
-
     if(Object.keys(errors).length > 0 || getValues("password") !== getValues("confirmPassword")) setCheckOk(false)
     else setCheckOk(true)
   }, [isValid]);
@@ -134,7 +141,14 @@ function Register() {
 
   return (
     <div>
+        {/* 麵包屑 */}
         <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
+
+        {/* 註冊表單
+        - 使用者名稱
+        - 信箱
+        - 密碼
+        - 確認密碼 */}
         <form action='' onSubmit={handleSubmit(onSubmit)}>
           <div className='mb-3 w-100' style={{maxWidth: 600+"px"}}>
             <Input
@@ -216,29 +230,23 @@ function Register() {
             ></Input>
           </div>
           
+          {/* 錯誤訊息 */}
           {showErrorInfo && <div className='mt-4 text-danger'>{errMessage}</div>}
 
-          
           <button type='submit' className={`btn btn-dark mt-3 ${checkOk ? "" : "disabled"}`} >
             註冊
           </button>
 
+          {/* 彈窗 */}
           <ButtonTipModal  ref={modalRef}
-            title = "提示標題" 
+            title = "註冊結果" 
             info = "註冊成功，即將跳轉到首頁" 
             navigatePath = "/" 
             changePage = {true}>
           </ButtonTipModal>
-          
         </form>
 
-        {loading && (
-          <div className="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1050 }}>
-            <div className="spinner-border text-light" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
-          </div>
-        )}
+        {loading && (<Loading></Loading>)}
     </div>
   );
 }

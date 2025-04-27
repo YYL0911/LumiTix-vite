@@ -1,7 +1,16 @@
 
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo, memo } from 'react';
+
+// 元件
 import Breadcrumb from "../../conponents/Breadcrumb";
+
+//麵包屑
+const breadcrumb = [
+  { name: '首頁', path: "/" },
+  { name: '活動訂單', path: "/events" },
+];
+
 
 // 假資料
 const sampleData = [
@@ -107,15 +116,7 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
 )
 })
 
-const breadcrumb = [
-  { name: '首頁', path: "/" },
-  { name: '活動訂單', path: "/events" },
-];
-
 function Events() {
-
-  
-
   const navigate = useNavigate();
   const [activeState, setActiveState] = useState("Ing"); //Ing Finish Check
 
@@ -126,12 +127,11 @@ function Events() {
       });
   }, [activeState]);
 
-  const handleNavigate = ((path) => {
-    navigate(path)
-  }); 
+  const handleNavigate = (path => navigate(path) ); 
 
   return (
     <>
+      {/* 麵包屑 */}
       <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
       {/* 新增活動 */}
@@ -159,7 +159,10 @@ function Events() {
       
 
       {/* 根據狀態產生活動列表 */}
-      <DataTable filterProducts={filterProducts} handleNavigate={handleNavigate}></DataTable>
+      <DataTable 
+        filterProducts={filterProducts} 
+        handleNavigate={handleNavigate}>
+      </DataTable>
     </>
     
   );
