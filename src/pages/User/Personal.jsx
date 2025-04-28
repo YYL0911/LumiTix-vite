@@ -11,6 +11,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import Input from '../../conponents/Input';
 import ButtonTipModal from "../../conponents/TipModal";
 import Breadcrumb from '../../conponents/Breadcrumb';
+import Loading from '../../conponents/Loading';
 
 
 // 麵包屑
@@ -20,8 +21,10 @@ const breadcrumb = [
 ];
 
 function Personal() {
-  const { setUserName, userToken } = useAuth(); // [變更使用者名稱, token]
+  const { setUserName, userToken, loading  } = useAuth(); // [變更使用者名稱, token]
   const navigate = useNavigate(); // 跳轉頁面
+
+  const [apiLoading, setApiLoading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
 
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
   //取得使用者資料
@@ -30,6 +33,7 @@ function Personal() {
       
       isFirstRender.current = false; // 更新為 false，代表已執行過
       // console.log("✅ useEffect 只執行一次");
+      setApiLoading(true)
       fetch("https://n7-backend.onrender.com/api/v1/users/profile",{
         method: "GET",
         headers: {
@@ -38,6 +42,7 @@ function Personal() {
         }}) 
         .then(res => res.json())
         .then(result => {
+          setApiLoading(false)
           if(!result.status){
             if(result.message == "尚未登入") navigate("/login");
           }
@@ -76,7 +81,7 @@ function Personal() {
 
   const onMainSubmit = (data) => {
     // console.log("主表單資料", data);
-
+    setApiLoading(true)
     fetch("https://n7-backend.onrender.com/api/v1/users/profile",{
       method: "PUT",
       headers: {
@@ -89,6 +94,7 @@ function Personal() {
     }) 
     .then(res => res.json())
     .then(result => {
+      setApiLoading(false)
       if(result.status){
         setUserName(data.name);
         setUpdateNameResult(`成功修改名稱為${data.name}`);
@@ -103,7 +109,8 @@ function Personal() {
   };
 
   const watchMain = useWatch({ control: mainControl }); // 監看表單狀態
-  const [checkNameOk, setCheckNameOk] = useState(true); // 是否可以發送修改名稱api
+  const [checkNameOk, setCheckNameOk] = useState(false); // 是否可以發送修改名稱api
+  const [isNameTouched, setIsNameTouched] = useState(false); // 是否有輸入過密碼欄
   //表單變更
   useEffect(() => {
     if(Object.keys(mainErrors).length > 0) setCheckNameOk(false)
@@ -112,6 +119,7 @@ function Personal() {
   useEffect(() => {
     if(Object.keys(mainErrors).length > 0 || mainGetValues("name").length < 2 || mainGetValues("name").length > 10) setCheckNameOk(false)
     else setCheckNameOk(true)
+  
   }, [mainValid]);
 
 
@@ -122,6 +130,7 @@ function Personal() {
   const [errMessage, setErrMessage] = useState(null); // 修改密碼api錯誤訊息
   const [isPasswordTouched, setIsPasswordTouched] = useState(false); // 是否有輸入過密碼欄
   const [isConfirmTouched, setIsConfirmTouched] = useState(false); // 是否有輸入過確認密碼欄
+  const [apiPasLoading, setApiPasLoading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
 
   // 密碼表單
   const {
@@ -145,7 +154,7 @@ function Personal() {
   // 修改密碼api
   const onPasswordSubmit = (data) => {
     // console.log("密碼表單資料", data);
-    
+    setApiPasLoading(true)
     fetch("https://n7-backend.onrender.com/api/v1/users/password",{
       method: "PUT",
       headers: {
@@ -160,10 +169,12 @@ function Personal() {
     }) 
     .then(res => res.json())
     .then(result => {
+      setApiPasLoading(false)
       if(result.status){
         passwordModal.current.hide(); // 提交成功關閉 Modal
         passwordReset();
         setShowErrorInfo(false)
+        setIsConfirmTouched(false)
       }
       else{
         if(result.message == "尚未登入"){
@@ -240,38 +251,34 @@ function Personal() {
               rules={{
                 //必填
                 required: '使用者名稱為必填', 
-                minLength: {
-                  value: 2,
-                  message: '使用者名稱不少於 2'
-                },
-                maxLength: {
-                  value: 10,
-                  message: '使用者名稱長度不超過 10',
-                },
+                minLength: {value: 2, message: '使用者名稱不少於 2'},
+                maxLength: {value: 10,message: '使用者名稱長度不超過 10',},
+                onChange: () => setIsNameTouched(true)
               }}
           />
         </div>
 
-        <div className="row g-3" style={{ maxWidth: "600px"}}>
-            {/* 第一列，四個欄位 */}
-            <div className="col-6 me-auto">
+        <div className="d-flex justify-content-between" style={{ maxWidth: "600px"}}>
+          <div className="col-6 pe-2">
+            <button
+              type="button"
+              className="btn btn-outline-dark w-100"
+              onClick={() => navigate("/")}
+            >
+              取消
+            </button>
+          </div>
+          <div className="col-6 ps-2">
               <button
-                type="button"
-                className="btn btn-outline-dark w-100"
-                onClick={() => navigate("/")}
+                type="submit"
+                className={`btn btn-dark w-100 ${(checkNameOk&&isNameTouched) ? "" : "disabled"}`}
               >
-                取消
+                修改完成
               </button>
-            </div>
-            <div className="col-6 ">
-                <button
-                  type="submit"
-                  className={`btn btn-dark w-100 ${checkNameOk ? "" : "disabled"}`}
-                >
-                  修改完成
-                </button>
-            </div>
+          </div>
         </div>
+
+        
 
       </form>
 
@@ -346,9 +353,10 @@ function Personal() {
                     placeholderTet="再次輸入密碼"
                   />
                 </div>
+                {showErrorInfo && <div className='my-2 text-danger' style={{maxWidth: 600+"px"}}>{errMessage}</div>}
+
               </div>
 
-              {showErrorInfo && <div className='ms-3 mb-3 text-danger'>{errMessage}</div>}
 
 
               <div className="modal-footer">
@@ -368,9 +376,12 @@ function Personal() {
                 </button>
               </div>
             </form>
+            {(apiPasLoading) && (<Loading></Loading>)}
           </div>
         </div>
       </div>
+
+      {(!loading && apiLoading && !apiPasLoading) && (<Loading></Loading>)}
     </div>
   );
 }
