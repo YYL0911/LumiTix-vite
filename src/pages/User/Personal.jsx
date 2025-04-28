@@ -366,6 +366,7 @@ function Personal() {
                   onClick={() => {
                     passwordReset()
                     setShowErrorInfo(false)
+                    setIsConfirmTouched(false)
                     passwordModal.current.hide()
                   }}
                 >
