@@ -5,7 +5,7 @@ function TicketScanerResult() {
   const { result } = location.state || {};  // 要加 || {} 防止錯誤
 
   return (
-    <div>
+    <div className='container'>
       驗票結果：{result.toString()}
     </div>
   );

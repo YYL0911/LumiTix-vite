@@ -26,7 +26,8 @@ function App() {
   return (
     <div className="page">
       <Navbar />
-      <div className='container my-3 page-main'>
+      {/* container */}
+      <div className='my-3 page-main'>
       {/* <Router > */}
         <Routes>
           <Route path='/' element = {<Test></Test>}></Route>

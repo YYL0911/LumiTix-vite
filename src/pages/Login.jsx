@@ -100,7 +100,7 @@ function Login() {
 
 
   return (
-    <div>
+    <div className='container'>
         <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
         <form action='' onSubmit={handleSubmit(onSubmit)}>
           <div className='mb-3 w-100' style={{maxWidth: 600+"px"}}>

@@ -216,7 +216,7 @@ function Personal() {
   }, []);
 
   return (
-    <div>
+    <div className='container'>
       {/* 麵包屑 */}
       <Breadcrumb breadcrumbs={breadcrumb} />
       <form onSubmit={mainHandleSubmit(onMainSubmit)}>

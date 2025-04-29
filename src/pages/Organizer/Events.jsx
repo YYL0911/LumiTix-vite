@@ -130,7 +130,7 @@ function Events() {
   const handleNavigate = (path => navigate(path) ); 
 
   return (
-    <>
+    <div  className='container'>
       {/* 麵包屑 */}
       <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
@@ -163,7 +163,7 @@ function Events() {
         filterProducts={filterProducts} 
         handleNavigate={handleNavigate}>
       </DataTable>
-    </>
+    </div>
     
   );
 }

@@ -68,7 +68,7 @@ function TicketScaner() {
   
 
   return (
-    <div>
+    <div className='container'>
       <h2>掃描 QR Code</h2>
       <div id = "reader"></div>
 
