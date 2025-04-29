@@ -2,260 +2,115 @@
 
 function Test() {
   return (
-    <div>
+    <div className='container'>
         暫時首頁
-        <div>
+        <br></br>
         暫時首頁
-    </div>
-    <div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>暫時首頁
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
+        <br></br>
         暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div><div>
-        暫時首頁
-    </div>
+        <br></br>
+
     </div>
     
   );

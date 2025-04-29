@@ -5,6 +5,7 @@
 @import "../node_modules/bootstrap/scss/mixins"; // 必要的方法
 @import "../node_modules/bootstrap/scss/bootstrap"; // 必要的方法Bootstrap 完整原始碼
 
+
  // 資訊要撐到完整頁面
  .page {
   display: flex;
@@ -22,8 +23,19 @@
 // 麵包屑文字顏色
 .breadcrumb a {
     text-decoration: none;
-    color: #000000; 
+    // color: #000000; 
 }
+// .breadcrumb-item + .breadcrumb-item::before{
+//   content: '';
+//   display: inline-block;
+//   background-image: url("https://fakeimg.pl/20x20/?text=PICTURE");
+//   background-size: contain;
+//   background-repeat: no-repeat;
+//   width: 20px;
+//   height: 20px;
+//   margin: 0 10px;
+// }
+
 
 // 標頭下拉選單位置
 .navbar-nav .dropdown-menu{

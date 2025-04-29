@@ -140,7 +140,7 @@ function Register() {
 
 
   return (
-    <div>
+    <div className='container'>
         {/* 麵包屑 */}
         <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
