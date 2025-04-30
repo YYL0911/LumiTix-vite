@@ -2,6 +2,8 @@
 import { createContext, useEffect, useContext, useState, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 
+import Loading from '../conponents/Loading';
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -37,7 +39,7 @@ export const AuthProvider = ({ children }) => {
       isFirstRender.current = false; // 更新為 false，代表已執行過
       // console.log("✅ useEffect 只執行一次");
       fetch("https://n7-backend.onrender.com/api/v1/users/auth",{
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`, // token 放這
@@ -72,6 +74,9 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{ userRole, login, logout, userName, userToken, setUserName, loading }}>
       {children}
+
+
+      {loading && (<Loading></Loading>)}
       
     </AuthContext.Provider>
   );

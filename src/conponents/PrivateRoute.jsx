@@ -6,7 +6,8 @@ import Loading from './Loading';
 const PrivateRoute = ({ roles }) => {
   const { userRole, loading} = useAuth();
 
-  if (loading) return (<Loading></Loading>);
+  // if (loading) return (<Loading></Loading>);
+  if (loading) return (<></>);
 
   // 沒有對應權限
   if (roles && !roles.includes(userRole)) {

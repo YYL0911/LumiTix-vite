@@ -21,7 +21,7 @@ const breadcrumb = [
 ];
 
 function Personal() {
-  const { setUserName, userToken, loading  } = useAuth(); // [變更使用者名稱, token]
+  const { setUserName, userToken, loading, userName  } = useAuth(); // [變更使用者名稱, token]
   const navigate = useNavigate(); // 跳轉頁面
 
   const [apiLoading, setApiLoading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
@@ -113,11 +113,14 @@ function Personal() {
   const [isNameTouched, setIsNameTouched] = useState(false); // 是否有輸入過密碼欄
   //表單變更
   useEffect(() => {
-    if(Object.keys(mainErrors).length > 0) setCheckNameOk(false)
+    if(Object.keys(mainErrors).length > 0 || userName == mainGetValues("name")) setCheckNameOk(false)
   }, [watchMain, mainErrors]);
-  // 即時更新錯誤狀態
+  // 即時更新錯誤狀態 || userName == mainGetValues("name")
   useEffect(() => {
-    if(Object.keys(mainErrors).length > 0 || mainGetValues("name").length < 2 || mainGetValues("name").length > 10) setCheckNameOk(false)
+    if(Object.keys(mainErrors).length > 0 || mainGetValues("name").length < 2 || mainGetValues("name").length > 10 
+    ) {
+      setCheckNameOk(false)
+    }
     else setCheckNameOk(true)
   
   }, [mainValid]);

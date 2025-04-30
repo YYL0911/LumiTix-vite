@@ -140,6 +140,12 @@ const DataTable = memo(({handleNavigate}) => {
 )
 })
 
+// 麵包屑
+const breadcrumb = [
+  { name: '首頁', path: "/" },
+  { name: '活動資訊', path: "/personal" },
+];
+
 
 function AllEvents() {
   const navigate = useNavigate();
@@ -150,6 +156,21 @@ function AllEvents() {
 
   const [loading, setloading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // const [addressData, setAddressData] = useState([]);
+  // // 取得地址資料
+  // useEffect(() => {
+  //   (async () => {
+  //     const result = await axios.get('./assets/taiwan.json')
+  //     console.log(result);
+  //     setAddressData(result.data);
+  //   })();
+  // }, [])
+  // <option value="">請選擇縣市</option>
+  //               {addressData.map((city) => {
+  //                 return <option value={city.CityName} key={city.CityEngName}>{city.CityName}</option>
+  //               })}
+  
 
   
   
@@ -163,20 +184,44 @@ function AllEvents() {
         // backgroundPosition: "center"
       }}>
 
-        <div className="container py-5 mx-auto">
+        <div className="container py-5 mx-auto allEvents">
           {/* 麵包屑 */}
-          <nav aria-label="breadcrumb" >
-            <ol className="breadcrumb text-muted">
-              <li className="breadcrumb-item">
-                <Link to= "/" style={{color: "#B0B0B0"}}>首頁</Link>
-              </li>
+          <Breadcrumb breadcrumbs={breadcrumb} />
 
-              <li className="breadcrumb-item">
-                <Link to= "/allEvents" style={{color: "#FFFFFF"}}>活動列表</Link>
-              </li>
-            
-            </ol>
-          </nav>
+          <div className="row g-0 mt-3">
+            <div className="col-md-3 col-12">
+              <input type="text" className="form-control-customer form-control bg-dark text-white" placeholder="收尋活動關鍵字"/>
+            </div>
+            <div className="col-md-2 col-6">
+              <select id="inputState1" className="form-control-customer form-select bg-dark text-white">
+                <option value="">參加時間</option>
+                <option>...</option>
+              </select>
+            </div>
+            <div className="col-md-2 col-6">
+              <select id="inputState2" className="form-control-customer form-select bg-dark text-white">
+                <option value="">地區</option>
+                <option>...</option>
+              </select>
+            </div>
+            <div className="col-md-2 col-6">
+              <select id="inputState3" className="form-control-customer form-select bg-dark text-white">
+                <option value="">活動類型</option>
+                <option>...</option>
+              </select>
+            </div>
+            <div className="col-md-2 col-6">
+              <select id="inputState4" className="form-control-customer form-select bg-dark text-white">
+                <option value="">票價</option>
+                <option>...</option>
+              </select>
+            </div>
+            <div className="col-md-1 col-12">
+              <button type="button" className="btn bg-white form-control-customer text-center w-100">收尋</button>
+              {/* <span class="input-group-text form-control-customer">收尋</span> */}
+            </div>
+          </div>
+         
 
         </div>
       </div>

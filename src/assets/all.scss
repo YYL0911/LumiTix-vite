@@ -16,15 +16,43 @@
   flex-grow: 1;
 }
 
-// 麵包屑圖示
-:root {
-    --bs-breadcrumb-divider: '>';
-}
-// 麵包屑文字顏色
+
+// 麵包屑文字顏色 
 .breadcrumb a {
     text-decoration: none;
-    // color: #000000; 
+    color: #6D6D6D; 
 }
+
+.allEvents .breadcrumb a{
+  color: #B0B0B0;
+}
+.allEvents .breadcrumb .active{
+  color: #ffffff;
+}
+
+.form-control-customer{
+  border-radius:0;
+  outline: none;
+  box-shadow: none;
+  height: 65px;
+}
+.form-control-customer:focus {
+  border-color:#f84646
+}
+
+.form-control-customer::placeholder {
+  color: #ffffff; /* 或你要的顏色 */
+  opacity: 1;  /* 確保顯示 */
+}
+
+
+@media (max-width: 768px) {
+  .form-control-customer{
+    height: 50px;
+  }
+}
+
+
 // .breadcrumb-item + .breadcrumb-item::before{
 //   content: '';
 //   display: inline-block;
@@ -61,13 +89,13 @@ ul.footer-list{
 .copyText{
     text-align: end;
 }
-  /* 當螢幕寬度小於 px 時， */
-  @media (max-width: 992px) {
-    // 權利說明文字桌機對齊
-    .copyText{
-        text-align: start;
-    }
+/* 當螢幕寬度小於 px 時， */
+@media (max-width: 992px) {
+  // 權利說明文字桌機對齊
+  .copyText{
+      text-align: start;
   }
+}
 
   
   
