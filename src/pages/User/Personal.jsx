@@ -113,11 +113,22 @@ function Personal() {
   const [isNameTouched, setIsNameTouched] = useState(false); // 是否有輸入過密碼欄
   //表單變更
   useEffect(() => {
-    if(Object.keys(mainErrors).length > 0 || userName == mainGetValues("name")) setCheckNameOk(false)
+    // console.log(1234)
+    //   console.log(Object.keys(mainErrors).length > 0 )
+    //   console.log(userName == mainGetValues("name") )
+    //   console.log("---------------------------------------")
+
+    if(Object.keys(mainErrors).length > 0 || userName == mainGetValues("name")){
+      setCheckNameOk(false)
+    } 
+    else setCheckNameOk(true)
   }, [watchMain, mainErrors]);
+
   // 即時更新錯誤狀態 || userName == mainGetValues("name")
   useEffect(() => {
-    if(Object.keys(mainErrors).length > 0 || mainGetValues("name").length < 2 || mainGetValues("name").length > 10 
+
+    if(Object.keys(mainErrors).length > 0 
+    || mainGetValues("name").length < 2 || mainGetValues("name").length > 10  // 
     ) {
       setCheckNameOk(false)
     }
