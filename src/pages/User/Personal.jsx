@@ -77,7 +77,7 @@ function Personal() {
     reset: mainReset,
     formState: { errors: mainErrors, isValid: mainValid },
     
-  } = useForm({ mode: 'onTouched' });
+  } = useForm({ mode: 'onChange' });
 
   const onMainSubmit = (data) => {
     // console.log("主表單資料", data);
@@ -118,7 +118,8 @@ function Personal() {
     //   console.log(userName == mainGetValues("name") )
     //   console.log("---------------------------------------")
 
-    if(Object.keys(mainErrors).length > 0 || userName == mainGetValues("name")){
+    if(Object.keys(mainErrors).length > 0 || userName == mainGetValues("name")
+      || mainGetValues("name").length < 2 || mainGetValues("name").length > 10){
       setCheckNameOk(false)
     } 
     else setCheckNameOk(true)

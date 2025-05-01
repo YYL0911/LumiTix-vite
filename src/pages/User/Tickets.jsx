@@ -12,101 +12,140 @@ const breadcrumb = [
 ];
 
 
+
+
+
 // 假資料
 const sampleData = [
   {
-    id: 1,
-    title: '台北愛樂《春之頌》交響音樂會',
-    showDate:"2024/12/31",
-    showTime:"20:00~20:50",
-    location:"台北演藝廳",
-    activeState:false,
-    imgSrc:"https://fakeimg.pl/120x160/?text=PICTURE",
+    order_id: "1c8da31a-5fd2-44f3-897e-4a259e7ec62b",
+    name: "台北愛樂《春之頌》交響音樂會",
+    location: "臺北國家音樂廳",
+    start_at: "2025-05-05 18:00",
+    end_at: "2025-05-05 20:00",
+    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
+    status: false
   },
   {
-    id: 2,
-    title: '台北愛樂《下之頌》交響音樂會',
-    showDate:"2024/10/31",
-    showTime:"20:00~20:50",
-    location:"台北演藝廳",
-    activeState:true,
-    imgSrc:"https://fakeimg.pl/120x160/?text=PICTURE",
+    order_id: "1c8da31a-5fd2-44f3-897e-4a257ec62b",
+    name: "台北愛樂交響音樂會",
+    location: "臺北國家音樂廳",
+    start_at: "2025-05-06 18:00",
+    end_at: "2025-05-05 20:00",
+    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
+    status: false
   },
   {
-    id: 3,
-    title: '台北愛樂《東之頌》交響音樂會',
-    showDate:"2024/5/31",
-    showTime:"20:00~20:50",
-    location:"台北演藝廳",
-    activeState:false,
-    imgSrc:"https://fakeimg.pl/120x160/?text=PICTURE",
-  },
-  {
-    id: 4,
-    title: '交響音樂會',
-    showDate:"2024/12/31",
-    showTime:"20:00~20:50",
-    location:"台北演藝廳",
-    activeState:true,
-    imgSrc:"https://fakeimg.pl/120x160/?text=PICTURE",
-  },
-  {
-    id: 5,
-    title: '台北愛樂《下之頌》',
-    showDate:"2024/10/31",
-    showTime:"20:00~20:50",
-    location:"台北演藝廳",
-    activeState:true,
-    imgSrc:"https://fakeimg.pl/120x160/?text=PICTURE",
-  },
-  {
-    id: 6,
-    title: '台交響音樂會',
-    showDate:"2024/5/31",
-    showTime:"20:00~20:50",
-    location:"台北演藝廳",
-    activeState:false,
-    imgSrc:"https://fakeimg.pl/120x160/?text=PICTURE",
+    order_id: "1c8da31a-5fd2-44f897e-4a259e7ec62b",
+    name: "台北愛樂《下下之頌》交響音樂會",
+    location: "臺北國家音樂廳",
+    start_at: "2025-07-05 18:00",
+    end_at: "2025-05-05 20:00",
+    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
+    status: true
+  },{
+    order_id: "1c8da31a-5fd2-44f3-897e-4a25ec62b",
+    name: "台北愛樂《春頌》交響音樂會",
+    location: "臺北國家音樂廳",
+    start_at: "2025-07-15 18:00",
+    end_at: "2025-05-05 20:00",
+    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
+    status: false
+  },{
+    order_id: "1c8da31a-5fd2-4f3-897e-4a259ec62b",
+    name: "愛樂《春》交響音樂會",
+    location: "臺北國家音樂廳",
+    start_at: "2025-08-05 18:00",
+    end_at: "2025-05-05 20:00",
+    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
+    status: true
+  },{
+    order_id: "1cda31a-5f2-44f3-897e-4a2e7ec62b",
+    name: "台北愛樂《頌》音樂會",
+    location: "臺北國家音樂廳",
+    start_at: "2025-09-20 18:00",
+    end_at: "2025-05-05 20:00",
+    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
+    status: false
+  },{
+    order_id: "1c8da31a-5f2-4f3-89e-4a259e762b",
+    name: "台樂《春之頌》交響音樂會",
+    location: "臺北國家音樂廳",
+    start_at: "2025-10-05 18:00",
+    end_at: "2025-05-05 20:00",
+    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
+    status: true
   },
   
 ];
 
 // 製造表格
 const DataTable = memo(({filterProducts, handleNavigate}) => {
+  let month = ""
+  let changeMonth = false
   return (
     <>  
-      {filterProducts.map((product) => (
 
-        <div key={product.id} className="bg-white my-3 d-flex align-items-center border border-2 border-black p-3">
-        <div className="flex-shrink-0">
-          <img src="https://fakeimg.pl/120x160/?text=PICTURE" alt="..."/>
-        </div>
-        <div className="flex-grow-1 ms-3">
-          <div className="d-flex flex-column-reverse flex-sm-row justify-content-between 
-          align-items-sm-center align-items-start">
+      {filterProducts.map((product) =>{
+        if(month != product.start_at.substring(0,7)){
+          month = product.start_at.substring(0,7)
+          changeMonth = true
+        }
+        else changeMonth = false
+        
+        
+        return(
+          <div  key={product.order_id}>
 
-            <div className=" my-2">
-              <p className=" m-0" >{product.showDate} {product.showTime}</p>
-              <h4 className="fw-bold mb-0 text-start">{product.title}</h4>
-              <p className=" m-0" >{product.location}</p>
+            { changeMonth ? 
+            <div className="mt-5 text-muted fw-bold">
+              {month}
             </div>
-            
-            <div className=" my-2 flex-shrink-0">
-              {product.activeState?
-              <p className=" border-bottom border-top border-gray-dark border-3 p-1 m-0" >
-                已使用
-              </p>
-              :
-              <p className=" border-bottom border-top border-danger border-3 p-1 m-0 fw-bold" >
-                未使用
-              </p>}
-            </div>
-            
+            :<></>
+            }
+            <div  className="bg-white my-3 d-flex align-items-center border border-2 border-black p-3">
+              <div className="flex-shrink-0">
+                <img src={ product.cover_image_url} alt="..."/>
+              </div>
+              <div className="flex-grow-1 ms-3">
+                <div className="d-flex flex-column-reverse flex-sm-row justify-content-between 
+                align-items-sm-center align-items-start">
+
+                  <div className=" my-2 text-muted">
+                    <p className=" m-0" >{product.start_at}</p>
+                    <h4 className="fw-bold mb-0 text-start">{product.name}</h4>
+                    <p className=" m-0" >{product.location}</p>
+                  </div>
+                  
+                  <div className=" my-2 flex-shrink-0">
+                    {product.status?
+                    <p className=" border-bottom border-top border-gray-dark border-3 p-1 m-0" >
+                      已使用
+                    </p>
+                    :
+                    <p className=" border-bottom border-top border-danger border-3 p-1 m-0 fw-bold" >
+                      未使用
+                    </p>}
+                  </div>
+                  
+                </div>
+              </div>
+            </div> 
           </div>
-        </div>
-        </div> 
+
+        )
+
+
+
+      } 
+       
+          
+        
             
-      ))}
+        
+    
+      )
+      }
     
     
     </>
@@ -121,7 +160,7 @@ function Tickets() {
   const filterProducts = useMemo(() => {
     return [...sampleData]
       .filter((product) => {
-        return  activeState==null ? true : product.activeState == (activeState);
+        return  activeState==null ? true : product.status == (activeState);
       });
   }, [activeState]);
 
