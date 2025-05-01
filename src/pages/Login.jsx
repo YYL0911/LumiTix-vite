@@ -100,7 +100,7 @@ function Login() {
 
 
   return (
-    <div className='container'>
+    <div className='container py-3'>
         <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
         <form action='' onSubmit={handleSubmit(onSubmit)}>
           <div className='mb-3 w-100' style={{maxWidth: 600+"px"}}>
@@ -148,7 +148,7 @@ function Login() {
           <button type="submit" className={`btn btn-dark me-2 px-3 my-3 ${checkOk ? "" : "disabled"}`} >登入</button>
           
           {/* 註冊文字 */}
-          <div className="d-flex align-items-center">
+          <div className="d-flex align-items-center my-2">
             <span className="me-2">還沒有帳號嗎？</span>
             <Link to='/register' className="my-auto text-black">立即註冊</Link>
           </div>

@@ -167,15 +167,23 @@ function AllEvents() {
   //   })();
   // }, [])
   // <option value="">請選擇縣市</option>
-  //               {addressData.map((city) => {
-  //                 return <option value={city.CityName} key={city.CityEngName}>{city.CityName}</option>
-  //               })}
+  // {addressData.map((city) => {
+  //   return <option value={city.CityName} key={city.CityEngName}>{city.CityName}</option>
+  // })}
+
+
+  const [locationData, setLocationData] = useState(["全部地區", "台北市","台中市", "高雄市"]);
+  const [categoryData, setCategoryData] = useState(["全部種類", "演唱會", "舞台劇", "音樂會"]);
+  const [dateData, setDatesData] = useState(["全部時間","今天","一週內","一個月內","兩個月內"]);
+  const [priceData, setPriceData] = useState(["全部價格", "免費", "TWD 1-1000", "TWD 1000-2000", "TWD 2000-3000", "TWD 3000 以上"]);
   
+  
+
 
   
   
   return (
-    <div style={{marginTop: -1+'rem'}}>
+    <>
       <div className="full-width-section"
       style={{
         backgroundColor: "black"
@@ -195,25 +203,33 @@ function AllEvents() {
             <div className="col-md-2 col-6">
               <select id="inputState1" className="form-control-customer form-select bg-dark text-white">
                 <option value="">參加時間</option>
-                <option>...</option>
+                {dateData.map((item) => {
+                  return <option value={item} key={item}>{item}</option>
+                })}
               </select>
             </div>
             <div className="col-md-2 col-6">
               <select id="inputState2" className="form-control-customer form-select bg-dark text-white">
                 <option value="">地區</option>
-                <option>...</option>
+                {locationData .map((item) => {
+                  return <option value={item} key={item}>{item}</option>
+                })}
               </select>
             </div>
             <div className="col-md-2 col-6">
               <select id="inputState3" className="form-control-customer form-select bg-dark text-white">
                 <option value="">活動類型</option>
-                <option>...</option>
+                {categoryData.map((item) => {
+                  return <option value={item} key={item}>{item}</option>
+                })}
               </select>
             </div>
             <div className="col-md-2 col-6">
               <select id="inputState4" className="form-control-customer form-select bg-dark text-white">
                 <option value="">票價</option>
-                <option>...</option>
+                {priceData.map((item) => {
+                  return <option value={item} key={item}>{item}</option>
+                })}
               </select>
             </div>
             <div className="col-md-1 col-12">
@@ -252,7 +268,7 @@ function AllEvents() {
 
 
       {loading && (<Loading></Loading>)}  
-    </div>
+    </>
     
   );
 }

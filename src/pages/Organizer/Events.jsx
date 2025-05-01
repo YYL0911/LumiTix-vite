@@ -68,20 +68,14 @@ const sampleData = [
 // 製造表格
 const DataTable = memo(({filterProducts, handleNavigate}) => {
   return (
-    <div className="table-responsive">
+    <div className="table-responsive" >
     <table className="table table-striped text-center align-middle">
-      <colgroup>
-        <col style={{ minWidth: '150px'}} />
-        <col style={{ minWidth: '120px'}} />
-        <col style={{ minWidth: '120px'}} />
-        <col style={{ minWidth: '220px'}} />
-      </colgroup>
       <thead>
         <tr>
-          <th scope="col" className="text-wrap text-break">活動名稱</th>
-          <th scope="col" className="text-wrap text-break">表演時段</th>
-          <th scope="col" className="text-wrap text-break">購票人數</th>
-          <th scope="col" className="text-wrap text-break">操作</th>
+          <th scope="col" className="text-wrap text-break" style={{ minWidth: '150px'}}>活動名稱</th>
+          <th scope="col" className="text-wrap text-break" style={{ minWidth: '120px'}}>表演時段</th>
+          <th scope="col" className="text-wrap text-break" style={{ minWidth: '120px'}}>購票人數</th>
+          <th scope="col" className="text-wrap text-break" style={{ minWidth: '220px'}}>操作</th>
         </tr>
       </thead>
       <tbody>
@@ -130,7 +124,7 @@ function Events() {
   const handleNavigate = (path => navigate(path) ); 
 
   return (
-    <div  className='container'>
+    <div  className='container py-3'>
       {/* 麵包屑 */}
       <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 

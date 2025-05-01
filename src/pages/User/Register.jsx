@@ -140,7 +140,7 @@ function Register() {
 
 
   return (
-    <div className='container'>
+    <div className='container py-3'>
         {/* 麵包屑 */}
         <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 

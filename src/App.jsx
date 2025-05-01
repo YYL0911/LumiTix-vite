@@ -14,6 +14,7 @@ import AllEvents from './pages/AllEvents';
 import EventInfo from './pages/EventInfo';
 import Register from './pages/User/Register';
 import Personal from './pages/User/Personal';
+import Tickets from './pages/User/Tickets';
 import Events from './pages/Organizer/Events';
 import ActiveInfo from './pages/Organizer/ActiveInfo';
 import TicketScaner from './pages/Organizer/TicketScaner';
@@ -27,7 +28,7 @@ function App() {
     <div className="page">
       <Navbar />
       {/* container */}
-      <div className='my-3 page-main'>
+      <div className='page-main'>
       {/* <Router > */}
         <Routes>
           <Route path='/' element = {<Test></Test>}></Route>
@@ -39,6 +40,7 @@ function App() {
           {/* 只有使用者可以看的頁面 */}
           <Route element={<PrivateRoute roles={['General']} />}>
             <Route path='/personal' element = {<Personal />}></Route>
+            <Route path='/tickets' element = {<Tickets></Tickets>}></Route>
           </Route>
 
           {/* 只有活動方可以看的頁面 */}
