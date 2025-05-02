@@ -28,7 +28,7 @@ function App() {
     <div className="page">
       <Navbar />
       {/* container */}
-      <div className='page-main'>
+      <div className='page-main'> 
       {/* <Router > */}
         <Routes>
           <Route path='/' element = {<Test></Test>}></Route>

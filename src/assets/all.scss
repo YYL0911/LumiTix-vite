@@ -30,16 +30,17 @@
   color: #ffffff;
 }
 
-// .breadcrumb-item + .breadcrumb-item::before{
-//   content: '';
-//   display: inline-block;
-//   background-image: url("https://fakeimg.pl/20x20/?text=PICTURE");
-//   background-size: contain;
-//   background-repeat: no-repeat;
-//   width: 20px;
-//   height: 20px;
-//   margin: 0 10px;
-// }
+.breadcrumb-item + .breadcrumb-item::before{
+  content: '';
+  display: inline-block;
+  
+  background-image: url("./img/keyboard_double_arrow_right.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  margin: 0 5px 0 0;
+}
 
 
 // 標頭下拉選單位置

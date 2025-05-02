@@ -12,6 +12,8 @@ export const AuthProvider = ({ children }) => {
   const [userName, setUserName] = useState(null); 
   const [userToken, setUserToken] = useState(null); 
   const [loading, setLoading] = useState(true);
+
+  const [headerHeight, setHeaderHeight] = useState(0);
   
 
   const login = (role, name, token) =>{
@@ -72,7 +74,9 @@ export const AuthProvider = ({ children }) => {
 
  
   return (
-    <AuthContext.Provider value={{ userRole, login, logout, userName, userToken, setUserName, loading }}>
+    <AuthContext.Provider value={{ 
+      userRole, login, logout, userName, userToken, setUserName, loading,
+      headerHeight, setHeaderHeight }}>
       {children}
 
 

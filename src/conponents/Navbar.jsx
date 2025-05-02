@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom"
 import logo from "../assets/img/Frame 1000005811.png"
 import { useAuth } from '../contexts/AuthContext';
+import { useEffect, useRef, useState } from 'react';
 
 import userIcon from "../assets/img/userIcon.png"
 import organizerIcon from "../assets/img/organizerIcon.png"
@@ -8,10 +9,26 @@ import adminIcon from "../assets/img/adminIcon.png"
 
 
 export default function Navbar() { 
-  const { userRole, userName, logout } = useAuth();
+  const { userRole, userName, logout ,setHeaderHeight} = useAuth();
+  const headerRef = useRef(null)
+
+  useEffect(()=>{
+    const updateHeight = () => {
+      if(headerRef.current){
+        setHeaderHeight(headerRef.current.offsetHeight)
+      }
+    }
+    updateHeight()
+    window.addEventListener('resize', updateHeight)
+
+    return () => {
+      window.removeEventListener('resize', updateHeight)
+    }
+  })
+  
   return (
-    <>
-      <nav className="navbar  bg-white container d-flex align-items-center">
+    <div ref ={headerRef} className="position-sticky z-2 top-0 bg-white" >
+      <nav className="navbar bg-white container d-flex align-items-center" >
         <div className="container-fluid ">
           <Link className="navbar-brand" to='/'>
           
@@ -82,7 +99,7 @@ export default function Navbar() {
         </div>
       </nav>
       <hr />
-    </>
+    </div>
 
   )
 }

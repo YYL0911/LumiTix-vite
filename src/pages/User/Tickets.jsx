@@ -1,17 +1,20 @@
 
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo, memo } from 'react';
+import { useState, useEffect, useMemo, memo, useRef } from 'react';
+
+// Context
+import { useAuth } from '../../contexts/AuthContext';
 
 // 元件
 import Breadcrumb from "../../conponents/Breadcrumb";
+
+import locationIcon from "../../assets/img/location_on.png"
 
 //麵包屑
 const breadcrumb = [
   { name: '首頁', path: "/" },
   { name: '票務管理', path: "/" },
 ];
-
-
 
 
 
@@ -24,7 +27,7 @@ const sampleData = [
     start_at: "2025-05-05 18:00",
     end_at: "2025-05-05 20:00",
     cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: false
+    status: true
   },
   {
     order_id: "1c8da31a-5fd2-44f3-897e-4a257ec62b",
@@ -66,7 +69,7 @@ const sampleData = [
     start_at: "2025-09-20 18:00",
     end_at: "2025-05-05 20:00",
     cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: false
+    status: true
   },{
     order_id: "1c8da31a-5f2-4f3-89e-4a259e762b",
     name: "台樂《春之頌》交響音樂會",
@@ -83,16 +86,15 @@ const sampleData = [
 const DataTable = memo(({filterProducts, handleNavigate}) => {
   let month = ""
   let changeMonth = false
+
   return (
     <>  
-
       {filterProducts.map((product) =>{
         if(month != product.start_at.substring(0,7)){
           month = product.start_at.substring(0,7)
           changeMonth = true
         }
         else changeMonth = false
-        
         
         return(
           <div  key={product.order_id}>
@@ -113,8 +115,13 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
 
                   <div className=" my-2 text-muted">
                     <p className=" m-0" >{product.start_at}</p>
-                    <h4 className="fw-bold mb-0 text-start">{product.name}</h4>
-                    <p className=" m-0" >{product.location}</p>
+                    <h4 className="fw-bold text-start my-2">{product.name}</h4>
+
+                    <div className="d-flex align-items-center">
+                      <img src={locationIcon} alt="icon" />
+                      <p className=" m-0 ms-1 align-self-end" >{product.location}</p>
+                    </div>
+                    
                   </div>
                   
                   <div className=" my-2 flex-shrink-0">
@@ -131,33 +138,27 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
                 </div>
               </div>
             </div> 
-          </div>
-
-        )
-
-
-
-      } 
-       
-          
-        
-            
-        
-    
+            </div>
+          )
+        } 
       )
-      }
-    
-    
-    </>
+    }
+  </>
         
 )
 })
 
 function Tickets() {
+  const { headerHeight } = useAuth();
   const navigate = useNavigate();
   const [activeState, setActiveState] = useState(null); //Ing Finish Check
 
   const filterProducts = useMemo(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+
     return [...sampleData]
       .filter((product) => {
         return  activeState==null ? true : product.status == (activeState);
@@ -166,6 +167,28 @@ function Tickets() {
 
   const handleNavigate = (path => navigate(path) ); 
 
+
+  const tabRef = useRef(null);
+  const [isFixed, setIsFixed] = useState(false);
+
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const tabTop = tabRef.current?.offsetTop;
+
+      if (tabTop < window.scrollY) {
+        setIsFixed(true);
+      } else {
+        setIsFixed(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+
+
   const tabs = [
     { key: null, label: '全部' },
     { key: true, label: '已使用' },
@@ -173,13 +196,31 @@ function Tickets() {
   ];
 
   return (
-    <div className='bg-body-tertiary ' style={{minHeight:472+'px'}}>
+    <div className='bg-body-tertiary ' style={{minHeight:405+'px'}}>
       <div  className='container py-3 px-md-5' >
         {/* 麵包屑 */}
         <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
-        <div className="py-2 border border-3 border-dark-subtle bg-white my-4">
-          <ul className="nav">
+        {isFixed && <div style={{top: `${headerHeight}px`}}></div>}
+        <div ref={tabRef} 
+         style={{
+          position: isFixed ? 'fixed' : 'static',
+          top: `${headerHeight}px`,
+        }}
+
+        // className = "start-0 w-100 bg-white z-3 justify-content-center d-flex"
+        // borderBottom: '1px solid #ccc',
+        className={`${isFixed ? 
+          ` start-0 end-0 
+            bg-white z-3
+           py-2 
+           border-bottom border-dark-subtle`
+          : 
+          'py-2 border border-3 border-dark-subtle bg-white my-4 '}
+        `}
+
+        >
+          <ul className={`nav ${isFixed?"container px-md-5":"" }`}>
             {tabs.map((tab) => (
                 <li className="nav-item" key={tab.key}>
                   <button
@@ -190,14 +231,10 @@ function Tickets() {
                   </button>
                 </li>
               ))}
+              
           </ul>
+
         </div>
-
-
-        
-
-
-  
 
 
 
