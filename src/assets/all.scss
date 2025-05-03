@@ -125,7 +125,15 @@ ul.footer-list{
 }
 
   
-  
+.scroll-container::-webkit-scrollbar {
+  display: none;
+}
+.scroll-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  cursor: grab;
+}
+
 
 
   
