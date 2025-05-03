@@ -177,65 +177,23 @@ function Events() {
       </button>
 
       {/* 活動狀態 */}
-  
-
-<div
-   ref={ref}
-  className="scroll-container d-flex overflow-auto my-3 text-nowrap"
-  // style={{
-  //   WebkitOverflowScrolling: 'touch',
-  //   scrollbarWidth: 'none', // Firefox 隱藏
-  // }}
->
-  {/* <style>
-    {`
-      .overflow-auto::-webkit-scrollbar {
-        display: none;
-      }
-    `}
-  </style> */}
-
-  {['holding', 'finished', 'checking', 'rejected'].map((key, index) => (
-    <button
-      key={index}
-      className={`btn mx-2   ${activeState === key ? 'btn-secondary' : 'btn-light'}   `}
-      onClick={() => setActiveState(key)}
-    >
-      {key === 'holding' && `正在舉辦 (${allData?.holding.length ?? 0})`}
-      {key === 'finished' && `已經結束 (${allData?.finished.length ?? 0})`}
-      {key === 'checking' && `正在審核 (${allData?.checking.length ?? 0})`}
-      {key === 'rejected' && `被拒絕 (${allData?.rejected.length ?? 0})`}
-    </button>
-  ))}
-
-
-{/* {['holding', 'finished', 'checking', 'rejected'].map((key, index) => (
-      <span style={{ display: 'inline-block' }} key={index}>
-        <input
-          type="radio"
-          className="btn-check"
-          name="activeState"
-          id={`option${index}`}
-          autoComplete="off"
-          defaultChecked={key === 'holding'}
-          onClick={() => setActiveState(key)}
-        />
-        <label
-          className="btn btn-light mx-2"
-          htmlFor={`option${index}`}
-        >
-          {key === 'holding' && `正在舉辦 (${allData?.holding.length ?? 0})`}
-          {key === 'finished' && `已經結束 (${allData?.finished.length ?? 0})`}
-          {key === 'checking' && `正在審核 (${allData?.checking.length ?? 0})`}
-          {key === 'rejected' && `被拒絕 (${allData?.rejected.length ?? 0})`}
-        </label>
-      </span>
-    ))} */}
-
-
-</div>
-
-
+      <div
+        ref={ref}
+        className="scroll-container d-flex overflow-auto my-3 text-nowrap "
+      >
+        {['holding', 'finished', 'checking', 'rejected'].map((key, index) => (
+          <button
+            key={index}
+            className={`btn me-2   ${activeState === key ? 'btn-secondary' : 'btn-light'}   `}
+            onClick={() => setActiveState(key)}
+          >
+            {key === 'holding' && `正在舉辦 (${allData?.holding.length ?? 0})`}
+            {key === 'finished' && `已經結束 (${allData?.finished.length ?? 0})`}
+            {key === 'checking' && `正在審核 (${allData?.checking.length ?? 0})`}
+            {key === 'rejected' && `被拒絕 (${allData?.rejected.length ?? 0})`}
+          </button>
+        ))}
+      </div>
 
 
       {/* 根據狀態產生活動列表 */}
