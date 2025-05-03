@@ -212,7 +212,7 @@ function Tickets() {
         // borderBottom: '1px solid #ccc',
         className={`${isFixed ? 
           ` start-0 end-0 
-            bg-white z-3
+            bg-white 
            py-2 
            border-bottom border-dark-subtle`
           : 
