@@ -69,7 +69,7 @@ function Login() {
         } 
         else if(result.data.user.role == "Admin"){
           login("Admin", result.data.user.name, result.data.token)
-          navigate("/");
+          navigate("/eventsList");
         } 
       }
     })
