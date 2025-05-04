@@ -20,6 +20,8 @@ import ActiveInfo from './pages/Organizer/ActiveInfo';
 import TicketScaner from './pages/Organizer/TicketScaner';
 import TicketScanerResult from './pages/Organizer/TicketScanerResult';
 
+import EventsList from './pages/Admin/EventsList';
+
 const NotFound = () => <h1>404 - 頁面不存在</h1>;
 
 function App() {
@@ -50,6 +52,14 @@ function App() {
             <Route path='/ticketScanerResult' element = {<TicketScanerResult />}></Route>
             <Route path="/activeInfo/:id" element={<ActiveInfo />} />
           </Route>
+
+           {/* 只有活動方可以看的頁面 */}
+          <Route element={<PrivateRoute roles={['Admin']} />}>
+            <Route path='/eventsList' element = {<EventsList></EventsList>}></Route>
+          </Route>
+
+
+          
 
 
           <Route path="*" element={<NotFound />} />

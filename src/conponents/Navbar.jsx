@@ -67,7 +67,7 @@ export default function Navbar() {
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end">
                     <li className="nav-item ps-3"><Link className="nav-link"  to=''>一般會員管理</Link></li>
-                    <li className="nav-item ps-3"><Link className="nav-link"  to=''>活動管理</Link></li>
+                    <li className="nav-item ps-3"><Link className="nav-link"  to='/eventsList'>活動管理</Link></li>
                     <li className="nav-item ps-3" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
                   </ul>
                 </li>
