@@ -7,7 +7,7 @@
 
 
  // 資訊要撐到完整頁面
- .page {
+.page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -124,15 +124,151 @@ ul.footer-list{
   }
 }
 
-  
-  
+// --- Section 1:Hero ---
+.hero-section {
+  background-image: url("../assets/img/Home/Hero-desktop.png"); // 首頁Section 1背景圖路徑
+  background-size: cover;
+  background-position: center center;
+  min-height: 70vh;
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+  padding-top: 15vh; // 使用 align-items 和 margin 控制垂直位置
+  text-align: center;
+  color: #fff;
+}
 
+// --- Hero Section 副標題 ("即刻玩賞台灣藝文") ---
+.hero-subtitle {
+  font-size: 3rem; // 根據設計圖調整大小
+  font-weight: bold;
+  margin-top: 20vh;
+  margin-bottom: 2rem; // 調整與下方搜尋列的距離
+  color: #f8f9fa;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+}
 
-  
+// --- Section 1 RWD ---
+@media (max-width: 767.98px) { 
+  .hero-section {
+    background-image: url("../assets/img/Home/Hero-mobile.png"); //確認這是行動版圖片的路徑 
+    min-height: 80vh; 
+    background-position: center 25%;
+    padding-top: 10rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: flex-end; 
+  }
 
+  .hero-subtitle {
+    font-size: 2rem;
+    font-weight: bold;   
+    margin-bottom: 2rem;
+  }
+}
 
+// --- Section 2: Why Choose Us ---
+.why-choose-us-section {
+  background-color: #f8f9fa; // Section 背景色
+}
+// 左欄標題區塊
+.why-choose-us-title-col-alt {
+  background-color: #7a0c0c; // 標題背景色
+  color: #fff; // 標題文字顏色
+  border: 1px solid #7a0c0c; // 標題邊框
+  display: flex; // 使用 flex 佈局
+  align-items: center; // 垂直置中內容
+  text-align: left; // 文字靠左
+  padding: 1.5rem; // 桌面版 padding 
+  h2 {
+    font-size: 5rem; // 桌面版字體大小 (
+    font-weight: bold; // 粗體
+    line-height: 1.3; // 行高
+    margin-bottom: 0; // 移除 h2 底部 margin
+  }
+}
+// --- 右欄 (col-lg-8) 內部網格的樣式 ---
+// 使用 CSS Grid (保持)
+.col-lg-8 > .row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+// 右欄內部的區塊通用設定
+.why-choose-us-feature-col {
+  background-color: #ffffff; // 特色區塊背景色
+  border: 1px solid #000; // 邊框顏色為黑色 
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem; // 桌面版 padding
+  h5 {
+    font-size: 2.8rem; // 桌面版 h5 字體
+    margin-bottom: 1rem; // h5 下方間距
+    font-weight: bold; // 粗體
+    text-align: left; // 文字靠左
+  }
+  p.small {
+    font-size: 1.4rem; // 桌面版 p 字體
+    line-height: 1.5; // 行高
+    color: #6c757d; // 文字顏色
+    text-align: left; // 文字靠左
+    font-weight: bold; // p 文字粗體
+  }
+  // **** 新增：直接給文字區塊 div 添加 margin-top: auto ****
+  // 選中 feature-col 下的第二個直接子元素 div (第一個是 img)
+  > div { // 這個 div 現在沒有 mt-auto class 了
+      margin-top: auto; // <--- 讓這個 div 的上方自動填滿空間
+  }
+}
+// 完全統一的圖示/圖片樣式
+.feature-icon {
+  max-height: 80px; // 桌面版通用最大高度
+  width: auto;
+  max-width: 100%;
+  margin-bottom: 1rem; // 圖示/圖片下方間距
+  align-self: flex-start; // 所有圖片統一靠左上
+}
 
-
-  
-
-  
+// --- Section 2 RWD ---
+@media (max-width: 991.98px) { // 使用 lg 斷點
+  .why-choose-us-section {
+    padding-top: 2rem; // 手機版 section padding
+    padding-bottom: 2rem;
+  }
+  // 手機版標題區塊
+  .why-choose-us-title-col-alt {
+    padding: 1rem; // 手機版 padding
+    h2 {
+      font-size: 3.5rem; // 手機版標題字體
+      line-height: 1.3;
+    }
+  }
+  // 手機版右欄內的區塊
+  .why-choose-us-feature-col {
+    padding: 1rem; // 手機版 padding
+    height: auto; // 手機版高度 auto
+    h5 {
+      font-size: 1.5rem; // 桌面版 h5 字體
+      margin-bottom: 0.5rem; // h5 下方間距
+      font-weight: bold; // 粗體
+      text-align: left; // 文字靠左
+    } 
+    p.small { 
+      font-size: 1rem; // 桌面版 p 字體
+      line-height: 1.5; // 行高
+      color: #6c757d; // 文字顏色
+      text-align: left; // 文字靠左
+      font-weight: bold; // p 文字粗體
+    } 
+    // **** 手機版：移除桌面的 margin-top: auto，恢復預設 ****
+    > div {
+        margin-top: 0.5rem; // 給一個固定的上方間距
+        // **** 注意：不再需要 !important ****
+    }
+  }
+  // 手機版完全統一圖示/圖片樣式
+  .feature-icon {
+    max-height: 50px; // 手機版通用最大高度
+    margin-bottom: 0.75rem;
+  }
+}
