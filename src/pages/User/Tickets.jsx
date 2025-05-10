@@ -209,7 +209,7 @@ function Tickets() {
 
   return (
     <div className='bg-body-tertiary ' style={{minHeight:405+'px'}}>
-      <div  className='container py-3 px-md-5' >
+      <div  className='container py-3' >
         {/* 麵包屑 */}
         <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
