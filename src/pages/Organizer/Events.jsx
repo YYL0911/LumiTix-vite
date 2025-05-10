@@ -74,7 +74,7 @@ function Events() {
         isFirstRender.current = false; // 更新為 false，代表已執行過
         // console.log("✅ useEffect 只執行一次");
         setApiLoading(true)
-        fetch("https://n7-backend.onrender.com/api/v1/organizer/orders",{
+        fetch("https://n7-backend.onrender.com/api/v1/organizer/events",{
           method: "GET",
           headers: {
             "Content-Type": "application/json",
