@@ -7,7 +7,7 @@ import { Routes, Route } from 'react-router-dom';
 
 import PrivateRoute from './conponents/PrivateRoute';
 
-import Test from './pages/test'
+import Home from './pages/HomePage/Home';
 
 import Login from './pages/Login';
 import AllEvents from './pages/AllEvents';
@@ -31,26 +31,26 @@ function App() {
     <div className="page">
       <Navbar />
       {/* container */}
-      <div className='page-main'>
+      <div className="page-main">
         {/* <Router > */}
         <Routes>
-          <Route path='/' element={<Test></Test>}></Route>
-          <Route path='/login' element={<Login></Login>}></Route>
-          <Route path='/register' element={<Register></Register>}></Route>
-          <Route path='/allEvents' element={<AllEvents></AllEvents>}></Route>
+          <Route path="/" element={<Home />}></Route>
+          <Route path="/login" element={<Login></Login>}></Route>
+          <Route path="/register" element={<Register></Register>}></Route>
+          <Route path="/allEvents" element={<AllEvents></AllEvents>}></Route>
           <Route path="/evevtInfo/:id" element={<EventInfo />} />
 
           {/* 只有使用者可以看的頁面 */}
-          <Route element={<PrivateRoute roles={['General']} />}>
-            <Route path='/personal' element={<Personal />}></Route>
-            <Route path='/tickets' element={<Tickets></Tickets>}></Route>
+          <Route element={<PrivateRoute roles={["General"]} />}>
+            <Route path="/personal" element={<Personal />}></Route>
+            <Route path="/tickets" element={<Tickets></Tickets>}></Route>
           </Route>
 
           {/* 只有活動方可以看的頁面 */}
-          <Route element={<PrivateRoute roles={['Organizer']} />}>
-            <Route path='/events' element={<Events />}></Route>
-            <Route path='/ticketScaner' element={<TicketScaner />}></Route>
-            <Route path='/ticketScanerResult' element={<TicketScanerResult />}></Route>
+          <Route element={<PrivateRoute roles={["Organizer"]} />}>
+            <Route path="/events" element={<Events />}></Route>
+            <Route path="/ticketScaner" element={<TicketScaner />}></Route>
+            <Route path="/ticketScanerResult" element={<TicketScanerResult />}></Route>
             <Route path="/activeInfo/:id" element={<ActiveInfo />} />
           </Route>
 
@@ -58,7 +58,6 @@ function App() {
           <Route element={<PrivateRoute roles={['Admin']} />}>
             <Route path='/eventsList' element={<EventsList></EventsList>}></Route>
           </Route>
-          <Route path='/userManagementList' element={<UserManagementList></UserManagementList>}></Route>
 
 
 
@@ -69,10 +68,11 @@ function App() {
       </div>
       <Footer />
       <Top />
-
     </div>
     // </HashRouter>
   );
 }
 
 export default App;
+
+
