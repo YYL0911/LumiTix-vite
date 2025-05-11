@@ -1,0 +1,641 @@
+// --- Section 1:Hero ---
+.hero-section {
+  background-image: url("../../assets/img/Home/Hero-desktop.png"); // 首頁Section 1背景圖路徑
+  background-size: cover;
+  background-position: center center;
+  min-height: 70vh;
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+  padding-top: 15vh; // 使用 align-items 和 margin 控制垂直位置
+  text-align: center;
+  color: #fff;
+}
+
+// --- Hero Section 副標題 ("即刻玩賞台灣藝文") ---
+.hero-subtitle {
+  font-size: 3rem; // 根據設計圖調整大小
+  font-weight: bold;
+  margin-top: 20vh;
+  margin-bottom: 2rem; // 調整與下方搜尋列的距離
+  color: #f8f9fa;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+// --- Section 1 RWD ---
+@media (max-width: 767.98px) { 
+  .hero-section {
+    background-image: url("../../assets/img/Home/Hero-mobile.png"); //確認這是行動版圖片的路徑 
+    min-height: 80vh; 
+    background-position: center 25%;
+    padding-top: 10rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: flex-end; 
+  }
+
+  .hero-subtitle {
+    font-size: 2rem;
+    font-weight: bold;   
+    margin-bottom: 2rem;
+  }
+}
+
+// --- Section 2: Why Choose Us ---
+.why-choose-us-section {
+  background-color: #f8f9fa; // Section 背景色
+}
+// 左欄標題區塊
+.why-choose-us-title-col-alt {
+  background-color: #7e1310; // 標題背景色
+  color: #fff; // 標題文字顏色
+  border: 1px solid #7e1310; // 標題邊框
+  display: flex; // 使用 flex 佈局
+  align-items: center; // 垂直置中內容
+  text-align: left; // 文字靠左
+  padding: 1.5rem; // 桌面版 padding 
+  h2 {
+    font-size: 5rem; // 桌面版字體大小 (
+    font-weight: bold; // 粗體
+    line-height: 1.3; // 行高
+    margin-bottom: 0; // 移除 h2 底部 margin
+  }
+}
+// --- 右欄 (col-lg-8) 內部網格的樣式 ---
+// 使用 CSS Grid (保持)
+.col-lg-8 > .row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+// 右欄內部的區塊通用設定
+.why-choose-us-feature-col {
+  background-color: #ffffff; // 特色區塊背景色
+  border: 1px solid #000; // 邊框顏色為黑色 
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem; // 桌面版 padding
+  h5 {
+    font-size: 2.8rem; // 桌面版 h5 字體
+    margin-bottom: 1rem; // h5 下方間距
+    font-weight: bold; // 粗體
+    text-align: left; // 文字靠左
+  }
+  p.small {
+    font-size: 1.4rem; // 桌面版 p 字體
+    line-height: 1.5; // 行高
+    color: #6c757d; // 文字顏色
+    text-align: left; // 文字靠左
+    font-weight: bold; // p 文字粗體
+  }
+  // **** 新增：直接給文字區塊 div 添加 margin-top: auto ****
+  // 選中 feature-col 下的第二個直接子元素 div (第一個是 img)
+  > div { // 這個 div 現在沒有 mt-auto class 了
+      margin-top: auto; // <--- 讓這個 div 的上方自動填滿空間
+  }
+}
+// 完全統一的圖示/圖片樣式
+.feature-icon {
+  max-height: 80px; // 桌面版通用最大高度
+  width: auto;
+  max-width: 100%;
+  margin-bottom: 1rem; // 圖示/圖片下方間距
+  align-self: flex-start; // 所有圖片統一靠左上
+}
+
+// --- Section 2 RWD ---
+@media (max-width: 767.98px) { // 使用 lg 斷點
+  .why-choose-us-section {
+    padding-top: 2rem; // 手機版 section padding
+    padding-bottom: 2rem;
+  }
+  // 手機版標題區塊
+  .why-choose-us-title-col-alt {
+    padding: 1rem; // 手機版 padding
+    h2 {
+      font-size: 3.5rem; // 手機版標題字體
+      line-height: 1.3;
+    }
+  }
+  // 手機版右欄內的區塊
+  .why-choose-us-feature-col {
+    padding: 1rem; // 手機版 padding
+    height: auto; // 手機版高度 auto
+    h5 {
+      font-size: 1.5rem; // 桌面版 h5 字體
+      margin-bottom: 0.5rem; // h5 下方間距
+      font-weight: bold; // 粗體
+      text-align: left; // 文字靠左
+    } 
+    p.small { 
+      font-size: 1rem; // 桌面版 p 字體
+      line-height: 1.5; // 行高
+      color: #6c757d; // 文字顏色
+      text-align: left; // 文字靠左
+      font-weight: bold; // p 文字粗體
+    } 
+    // **** 手機版：移除桌面的 margin-top: auto，恢復預設 ****
+    > div {
+        margin-top: 0.5rem; // 給一個固定的上方間距
+        // **** 注意：不再需要 !important ****
+    }
+  }
+  // 手機版完全統一圖示/圖片樣式
+  .feature-icon {
+    max-height: 50px; // 手機版通用最大高度
+    margin-bottom: 0.75rem;
+  }
+}
+
+// --- Section 3: Carousel Section ---
+.carousel-section {
+  background-color: #000; 
+  position: relative; // 為了導航箭頭的絕對定位
+}
+.home-main-carousel {
+  padding-top: 2rem; 
+  padding-bottom: 3rem; // 為下方的 swiper-controls 留出空間
+  position: relative; // Swiper 容器也需要相對定位，以約束絕對定位的箭頭
+  .swiper-slide {
+    background-position: center;
+    background-size: cover;
+    width: 60%; // 此寬度由 Swiper 的 slidesPerView 和 Coverflow 效果管理
+    overflow: hidden;
+    position: relative;
+    border: 1px solid white; // 將預設邊框改為白色，這會應用於非 active 的 slide
+    padding: 2rem;
+    transition: filter 0.5s ease, border-color 0.3s ease, padding 0.3s ease, opacity 0.5s ease;
+    opacity: 0.6; // 非 active slide 的基礎透明度
+    filter: blur(1px) brightness(0.7); // 非 active slide 的模糊和變暗效果
+      .carousel-slide-content {
+        left: 2rem;  
+        right: 2rem;
+        bottom: 2rem; 
+      }
+    &.swiper-slide-active {
+      border-color: #c00000; 
+      opacity: 1; 
+      filter: none; // Active slide 移除模糊和變暗
+      .carousel-slide-content {
+        left: 2rem;  
+        right: 2rem;
+        bottom: 2rem; 
+      }
+    }
+  }
+  .carousel-slide-img {
+    display: block;
+    width: 100%;
+    height: 100%; 
+    object-fit: cover; 
+  }
+  .carousel-slide-content {
+    position: absolute;
+    bottom: 0; 
+    left: 0;   
+    right: 0;  
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%); 
+    color: #fff; 
+    .slide-date, .slide-location {
+      opacity: 0.9; 
+      font-size: 0.8rem; 
+    }
+    .slide-location i {
+      font-size: 0.9em; 
+    }
+    .slide-title {
+      font-size: 1.2rem; 
+      font-weight: bold;
+      margin-bottom: 0.5rem !important; 
+    }
+    .slide-category {
+      font-size: 0.75rem; 
+      color: white;       // 文字顏色
+      padding: 0.2rem; // 上下內邊距 (讓線條與文字有點距離)，左右不需要，因為線條只跟文字等寬
+      border-top: 1px solid #fe451c;    // 上方紅線 
+      border-bottom: 1px solid #fe451c; // 下方紅線 
+      display: inline-block; // 確保 padding 和 border 正確應用
+      letter-spacing: 1px;
+    }
+  }
+}
+// --- Section 3 RWD ---
+@media (max-width: 767.98px) {
+.home-main-carousel {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    .swiper-slide {
+      width: 80%; // 手機版讓每個 slide 寬一點
+      opacity: 1;
+      filter: none;
+      .carousel-slide-content {
+        .slide-title {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+}
+// --- Section 3 Swiper 控制項樣式 ---
+.swiper-controls {
+  .swiper-custom-pagination { // Pagination dots 容器
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .swiper-pagination-bullet {
+      background-color: #3d3d3d; // 未選中圓點顏色 (淺灰色)
+      opacity: 1;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      width: 8px; 
+      height: 8px;
+      border-radius: 1%; // 改為正方形
+      margin: 0 5px !important; // 調整間距
+      cursor: pointer;
+      &:hover {
+        background-color: #aaa;
+      }
+    }
+    .swiper-pagination-bullet-active {
+      background-color: #fe451c; // 選中正方點紅色
+      transform: scale(1.5); // 選中時稍微放大
+    }
+  }
+}
+.swiper-button-prev-custom, // 導航箭頭絕對定位
+.swiper-button-next-custom {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10; // 確保在 slide 之上
+  cursor: pointer;
+  color: #fff; // 箭頭圖示顏色
+  background-color: rgba(0, 0, 0, 0.3); // 半透明背景使其更易見
+  border-radius: 50%; // 圓形背景
+  width: 40px; // 調整背景大小
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #eee;
+  }
+  @media (max-width: 767.98px) {
+    display: none; // 手機上不需要箭頭
+    width: 30px;
+    height: 30px;
+    i { font-size: 1.2rem; }
+  }
+}
+.swiper-button-prev-custom {
+  left: 8px; // 距離 Swiper 容器左邊緣的距離 (可調整)
+}
+.swiper-button-next-custom {
+  right: 8px; // 距離 Swiper 容器右邊緣的距離 (可調整)
+}
+
+// --- Section 4: Recommended Events ---
+.recommended-section {
+  position:relative; // 為了放背景圖絕對定位用
+  background-image: url("/src/assets/img/Home/recommended/Frame.png"),;
+  background-repeat: no-repeat;
+  background-position: 50% 44.5%;
+  background-size: contain; // 或 cover，看你要填滿還是等
+  overflow: hidden; // 避免背景圖超出區塊
+  background-color: #ffffff; // *** CHANGED: Section 背景改為白色 ***
+  color: #212529;         // *** CHANGED: 預設文字顏色改為深色 ***
+  padding-top: 3rem;      // 增加一些上下 padding
+  padding-bottom: 3rem;
+  // ✅ 提高區塊內部所有內容的層級
+> .border,
+> .position-relative,
+.container {
+  position: relative;
+  z-index: 1;
+}
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #000000;
+  }
+  .recommended-swiper {
+    position: relative;
+  }
+  .event-card {
+    background-color: #ffffff; // 卡片背景為白色
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .event-card-img-wrapper {
+      width: 100%;
+      position: relative;
+      border: 1px solid #000000;
+      padding: 1.5rem; // <<<<<<< 調整這個值來控制間距大小，例如 0.5rem 或 10px
+      background-color: #fff; // <<<<<<< 這個是間距區域的背景色，通常是白色，
+      aspect-ratio: 4 / 3; // 這是整個 wrapper (包含邊框和padding) 的長寬比，
+      .event-card-main-img {
+        display: block; // 移除預設的行內元素底部空白
+        width: 100%;    // 填滿 .event-card-img-wrapper 的內容區域 (padding 的內部)
+        height: 100%;   // 填滿 .event-card-img-wrapper 的內容區域 (padding 的內部)
+        object-fit: cover; // 保持圖片自身長寬比，填滿容器，多餘部分裁剪
+        transition: transform 0.3s ease
+      }
+    }
+    .event-card-content {
+      padding: 1rem;
+      position: relative;
+      z-index: 2;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      .event-card-info-top {
+        .event-date, .event-location {
+          font-size: 1rem;
+          color: #555555; // *** CHANGED: 日期和地點文字顏色改為深灰色 ***
+        }
+        .event-location i {
+          font-size: 0.9rem;
+        }
+      }
+      .event-title {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #000000; // *** CHANGED: 活動標題文字顏色改為黑色 ***
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: calc(1.1rem * 1.3 * 2);
+      }
+      .event-category-tag { // 樣式保持不變 (紅色文字與邊框)
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: bold;
+        color: #000000;
+        border-top: 1px solid #fe451c;    // 上方紅線 
+        border-bottom: 1px solid #fe451c; // 下方紅線 
+        padding: 0.2rem 0.5rem;
+        margin-top: 0.5rem;
+        align-self: flex-start;
+        letter-spacing: 0.5px;
+      }
+    }
+    &:hover {
+      .event-card-main-img {
+        transform: scale(1.05);
+      }
+    }
+  }
+// --- Section 4 RWD ---
+@media (max-width: 767.98px) {
+.recommended-swiper {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  }
+}
+// --- Section 4 Swiper 控制項樣式 ---
+.swiper-controls-recommended {
+  .swiper-pagination-recommended {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .swiper-pagination-bullet {
+      background-color: #b0b0b0; // 未選中圓點顏色
+      opacity: 1;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      width: 8px;
+      height: 8px;
+      border-radius: 1%;
+      margin: 0 5px !important;
+      cursor: pointer;
+      &:hover {
+        background-color: #bbbbbb;
+      }
+    }
+    .swiper-pagination-bullet-active {
+      background-color: #fe451c; // 選中方塊顏色
+      transform: scale(1.5); // 選中時稍微放大
+    }
+  }
+}
+  .swiper-button-prev-recommended, // 導航箭頭絕對定位
+  .swiper-button-next-recommended {
+    position: absolute;
+    top: 45%;
+    transform: translateY(-50%);
+    z-index: 10; // 確保在 slide 之上
+    cursor: pointer;
+    color: #fff; // 箭頭圖示顏色
+    background-color: rgba(0, 0, 0, 0.3); // 半透明背景使其更易見
+    border-radius: 50%; // 圓形背景
+    width: 40px; // 調整背景大小
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #eee;
+    }
+    @media (max-width: 767.98px) {
+      display: none; // 手機上不需要箭頭
+      width: 30px;
+      height: 30px;
+      i { font-size: 1.2rem; }
+    }
+  }
+  .swiper-button-prev-recommended {
+    left: 8px; // 距離 Swiper 容器左邊緣的距離 (可調整)
+  }
+  .swiper-button-next-recommended {
+    right: 8px; // 距離 Swiper 容器右邊緣的距離 (可調整)
+  }
+}
+
+// --- Section 5: Upcoming Events ---
+.upcoming-section {
+  position:relative; // 為了放背景圖絕對定位用
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain; // 或 cover，看你要填滿還是等
+  overflow: hidden; // 避免背景圖超出區塊
+  background-color: #ffffff; // 背景改為白色
+  color: #212529; // 預設文字顏色改為深色
+  padding-top: 3rem; // 增加一些上下 padding
+  padding-bottom: 3rem;
+  // ✅ 提高區塊內部所有內容的層級
+> .border,
+> .position-relative,
+.container {
+  position: relative;
+  z-index: 1;
+}
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #000000;
+  }
+  .upcoming-swiper {
+    position: relative;
+  }
+  .event-card {
+    background-color: #181818; // 卡片背景為黑色
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid #000000;
+    .event-card-img-wrapper {
+      width: 100%;
+      position: relative;
+      aspect-ratio: 4 / 3; // 這是整個 wrapper (包含邊框和padding) 的長寬比，
+      .event-card-main-img {
+        display: block; // 移除預設的行內元素底部空白
+        width: 100%;    // 填滿 .event-card-img-wrapper 的內容區域 (padding 的內部)
+        height: 100%;   // 填滿 .event-card-img-wrapper 的內容區域 (padding 的內部)
+        object-fit: cover; // 保持圖片自身長寬比，填滿容器，多餘部分裁剪
+        transition: transform 0.3s ease
+      }
+    }
+    .event-card-content {
+      padding: 1rem;
+      position: relative;
+      z-index: 2;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      .event-card-info-top {
+        .event-date, .event-location {
+          font-size: 1rem;
+          color: #b0b0b0; // 日期和地點文字顏色改為深灰色
+        }
+        .event-location i {
+          font-size: 0.9rem;
+        }
+      }
+      .event-title {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #ffffff; // 活動標題文字顏色改為黑色
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: calc(1.1rem * 1.3 * 2);
+      }
+      .event-category-tag { // 樣式保持不變 (紅色文字與邊框)
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: bold;
+        color: #ffffff;
+        border-top: 1px solid #fe451c;    // 上方紅線 
+        border-bottom: 1px solid #fe451c; // 下方紅線 
+        padding: 0.2rem 0.5rem;
+        margin-top: 0.5rem;
+        align-self: flex-start;
+        letter-spacing: 0.5px;
+      }
+    }
+    &:hover {
+      .event-card-main-img {
+        transform: scale(1.05);
+      }
+    }
+  }
+// --- Override for EVEN cards in Section 5 ---
+.upcoming-swiper .upcoming-slide:nth-child(even) {
+  .event-card {
+    background-color: #ffffff; // 文字內容區域背景改為白色
+    .event-card-content {
+      .event-card-info-top {
+        .event-date, .event-location {
+          color: #555555;
+        }
+      }
+      .event-title {
+        color: #000000; // 文字改為黑色
+      }
+      .event-category-tag { // 樣式保持不變 (紅色文字與邊框)
+        color: #000000;
+      }
+    }
+  }
+}
+// 奇數卡片將使用上方 .event-card 的預設深色樣式
+// --- Section 5 RWD ---
+@media (max-width: 767.98px) {
+  .upcoming-swiper {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    }
+  }
+// --- Section 5 Swiper 控制項樣式 ---
+.swiper-controls-upcoming {
+  .swiper-pagination-upcoming {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .swiper-pagination-bullet {
+      background-color: #b0b0b0; // 未選中圓點顏色
+      opacity: 1;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      width: 8px;
+      height: 8px;
+      border-radius: 1%;
+      margin: 0 5px !important;
+      cursor: pointer;
+      &:hover {
+        background-color: #bbbbbb;
+      }
+    }
+    .swiper-pagination-bullet-active {
+      background-color: #fe451c; // 選中方塊顏色
+      transform: scale(1.5); // 選中時稍微放大
+    }
+  }
+}
+  .swiper-button-prev-upcoming, // 導航箭頭絕對定位
+  .swiper-button-next-upcoming {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10; // 確保在 slide 之上
+    cursor: pointer;
+    color: #fff; // 箭頭圖示顏色
+    background-color: rgba(0, 0, 0, 0.3); // 半透明背景使其更易見
+    border-radius: 50%; // 圓形背景
+    width: 40px; // 調整背景大小
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #eee;
+    }
+    @media (max-width: 767.98px) {
+      display: none; // 手機上不需要箭頭
+      width: 30px;
+      height: 30px;
+      i { font-size: 1.2rem; }
+    }
+  }
+  .swiper-button-prev-upcoming {
+    left: 8px; // 距離 Swiper 容器左邊緣的距離 (可調整)
+  }
+  .swiper-button-next-upcoming {
+    right: 8px; // 距離 Swiper 容器右邊緣的距離 (可調整)
+  }
+}
