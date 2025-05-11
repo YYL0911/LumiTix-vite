@@ -3,7 +3,7 @@ import './assets/all.scss'
 import Navbar from './conponents/Navbar';
 import Footer from './conponents/Footer';
 import Top from './conponents/Top';
-import {Routes, Route} from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 import PrivateRoute from './conponents/PrivateRoute';
 
@@ -21,45 +21,47 @@ import TicketScaner from './pages/Organizer/TicketScaner';
 import TicketScanerResult from './pages/Organizer/TicketScanerResult';
 
 import EventsList from './pages/Admin/EventsList';
+import UserManagementList from './pages/Admin/UserManagementList';
 
 const NotFound = () => <h1>404 - 頁面不存在</h1>;
 
 function App() {
-  
+
   return (
     <div className="page">
       <Navbar />
       {/* container */}
-      <div className='page-main'> 
-      {/* <Router > */}
+      <div className='page-main'>
+        {/* <Router > */}
         <Routes>
-          <Route path='/' element = {<Test></Test>}></Route>
-          <Route path='/login' element = {<Login></Login>}></Route>
-          <Route path='/register' element = {<Register></Register>}></Route>
-          <Route path='/allEvents' element = {<AllEvents></AllEvents>}></Route>
+          <Route path='/' element={<Test></Test>}></Route>
+          <Route path='/login' element={<Login></Login>}></Route>
+          <Route path='/register' element={<Register></Register>}></Route>
+          <Route path='/allEvents' element={<AllEvents></AllEvents>}></Route>
           <Route path="/evevtInfo/:id" element={<EventInfo />} />
-        
+
           {/* 只有使用者可以看的頁面 */}
           <Route element={<PrivateRoute roles={['General']} />}>
-            <Route path='/personal' element = {<Personal />}></Route>
-            <Route path='/tickets' element = {<Tickets></Tickets>}></Route>
+            <Route path='/personal' element={<Personal />}></Route>
+            <Route path='/tickets' element={<Tickets></Tickets>}></Route>
           </Route>
 
           {/* 只有活動方可以看的頁面 */}
           <Route element={<PrivateRoute roles={['Organizer']} />}>
-            <Route path='/events' element = {<Events />}></Route>
-            <Route path='/ticketScaner' element = {<TicketScaner />}></Route>
-            <Route path='/ticketScanerResult' element = {<TicketScanerResult />}></Route>
+            <Route path='/events' element={<Events />}></Route>
+            <Route path='/ticketScaner' element={<TicketScaner />}></Route>
+            <Route path='/ticketScanerResult' element={<TicketScanerResult />}></Route>
             <Route path="/activeInfo/:id" element={<ActiveInfo />} />
           </Route>
 
-           {/* 只有活動方可以看的頁面 */}
+          {/* 只有活動方可以看的頁面 */}
           <Route element={<PrivateRoute roles={['Admin']} />}>
-            <Route path='/eventsList' element = {<EventsList></EventsList>}></Route>
+            <Route path='/eventsList' element={<EventsList></EventsList>}></Route>
           </Route>
+          <Route path='/userManagementList' element={<UserManagementList></UserManagementList>}></Route>
 
 
-          
+
 
 
           <Route path="*" element={<NotFound />} />
@@ -67,7 +69,7 @@ function App() {
       </div>
       <Footer />
       <Top />
-        
+
     </div>
     // </HashRouter>
   );
