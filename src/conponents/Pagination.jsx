@@ -42,27 +42,33 @@ function PaginationComponent({ totalPages, currentPage, onPageChange }) {
       <ul className="pagination justify-content-center mt-5">
 
 
-        <li className={`page-item ${1 === currentPage? "disabled" : ""}`}>
+        <li className={`page-item mx-1 ${1 === currentPage? "disabled" : ""}`}>
             <button
-                className="page-link"
+                className="page-link rounded-circle"
                 onClick={(e) => {
                     handleChangeOnePage(-1)
                     e.currentTarget.blur();
                 }}
                 disabled={currentPage === 1}
             >
-                &laquo;
+                {/* &laquo; */}
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-caret-left-fill" viewBox="0 0 16 16">
+                  <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+                </svg>
             </button>
         </li>
 
         {getPageNumbers().map((page, index) => (
             <li 
               key={index}
-              className={`page-item ${page === currentPage ? "active" : ""} ${page === "..." ? "disabled" : ""}`}
+              className={`page-item mx-1 ${page === currentPage ? "active" : ""} ${page === "..." ? "disabled" : ""}`}
             >
                 <button
-                    className="page-link"
-                    onClick={() => handleClick(page)}
+                    className="page-link rounded-circle"
+                    onClick={(e) => {
+                      e.currentTarget.blur();
+                      handleClick(page)
+                    }}
                     disabled={page === "..."}
                 >
                     {page}
@@ -70,44 +76,22 @@ function PaginationComponent({ totalPages, currentPage, onPageChange }) {
             </li>
         ))}
 
-        <li className={`page-item ${totalPages === currentPage? "disabled" : ""}`}>
+        <li className={`page-item mx-1 ${totalPages === currentPage? "disabled" : ""}`}>
             <button
-                className="page-link"
+                className="page-link rounded-circle"
                 onClick={(e) => {
                     handleChangeOnePage(1)
                     e.currentTarget.blur();
                 }}
                 disabled={currentPage === totalPages}
             >
-                &raquo;
+                {/* &raquo; */}
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-caret-right-fill" viewBox="0 0 16 16">
+                  <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                </svg>
             </button>
         </li>
 
-        
-        {/* <li
-            className={`page-item ${1 === currentPage? "disabled" : ""}`}
-            style={currentPage === 1 ? { pointerEvents: "none" } : {}}
-            onClick={() => handleChangeOnePage(-1)}
-        >
-            <span className="page-link">上一頁</span>
-        </li>
-
-        {getPageNumbers().map((page, index) => (
-          <li
-            key={index}
-            className={`page-item ${page === currentPage ? "active" : ""} ${page === "..." ? "disabled" : ""}`}
-            onClick={() => handleClick(page)}
-          >
-            <span className="page-link">{page}</span>
-          </li>
-        ))}
-
-        <li
-            className={`page-item ${totalPages === currentPage? "disabled" : ""}`}
-            onClick={() => handleChangeOnePage(1)}
-        >
-            <span className="page-link">下一頁</span>
-        </li> */}
       </ul>
     </nav>
   );

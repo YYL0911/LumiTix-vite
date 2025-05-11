@@ -13,7 +13,7 @@ import locationIcon from "../../assets/img/location_on.png"
 //麵包屑
 const breadcrumb = [
   { name: '首頁', path: "/" },
-  { name: '票務管理', path: "/" },
+  { name: '活動管理', path: "/" },
 ];
 
 
@@ -27,7 +27,8 @@ const sampleData = [
     start_at: "2025-05-05 18:00",
     end_at: "2025-05-05 20:00",
     cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: true
+    status: '待審核',
+    sale_rate: null
   },
   {
     order_id: "1c8da31a-5fd2-44f3-897e-4a257ec62b",
@@ -36,7 +37,8 @@ const sampleData = [
     start_at: "2025-05-06 18:00",
     end_at: "2025-05-05 20:00",
     cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: false
+    status: '銷售中',
+    sale_rate: 0.95
   },
   {
     order_id: "1c8da31a-5fd2-44f897e-4a259e7ec62b",
@@ -45,7 +47,8 @@ const sampleData = [
     start_at: "2025-07-05 18:00",
     end_at: "2025-05-05 20:00",
     cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: true
+    status: '待審核',
+    sale_rate: null
   },{
     order_id: "1c8da31a-5fd2-44f3-897e-4a25ec62b",
     name: "台北愛樂《春頌》交響音樂會",
@@ -53,7 +56,8 @@ const sampleData = [
     start_at: "2025-07-15 18:00",
     end_at: "2025-05-05 20:00",
     cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: false
+    status: '銷售結束',
+    sale_rate: 0.93
   },{
     order_id: "1c8da31a-5fd2-4f3-897e-4a259ec62b",
     name: "愛樂《春》交響音樂會",
@@ -61,7 +65,8 @@ const sampleData = [
     start_at: "2025-08-05 18:00",
     end_at: "2025-05-05 20:00",
     cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: true
+    status: '銷售結束',
+    sale_rate: 0.9
   },{
     order_id: "1cda31a-5f2-44f3-897e-4a2e7ec62b",
     name: "台北愛樂《頌》音樂會",
@@ -69,7 +74,8 @@ const sampleData = [
     start_at: "2025-09-20 18:00",
     end_at: "2025-05-05 20:00",
     cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: true
+    status: '銷售中',
+    sale_rate: 0.98
   },{
     order_id: "1c8da31a-5f2-4f3-89e-4a259e762b",
     name: "台樂《春之頌》交響音樂會",
@@ -77,7 +83,8 @@ const sampleData = [
     start_at: "2025-10-05 18:00",
     end_at: "2025-05-05 20:00",
     cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: true
+    status: '銷售中',
+    sale_rate: 0.9
   },
   
 ];
@@ -90,21 +97,9 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
   return (
     <>  
       {filterProducts.map((product) =>{
-        if(month != product.start_at.substring(0,7)){
-          month = product.start_at.substring(0,7)
-          changeMonth = true
-        }
-        else changeMonth = false
-        
         return(
           <div  key={product.order_id}>
 
-            { changeMonth ? 
-            <div className="mt-5 text-muted fw-bold">
-              {month}
-            </div>
-            :<></>
-            }
             <a className="text-decoration-none" href="#" onClick={(e) => {
               e.preventDefault();
               // handleNavigate(`/evevtInfo/${product.order_id}`)
@@ -126,18 +121,27 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
                         <img src={locationIcon} alt="icon" />
                         <p className=" m-0 ms-1 align-self-end" >{product.location}</p>
                       </div>
+
+                      {product.sale_rate && <p className=" m-0 mt-2" >售票率：{product.sale_rate*100}</p>}
                       
                     </div>
                     
-                    <div className=" my-2 flex-shrink-0 text-black">
-                      {product.status?
+                    <div className=" my-2 flex-shrink-0 text-black justify-content-sm-end justify-content-start d-flex" style={{minWidth:75+'px'}}>
+
+                      {product.status == "銷售結束" ?
                       <p className=" border-bottom border-top border-gray-dark border-3 p-1 m-0" >
-                        已使用
+                        銷售結束
                       </p>
                       :
+                      product.status == "待審核" ?
                       <p className=" border-bottom border-top border-danger border-3 p-1 m-0 fw-bold" >
-                        未使用
-                      </p>}
+                        待審核
+                      </p>
+                      :
+                      <p className=" border-bottom border-top border-success border-3 p-1 m-0 fw-bold" >
+                        銷售中
+                      </p>
+                      }
                     </div>
                     
                   </div>
@@ -155,22 +159,22 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
 )
 })
 
-
 const tabs = [
-  { key: null, label: '全部' },
-  { key: true, label: '已使用' },
-  { key: false, label: '未使用' },
+  { key: '全部', label: '全部'},
+  { key: '待審核', label: '待審核'},
+  { key: '銷售中', label: '銷售中'},
+  { key: '銷售結束', label: '銷售結束' },
 ];
 
-function Tickets() {
+function EventsList() {
   const { headerHeight } = useAuth();
   const navigate = useNavigate();
-  const [activeState, setActiveState] = useState(null); //Ing Finish Check
+  const [activeState, setActiveState] = useState('全部'); 
 
   const filterProducts = useMemo(() => {
     return [...sampleData]
       .filter((product) => {
-        return  activeState==null ? true : product.status == (activeState);
+        return  (product.status == (activeState) || activeState == '全部');
       });
   }, [activeState]);
 
@@ -209,7 +213,7 @@ function Tickets() {
 
   return (
     <div className='bg-body-tertiary ' style={{minHeight:405+'px'}}>
-      <div  className='container py-3' >
+      <div  className='container py-3 px-md-5' >
         {/* 麵包屑 */}
         <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
@@ -252,4 +256,4 @@ function Tickets() {
   );
 }
 
-export default Tickets;
+export default EventsList;

@@ -9,6 +9,7 @@ import PaginationComponent from "../conponents/Pagination";
 
 import locationIcon from "../assets/img/location_on.png"
 import searchIcon from "../assets/img/Search.png"
+import searchBG from "../assets/img/AlleventsBg.png"
 
 
 
@@ -98,7 +99,7 @@ const CardItem = ({ id, imgSrc, title, showTime, location, handleNavigate }) => 
     handleNavigate(`/evevtInfo/${id}`)
   }}>
     
-    <div className="border p-2">
+    <div className="border border-2 border-secondary p-2">
       <img src={imgSrc} className="img-fluid object-fit-cover w-100 " alt={title} />
     </div>
     <div className="d-flex flex-column justify-content-between mt-3" >
@@ -187,10 +188,10 @@ function AllEvents() {
     <>
       <div className="full-width-section"
       style={{
-        backgroundColor: "black"
-        // backgroundImage: `url('/your-image.jpg')`,
-        // backgroundSize: "cover",
-        // backgroundPosition: "center"
+        // backgroundColor: "black",
+        backgroundImage: `url(${searchBG})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center"
       }}>
 
         <div className="container py-5 mx-auto allEvents">
