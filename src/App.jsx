@@ -7,7 +7,7 @@ import {Routes, Route} from 'react-router-dom';
 
 import PrivateRoute from './conponents/PrivateRoute';
 
-import Home from './pages/Home';
+import Home from './pages/HomePage/Home';
 
 import Login from './pages/Login';
 import AllEvents from './pages/AllEvents';
