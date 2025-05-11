@@ -104,7 +104,7 @@ function Events() {
 
   const filterProducts = useMemo(() => {
     return allData ? allData[activeState] : []
-  }, [activeState]);
+  }, [activeState,allData]);
 
   const handleNavigate = (path => navigate(path) ); 
 
