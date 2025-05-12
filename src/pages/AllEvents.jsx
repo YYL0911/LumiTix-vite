@@ -12,6 +12,28 @@ import searchIcon from "../assets/img/Search.png"
 import searchBG from "../assets/img/AlleventsBg.png"
 
 
+const dataString =  (dateDelt) => {
+  const today = new Date();
+  const futureDate = new Date(today); // 複製一份
+  futureDate.setDate(today.getDate() + dateDelt);
+  const yyyy = futureDate.getFullYear();
+  const mm = String(futureDate.getMonth() + 1).padStart(2, '0'); // 月份從 0 開始
+  const dd = String(futureDate.getDate()).padStart(2, '0');
+
+  return`${yyyy}-${mm}-${dd}`;
+}
+
+const daysFromToday = (dateStr, targetDelt) => {
+  const today = new Date();
+  const targetDate = new Date(dateStr);
+
+  today.setHours(0, 0, 0, 0);
+  targetDate.setHours(0, 0, 0, 0);
+
+
+  return  (Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24))) <= targetDelt
+}
+
 
 // 假資料
 const sampleData = [
@@ -19,7 +41,7 @@ const sampleData = [
     id: 1,
     imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
     title: '台北愛樂《春之頌》交響音樂會響音樂會響音樂會響音樂會響音樂會響音樂會響音樂',
-    showDate:"2024/12/31",
+    showDate: dataString(0),
     showTime:"20:00~20:50",
     location:"台北市",
     category:"演唱會"
@@ -29,7 +51,7 @@ const sampleData = [
     id: 2,
     imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
     title: '台北愛樂《下之頌》交響音樂會',
-    showDate:"2024/10/31",
+    showDate:dataString(6),
     showTime:"20:00~20:50",
     location:"台北市",
     category:"演唱會"
@@ -38,7 +60,7 @@ const sampleData = [
     id: 3,
     imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
     title: '台北愛樂《東之頌》交響音樂會',
-    showDate:"2024/5/31",
+    showDate: dataString(30),
     showTime:"20:00~20:50",
     location:"台北市",
     category:"舞台劇"
@@ -47,7 +69,7 @@ const sampleData = [
     id: 4,
     imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
     title: '台北愛樂《春之頌》交響音樂會',
-    showDate:"2024/12/31",
+    showDate:dataString(7),
     showTime:"20:00~20:50",
     location:"高雄市",
     category:"演唱會"
@@ -56,7 +78,7 @@ const sampleData = [
     id: 5,
     imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
     title: '台北愛樂《下之頌》交響音樂會',
-    showDate:"2024/10/31",
+    showDate:dataString(10),
     showTime:"20:00~20:50",
     location:"台北市",
     category:"演唱會"
@@ -65,7 +87,7 @@ const sampleData = [
     id: 6,
     imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
     title: '台北愛樂《東之頌》交響音樂會',
-    showDate:"2024/5/31",
+    showDate:dataString(60),
     showTime:"20:00~20:50",
     location:"台中市",
     category:"音樂會"
@@ -74,7 +96,7 @@ const sampleData = [
     id: 7,
     imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
     title: '台北愛樂《春之頌》交響音樂會',
-    showDate:"2024/12/31",
+    showDate:dataString(15),
     showTime:"20:00~20:50",
     location:"台北市",
     category:"舞台劇"
@@ -83,7 +105,7 @@ const sampleData = [
     id: 8,
     imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
     title: '台北愛樂《下之頌》交響音樂會',
-    showDate:"2024/10/31",
+    showDate:dataString(20),
     showTime:"20:00~20:50",
     location:"高雄市",
     category:"演唱會"
@@ -92,7 +114,7 @@ const sampleData = [
     id: 9,
     imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
     title: '台北愛樂《東之頌》交響音樂會',
-    showDate:"2024/5/31",
+    showDate:dataString(80),
     showTime:"20:00~20:50",
     location:"台中市",
     category:"舞台劇"
@@ -221,18 +243,26 @@ function AllEvents() {
   
   const handleSeach = () => {
     // 
+    let tmpDelt = 0 
+    if(dateSelect == "一週內") tmpDelt = 7
+    else if(dateSelect == "一個月內") tmpDelt = 30
+    else if(dateSelect == "兩個月內") tmpDelt = 60
+    
     const result = sampleData.filter((product) => {
+      
       return (
         ( keyword === "" || product.title.match(keyword)) &&
-        
+        (dateSelect === "全部時間" || dateSelect === "" || daysFromToday(product.showDate,tmpDelt)) &&
         (locationSelect === "全部地區" || locationSelect === "" || product.location === locationSelect) &&
         (categorySelect === "全部種類" || categorySelect === "" || product.category === categorySelect)
-        
+        // daysFromToday
       );
     });
   
     setFilteredProducts(result); // 更新顯示的資料
-    setTotalPages(Math.ceil(result.length/8))
+    if(Math.ceil(result.length/8) < 1) setTotalPages(1)
+    else setTotalPages(Math.ceil(result.length/8))
+
   };
 
   
