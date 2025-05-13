@@ -1,0 +1,104 @@
+// 
+.m-xy-1 {
+  margin: 80px 0 0;
+}
+
+.m-xy-2 {
+  margin: 0 0 80px;
+}
+
+.m-x-1 {
+  margin: 0 0;
+}
+
+@media (max-width: 992px) {
+  .m-xy-1 {
+    margin: 48px 0 0;
+  }
+
+  .m-xy-2 {
+    margin: 0 0 48px;
+  }
+
+  .m-x-1 {
+    margin: 0 0;
+  }
+}
+
+.border-Neutral-700 {
+  border-color: #4F4F4F !important;
+}
+
+.bg-Neutral-700 {
+  background-color: #4F4F4F !important;
+}
+
+.bg-Primary-50 {
+  background-color: #FFF3ED !important;
+}
+
+.text-Neutral-300 {
+  color: #B0B0B0;
+}
+
+.text-Neutral-700 {
+  color: #4F4F4F;
+}
+
+.text-Primary-900 {
+  color: #7E1310;
+}
+
+.text-Primary-700 {
+  color: #C61408;
+}
+
+// 按鈕變化
+.btn-sale {
+  background-color: #C61408;
+  color: #FFFFFF;
+}
+
+.btn-unsale {
+  background-color: #E7E7E7;
+  color: #B0B0B0;
+}
+
+@media (max-width: 992px) {
+  .saleStatusBtn {
+    width: 100%;
+  }
+}
+
+// navbar
+.sticky-navbar {
+  position: sticky;
+  top: 63px;
+  background-color: white;
+}
+
+.hide-visibility {
+  visibility: hidden;
+}
+
+.eventInfo-nav {
+  overflow-x: auto;
+  white-space: nowrap;
+
+  /* 隱藏 scrollbar - Webkit (Chrome, Safari) */
+  -ms-overflow-style: none;  /* IE 10+ */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.eventInfo-nav::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+.nav-item {
+  flex-shrink: 0;
+}
+
+// section
+.sectionTop {
+  scroll-margin-top: 130px;
+}
