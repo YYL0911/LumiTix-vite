@@ -197,7 +197,7 @@ function EventInfo() {
 
           {/* 活動封面 */}
           <div className="border border-2 border-black p-lg-7 p-2 mb-4">
-            <img className="p-lg-0 p-1" src={testData.cover_Image} alt="活動封面" />
+            <img className="p-lg-0 p-1 w-100" src={testData.cover_Image} alt="活動封面" />
           </div>
 
           {/* 活動標題 */}
@@ -325,7 +325,7 @@ function EventInfo() {
               <div className="d-flex flex-column flex-lg-row gap-6">
 
                 <div className="col m-auto">
-                  <img src={testData.section_Image} alt="票券區域圖" />
+                  <img className="w-100" src={testData.section_Image} alt="票券區域圖" />
                 </div>
 
                 <div className="col w-100">
