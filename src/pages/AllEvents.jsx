@@ -11,6 +11,16 @@ import locationIcon from "../assets/img/location_on.png"
 import searchIcon from "../assets/img/Search.png"
 import searchBG from "../assets/img/AlleventsBg.png"
 
+import pic1 from "../assets/img/tmpPic/pic (1).png"
+import pic2 from "../assets/img/tmpPic/pic (2).png"
+import pic3 from "../assets/img/tmpPic/pic (3).png"
+import pic4 from "../assets/img/tmpPic/pic (4).png"
+import pic5 from "../assets/img/tmpPic/pic (5).png"
+import pic6 from "../assets/img/tmpPic/pic (6).png"
+import pic7 from "../assets/img/tmpPic/pic (7).png"
+import pic8 from "../assets/img/tmpPic/pic (8).png"
+import pic9 from "../assets/img/tmpPic/pic (9).png"
+
 
 const dataString =  (dateDelt) => {
   const today = new Date();
@@ -35,12 +45,12 @@ const daysFromToday = (dateStr, targetDelt) => {
 }
 
 
-// 假資料
+// 假資料 https://fakeimg.pl/200x290/?text=PICTURE
 const sampleData = [
   {
     id: 1,
-    imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
-    title: '台北愛樂《春之頌》交響音樂會響音樂會響音樂會響音樂會響音樂會響音樂會響音樂',
+    imgSrc:pic1,
+    title: '鋼琴獨奏會《浪漫派之聲》蕭邦與李斯特',
     showDate: dataString(0),
     showTime:"20:00~20:50",
     location:"台北市",
@@ -49,8 +59,8 @@ const sampleData = [
   },
   {
     id: 2,
-    imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
-    title: '台北愛樂《下之頌》交響音樂會',
+    imgSrc:pic2,
+    title: 'Moonstruck《月光迷途》音樂旅程',
     showDate:dataString(6),
     showTime:"20:00~20:50",
     location:"台北市",
@@ -58,8 +68,8 @@ const sampleData = [
   },
   {
     id: 3,
-    imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
-    title: '台北愛樂《東之頌》交響音樂會',
+    imgSrc:pic3,
+    title: 'MOSAIC BAND《色彩爆發》世界巡演',
     showDate: dataString(30),
     showTime:"20:00~20:50",
     location:"台北市",
@@ -67,8 +77,8 @@ const sampleData = [
   },
   {
     id: 4,
-    imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
-    title: '台北愛樂《春之頌》交響音樂會',
+    imgSrc:pic4,
+    title: 'Retro Groove《復古風暴》現場演唱會',
     showDate:dataString(7),
     showTime:"20:00~20:50",
     location:"高雄市",
@@ -76,8 +86,8 @@ const sampleData = [
   },
   {
     id: 5,
-    imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
-    title: '台北愛樂《下之頌》交響音樂會',
+    imgSrc:pic5,
+    title: '夜行少女《無盡之夜》全台巡演',
     showDate:dataString(10),
     showTime:"20:00~20:50",
     location:"台北市",
@@ -85,8 +95,8 @@ const sampleData = [
   },
   {
     id: 6,
-    imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
-    title: '台北愛樂《東之頌》交響音樂會',
+    imgSrc:pic6,
+    title: '原創戲劇《時光書簡》跨世代親情故事',
     showDate:dataString(60),
     showTime:"20:00~20:50",
     location:"台中市",
@@ -94,8 +104,8 @@ const sampleData = [
   },
   {
     id: 7,
-    imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
-    title: '台北愛樂《春之頌》交響音樂會',
+    imgSrc:pic7,
+    title: '國樂團《絲竹共鳴》東方韻味特場',
     showDate:dataString(15),
     showTime:"20:00~20:50",
     location:"台北市",
@@ -103,8 +113,8 @@ const sampleData = [
   },
   {
     id: 8,
-    imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
-    title: '台北愛樂《下之頌》交響音樂會',
+    imgSrc:pic8,
+    title: '黑色幽默劇《辦公室奇談》人生如戲',
     showDate:dataString(20),
     showTime:"20:00~20:50",
     location:"高雄市",
@@ -112,8 +122,8 @@ const sampleData = [
   },
   {
     id: 9,
-    imgSrc:"https://fakeimg.pl/200x290/?text=PICTURE",
-    title: '台北愛樂《東之頌》交響音樂會',
+    imgSrc:pic9,
+    title: '當代戲劇《鏡中謎影》懸疑大戲',
     showDate:dataString(80),
     showTime:"20:00~20:50",
     location:"台中市",
@@ -129,8 +139,8 @@ const CardItem = ({ id, imgSrc, title, showTime, location, category, handleNavig
     handleNavigate(`/evevtInfo/${id}`)
   }}>
     
-    <div className="border border-2 border-secondary p-2">
-      <img src={imgSrc} className="img-fluid object-fit-cover w-100 " alt={title} />
+    <div className="border border-2 border-secondary ratio" style={{ '--bs-aspect-ratio': '145.78%' }}>
+      <img src={imgSrc} className="img-fluid object-fit-cover w-100 h-100 p-2" alt={title} />
     </div>
     <div className="d-flex flex-column justify-content-between mt-3" >
       
@@ -189,12 +199,10 @@ const breadcrumb = [
 
 
 function AllEvents() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   //跳轉頁面
-  const handleNavigate = ((path) => {
-    navigate(path)
-  }); 
+  const handleNavigate = ((path) => navigate(path)); 
 
   const [loading, setloading] = useState(false);
   
@@ -213,9 +221,12 @@ function AllEvents() {
   const [dateSelect, setDateSelect] = useState(searchParams.get('date') || "" );
   const [priceSelect, setPriceSelect] = useState(searchParams.get('price') || "" );
 
-
+  const [filteredProducts, setFilteredProducts] = useState(sampleData);
 
   useEffect(() => {
+    const paramKeyword = searchParams.get('keyword') || "";
+    setKeyword(paramKeyword)
+
     // 每次 URL 中的 location 改變，就觸發這個 useEffect
     const paramLocation = searchParams.get('location') || "";
     if (locationData.includes(paramLocation)) setLocationSelect(paramLocation);
@@ -229,33 +240,23 @@ function AllEvents() {
     if (dateData.includes(paramDate)) setDateSelect(paramDate);
     else setDateSelect(""); // 預設值
 
-    const paramPrice = searchParams.get('price') || "";
-    if (priceData.includes(paramPrice)) setPriceSelect(paramPrice);
-    else setPriceSelect(""); // 預設值
+    // const paramPrice = searchParams.get('price') || "";
+    // if (priceData.includes(paramPrice)) setPriceSelect(paramPrice);
+    // else setPriceSelect(""); // 預設值
 
 
-    // 如果你有資料要根據 location 載入，可以在這裡加上 fetchData(newLocation)
-  }, [searchParams]);
-
-
-  const [filteredProducts, setFilteredProducts] = useState(sampleData);
-
-  
-  const handleSeach = () => {
-    // 
+    // 篩選資料
     let tmpDelt = 0 
-    if(dateSelect == "一週內") tmpDelt = 7
-    else if(dateSelect == "一個月內") tmpDelt = 30
-    else if(dateSelect == "兩個月內") tmpDelt = 60
+    if(paramDate == "一週內") tmpDelt = 7
+    else if(paramDate == "一個月內") tmpDelt = 30
+    else if(paramDate == "兩個月內") tmpDelt = 60
     
     const result = sampleData.filter((product) => {
-      
       return (
-        ( keyword === "" || product.title.match(keyword)) &&
-        (dateSelect === "全部時間" || dateSelect === "" || daysFromToday(product.showDate,tmpDelt)) &&
-        (locationSelect === "全部地區" || locationSelect === "" || product.location === locationSelect) &&
-        (categorySelect === "全部種類" || categorySelect === "" || product.category === categorySelect)
-        // daysFromToday
+        (paramKeyword === "" || product.title.match(paramKeyword)) &&
+        (paramDate === "全部時間" || paramDate === "" || daysFromToday(product.showDate,tmpDelt)) &&
+        (paramLocation === "全部地區" || paramLocation === "" || product.location === paramLocation) &&
+        (paramCategory === "全部種類" || paramCategory === "" || product.category === paramCategory)
       );
     });
   
@@ -263,8 +264,19 @@ function AllEvents() {
     if(Math.ceil(result.length/8) < 1) setTotalPages(1)
     else setTotalPages(Math.ceil(result.length/8))
 
-  };
+  }, [searchParams]);
 
+
+  
+  const handleSeach = () => {
+    const newParams = new URLSearchParams();
+    if (keyword) newParams.set('keyword', keyword);
+    if (locationSelect) newParams.set('location', locationSelect);
+    if (categorySelect) newParams.set('category', categorySelect);
+    if (dateSelect) newParams.set('date', dateSelect);
+    setSearchParams(newParams); // 更新網址
+
+  };
   
   
 
@@ -316,15 +328,6 @@ function AllEvents() {
                 })}
               </select>
             </div>
-            {/* <div className="col-md-2 col-6">
-              <select id="inputPrice" value={priceSelect} onChange={(e) => setPriceSelect(e.target.value)}
-              className="form-control-customer form-select bg-dark text-white">
-                <option value="" disabled>票價</option>
-                {priceData.map((item) => {
-                  return <option value={item} key={item}>{item}</option>
-                })}
-              </select>
-            </div> */}
             <div className="col-md-1 col-12">
               <button className="btn form-control-customer 
               d-flex align-items-center justify-content-center bg-white w-100"
@@ -334,39 +337,35 @@ function AllEvents() {
               </button>
             </div>
           </div>
-         
-
         </div>
       </div>
       
 
-    <div className="container">
-      {/* 產生活動列表 */}
-      <div className="row mt-5">
-        <DataTable 
-        filterProducts={filteredProducts}
-        handleNavigate={handleNavigate}
-        currentPage={currentPage}
-        >
-        </DataTable>
+      <div className="container">
+        {/* 產生活動列表 */}
+        <div className="row mt-5">
+          <DataTable 
+          filterProducts={filteredProducts}
+          handleNavigate={handleNavigate}
+          currentPage={currentPage}
+          >
+          </DataTable>
+        </div>
+        
+        <PaginationComponent
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={(page) =>{
+            setCurrentPage(page)
+            window.scrollTo({
+                  top: 0,
+                  behavior: 'smooth'
+                });
+            } 
+          }
+        />
+
       </div>
-      
-      <PaginationComponent
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={(page) =>{
-          setCurrentPage(page)
-          window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-              });
-          } 
-        }
-      />
-
-    </div>
-
-
 
 
       {loading && (<Loading></Loading>)}  
