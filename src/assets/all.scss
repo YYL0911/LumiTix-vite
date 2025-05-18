@@ -6,6 +6,11 @@
 @import "../node_modules/bootstrap/scss/bootstrap"; // 必要的方法Bootstrap 完整原始碼
 
 
+@import "./scss/base/base";
+
+@import "./scss/pages/EventInfo.scss";
+@import "./scss/pages/UserManagementList";
+
  // 資訊要撐到完整頁面
 .page {
   display: flex;

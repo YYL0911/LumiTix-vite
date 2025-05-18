@@ -415,6 +415,9 @@ $spacers: (
   3: $spacer,
   4: $spacer * 1.5,
   5: $spacer * 3,
+  6: $spacer * 2, //自訂
+  7: $spacer * 2.5, //自訂
+  8: $spacer * 5, //自訂
 ) !default;
 // scss-docs-end spacer-variables-maps
 
@@ -603,7 +606,7 @@ $aspect-ratios: (
 
 // scss-docs-start font-variables
 // stylelint-disable value-keyword-case
-$font-family-sans-serif:      system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
+$font-family-sans-serif:      Noto Sans TC, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
 $font-family-monospace:       SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !default;
 // stylelint-enable value-keyword-case
 $font-family-base:            var(--#{$prefix}font-sans-serif) !default;
@@ -1010,9 +1013,9 @@ $form-select-disabled-color:        null !default;
 $form-select-disabled-bg:           $input-disabled-bg !default;
 $form-select-disabled-border-color: $input-disabled-border-color !default;
 $form-select-bg-position:           right $form-select-padding-x center !default;
-$form-select-bg-size:               16px 12px !default; // In pixels because image dimensions
+$form-select-bg-size:               16px 16px !default; // In pixels because image dimensions
 $form-select-indicator-color:       $gray-800 !default;
-$form-select-indicator:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
+$form-select-indicator:             url('data:image/svg+xml;utf8,<svg fill="white" height="25" width="25" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M4 6l4 4 4-4z"/></svg>');// url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
 
 $form-select-feedback-icon-padding-end: $form-select-padding-x * 2.5 + $form-select-indicator-padding !default;
 $form-select-feedback-icon-position:    center right $form-select-indicator-padding !default;

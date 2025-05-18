@@ -3,7 +3,7 @@ import './assets/all.scss'
 import Navbar from './conponents/Navbar';
 import Footer from './conponents/Footer';
 import Top from './conponents/Top';
-import {Routes, Route} from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 import PrivateRoute from './conponents/PrivateRoute';
 
@@ -21,11 +21,12 @@ import TicketScaner from './pages/Organizer/TicketScaner';
 import TicketScanerResult from './pages/Organizer/TicketScanerResult';
 
 import EventsList from './pages/Admin/EventsList';
+import UserManagementList from './pages/Admin/UserManagementList';
 
 const NotFound = () => <h1>404 - 頁面不存在</h1>;
 
 function App() {
-  
+
   return (
     <div className="page">
       <Navbar />
@@ -53,13 +54,13 @@ function App() {
             <Route path="/activeInfo/:id" element={<ActiveInfo />} />
           </Route>
 
-           {/* 只有活動方可以看的頁面 */}
+          {/* 只有活動方可以看的頁面 */}
           <Route element={<PrivateRoute roles={['Admin']} />}>
-            <Route path='/eventsList' element = {<EventsList></EventsList>}></Route>
+            <Route path='/eventsList' element={<EventsList></EventsList>}></Route>
           </Route>
 
 
-          
+
 
 
           <Route path="*" element={<NotFound />} />
@@ -73,3 +74,5 @@ function App() {
 }
 
 export default App;
+
+
