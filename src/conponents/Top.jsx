@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
 import top from "../assets/img/Top.png"
 
 function Top() {
   const [showButton, setShowButton] = useState(false);
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    // 每次路由變更時捲動到最上方
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   // 監聽滾動事件
   useEffect(() => {
