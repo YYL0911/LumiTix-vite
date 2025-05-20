@@ -21,7 +21,7 @@ function TicketScanerResult() {
       {/* 麵包屑 */}
       <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
-      {result.toString() === "成功" ? (
+      {result.status  ? (
       <>
         <h1 className='p-3 border border-2 border-dark-subtle d-inline-block text-success fw-bold align-self-center'>
           驗票成功
@@ -30,18 +30,18 @@ function TicketScanerResult() {
           詳細資訊:
           <div className='my-2 p-3 border border-3 border-dark text-secondary'>
             訂單編號
-            <p className="border-bottom border-2 text-black">123</p>
+            <p className="border-bottom border-2 text-black">{result.data.ticket_no}</p>
             活動名稱
-            <p className="border-bottom border-2 text-black">123</p>
+            <p className="border-bottom border-2 text-black">{result.data.event.tilte}</p>
             活動時間
-            <p className="border-bottom border-2 text-black">123</p>
+            <p className="border-bottom border-2 text-black">{result.data.event.start_at}</p>
             活動地點
-            <p className="border-bottom border-2 text-black">123</p>
-            參加者資訊<br />
+            <p className="border-bottom border-2 text-black">{result.data.event.location}</p>
+            <br />參加者資訊<br />
             姓名
-            <p className="border-bottom border-2 text-black">123</p>
+            <p className="border-bottom border-2 text-black">{result.data.user.name}</p>
             電子郵件
-            <p className="border-bottom border-2 text-black">123</p>
+            <p className="border-bottom border-2 text-black">{result.data.user.email}</p>
           </div>
         </div>
       </>
@@ -53,7 +53,7 @@ function TicketScanerResult() {
         <div className='my-3'>
           詳細資訊:
           <div className='my-2 p-3 text-danger text-center text-break'>
-            123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456123456
+            {result.message}
           </div>
         </div>
       </>
