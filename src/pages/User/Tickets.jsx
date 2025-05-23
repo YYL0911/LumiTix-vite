@@ -14,8 +14,8 @@ import locationIcon from "../../assets/img/location_on.png"
 
 //麵包屑
 const breadcrumb = [
-  { name: '首頁', path: "/" },
-  { name: '票務管理', path: "/" },
+  { name: "首頁", path: "/" },
+  { name: "票務管理", path: "/tickets" },
 ];
 
 
@@ -109,7 +109,7 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
             }
             <a className="text-decoration-none" href="#" onClick={(e) => {
               e.preventDefault();
-              // handleNavigate(`/evevtInfo/${product.order_id}`)
+              handleNavigate(`/ticketInfo/${product.order_id}`);
             }}>
 
               <div  className="bg-white my-3 d-flex align-items-center border border-2 border-black p-3">
@@ -172,7 +172,7 @@ function Tickets() {
   const [activeState, setActiveState] = useState(null);
   const [allData, setAllData] = useState(null); 
 
- 
+
 
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
   const [apiLoading, setApiLoading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
@@ -258,7 +258,7 @@ function Tickets() {
 
         {isFixed && <div style={{top: `${headerHeight}px`}}></div>}
         <div ref={tabRef} 
-         style={{
+        style={{
           position: isFixed ? 'fixed' : 'static',
           top: `${headerHeight}px`,
         }}
