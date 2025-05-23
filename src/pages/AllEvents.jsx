@@ -1,6 +1,6 @@
 
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useState, useEffect} from 'react';
+import { useState, useEffect, useRef} from 'react';
 
 // 元件
 import Breadcrumb from "../conponents/Breadcrumb";
@@ -52,9 +52,7 @@ const sampleData = [
     imgSrc:pic1,
     title: '鋼琴獨奏會《浪漫派之聲》蕭邦與李斯特',
     showDate: dataString(0),
-    showTime:"20:00~20:50",
-    location:"台北市",
-    category:"演唱會"
+    showTime:"20:00~20:50",location:"台北市",category:"演唱會"
 
   },
   {
@@ -62,84 +60,68 @@ const sampleData = [
     imgSrc:pic2,
     title: 'Moonstruck《月光迷途》音樂旅程',
     showDate:dataString(6),
-    showTime:"20:00~20:50",
-    location:"台北市",
-    category:"演唱會"
+    showTime:"20:00~20:50",location:"台北市",category:"演唱會"
   },
   {
     id: 3,
     imgSrc:pic3,
     title: 'MOSAIC BAND《色彩爆發》世界巡演',
     showDate: dataString(30),
-    showTime:"20:00~20:50",
-    location:"台北市",
-    category:"舞台劇"
+    showTime:"20:00~20:50",location:"台北市",category:"舞台劇"
   },
   {
     id: 4,
     imgSrc:pic4,
     title: 'Retro Groove《復古風暴》現場演唱會',
     showDate:dataString(7),
-    showTime:"20:00~20:50",
-    location:"高雄市",
-    category:"演唱會"
+    showTime:"20:00~20:50",location:"高雄市",category:"演唱會"
   },
   {
     id: 5,
     imgSrc:pic5,
     title: '夜行少女《無盡之夜》全台巡演',
     showDate:dataString(10),
-    showTime:"20:00~20:50",
-    location:"台北市",
-    category:"演唱會"
+    showTime:"20:00~20:50",location:"台北市",category:"演唱會"
   },
   {
     id: 6,
     imgSrc:pic6,
     title: '原創戲劇《時光書簡》跨世代親情故事',
     showDate:dataString(60),
-    showTime:"20:00~20:50",
-    location:"台中市",
-    category:"音樂會"
+    showTime:"20:00~20:50",location:"台中市",category:"音樂會"
   },
   {
     id: 7,
     imgSrc:pic7,
     title: '國樂團《絲竹共鳴》東方韻味特場',
     showDate:dataString(15),
-    showTime:"20:00~20:50",
-    location:"台北市",
-    category:"舞台劇"
+    showTime:"20:00~20:50",location:"台北市",category:"舞台劇"
   },
   {
     id: 8,
     imgSrc:pic8,
     title: '黑色幽默劇《辦公室奇談》人生如戲',
     showDate:dataString(20),
-    showTime:"20:00~20:50",
-    location:"高雄市",
-    category:"演唱會"
+    showTime:"20:00~20:50",location:"高雄市",category:"演唱會"
   },
   {
     id: 9,
     imgSrc:pic9,
     title: '當代戲劇《鏡中謎影》懸疑大戲',
     showDate:dataString(80),
-    showTime:"20:00~20:50",
-    location:"台中市",
-    category:"舞台劇"
+    showTime:"20:00~20:50",location:"台中市",category:"舞台劇"
   }
   
 ];
 
 // 列表元件
 const CardItem = ({ id, imgSrc, title, showTime, location, category, handleNavigate }) => (
-  <a className="card mb-5 col-md-3 col-6 text-decoration-none" style={{ border: 'none' }} href="#" onClick={(e) => {
+  <a className="allEventHover card mb-5 col-md-3 col-6 text-decoration-none" style={{ border: 'none' }} href="#" onClick={(e) => {
     e.preventDefault();
     handleNavigate(`/evevtInfo/${id}`)
   }}>
     
-    <div className="border border-2 border-secondary ratio" style={{ '--bs-aspect-ratio': '145.78%' }}>
+    <div className="allEventImg border border-2 border-secondary ratio" style={{ '--bs-aspect-ratio': '145.78%' }}>
       <img src={imgSrc} className="img-fluid object-fit-cover w-100 h-100 p-2" alt={title} />
     </div>
     <div className="d-flex flex-column justify-content-between mt-3" >
@@ -174,18 +156,24 @@ const DataTable = ({ filterProducts, handleNavigate, currentPage }) => {
 
   return (
     <>
-      {pageProducts.map((product) => (
-        <CardItem
-          key={product.id}
-          id={product.id}
-          imgSrc={product.imgSrc}
-          title={product.title}
-          showTime={product.showDate}
-          location={product.location}
-          category={product.category}
-          handleNavigate={handleNavigate}
-        />
-      ))}
+      {
+        pageProducts.length === 0 ? (
+          <h1>無符合資料</h1>
+        ) : (
+          pageProducts.map((product) => (
+            <CardItem
+              key={product.id}
+              id={product.id}
+              imgSrc={product.imgSrc}
+              title={product.title}
+              showTime={product.showDate}
+              location={product.location}
+              category={product.category}
+              handleNavigate={handleNavigate}
+            />
+          ))
+        )
+      }
     </>
   );
 };
@@ -203,6 +191,7 @@ function AllEvents() {
   const navigate = useNavigate();
   //跳轉頁面
   const handleNavigate = ((path) => navigate(path)); 
+  const [apiLoading, setApiLoading] = useState(false);
 
   const [loading, setloading] = useState(false);
   
@@ -210,7 +199,9 @@ function AllEvents() {
   const [currentPage, setCurrentPage] = useState(1);
 
 
-  const [locationData, setLocationData] = useState(["全部地區", "台北市","台中市", "高雄市"]);
+  const [locationData] = useState([
+    "全部地區","台北市","新北市","桃園市","台中市","台南市","高雄市","基隆市","新竹市","嘉義市","新竹縣","苗栗縣","彰化縣","南投縣","雲林縣","嘉義縣","屏東縣","宜蘭縣","花蓮縣","台東縣","澎湖縣","金門縣","連江縣"
+  ]);
   const [categoryData, setCategoryData] = useState(["全部種類", "演唱會", "舞台劇", "音樂會"]);
   const [dateData, setDatesData] = useState(["全部時間","今天","一週內","一個月內","兩個月內"]);
   const [priceData, setPriceData] = useState(["全部價格", "免費", "TWD 1-1000", "TWD 1000-2000", "TWD 2000-3000", "TWD 3000 以上"]);
@@ -266,28 +257,47 @@ function AllEvents() {
 
   }, [searchParams]);
 
-
-  
   const handleSeach = () => {
     const newParams = new URLSearchParams();
     if (keyword) newParams.set('keyword', keyword);
     if (locationSelect) newParams.set('location', locationSelect);
     if (categorySelect) newParams.set('category', categorySelect);
     if (dateSelect) newParams.set('date', dateSelect);
-    setSearchParams(newParams); // 更新網址
-
+    setSearchParams(newParams);
+    setCurrentPage(1)
   };
-  
+
+
+  const isFirstRender = useRef(true); // 記錄是否是第一次渲染
+  // useEffect(() => {
+  //   if (isFirstRender.current) {
+      
+  //     isFirstRender.current = false; // 更新為 false，代表已執行過
+  //     // console.log("✅ useEffect 只執行一次");
+  //     // setApiLoading(true)
+  //     fetch("",{
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       }}) 
+  //       .then(res => res.json())
+  //       .then(result => {
+  //           console.log(result)
+          
+  //       })
+  //       .catch(err => {
+  //         console.log(err);
+  //       });
+  //   }
+  // }, []);
   
 
   return (
     <>
       <div className="full-width-section"
       style={{
-        // backgroundColor: "black",
         backgroundImage: `url(${searchBG})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center"
+        backgroundSize: "cover",    backgroundPosition: "center"
       }}>
         <div className="container py-5 mx-auto allEvents">
           {/* 麵包屑 */}
