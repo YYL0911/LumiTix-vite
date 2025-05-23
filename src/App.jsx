@@ -15,6 +15,7 @@ import EventInfo from './pages/EventInfo';
 import Register from './pages/User/Register';
 import Personal from './pages/User/Personal';
 import Tickets from './pages/User/Tickets';
+import TicketDetailPage from "./pages/User/TicketDetailPage";
 import Events from './pages/Organizer/Events';
 import ActiveInfo from './pages/Organizer/ActiveInfo';
 import TicketScaner from './pages/Organizer/TicketScaner';
@@ -44,6 +45,7 @@ function App() {
           <Route element={<PrivateRoute roles={["General"]} />}>
             <Route path="/personal" element={<Personal />}></Route>
             <Route path="/tickets" element={<Tickets></Tickets>}></Route>
+            <Route path="/ticketInfo/:id" element={<TicketDetailPage />} />
           </Route>
 
           {/* 只有活動方可以看的頁面 */}
@@ -55,13 +57,9 @@ function App() {
           </Route>
 
           {/* 只有活動方可以看的頁面 */}
-          <Route element={<PrivateRoute roles={['Admin']} />}>
-            <Route path='/eventsList' element={<EventsList></EventsList>}></Route>
+          <Route element={<PrivateRoute roles={["Admin"]} />}>
+            <Route path="/eventsList" element={<EventsList></EventsList>}></Route>
           </Route>
-
-
-
-
 
           <Route path="*" element={<NotFound />} />
         </Routes>
