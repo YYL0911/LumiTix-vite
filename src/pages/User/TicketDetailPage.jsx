@@ -1,224 +1,361 @@
 // 1. 從 React 和其他函式庫/組件導入必要的模組
 import { useState, useEffect } from "react"; // React 核心鉤子 (hooks)，用於狀態 (state) 和副作用 (side effects)
-import { useParams } from "react-router-dom"; // 鉤子，用於存取 URL 參數 (例如 /tickets/TICKET_ID)
-import { useNavigate } from "react-router-dom"; // 鉤子，用於程式化導航 (已導入但在此特定程式碼中未使用)
-import { useAuth } from "../../contexts/AuthContext"; // 自訂鉤子，用於身份驗證上下文 (已導入但在此特定程式碼中未使用)
-import axios from "axios"; // 匯入 axios（放在第三方套件區）
+import { useParams, useNavigate } from "react-router-dom"; // React Router 鉤子，分別用於獲取 URL 參數和進行程式化導航
+import { useAuth } from "../../contexts/AuthContext"; // 自訂鉤子，用於從身份驗證上下文中獲取認證相關資訊 (例如 userToken)
+import axios from "axios"; // 用於發送 HTTP 請求的函式庫
 import Breadcrumb from "../../conponents/Breadcrumb"; // 自訂組件，用於顯示麵包屑導航
 import Loading from "../../conponents/Loading"; // 自訂組件，用於顯示載入指示器
 
-// 2. 定義此頁面的麵包屑結構
+// 2. 定義此頁面的麵包屑靜態結構
 const breadcrumb = [
-  { name: "首頁", path: "/" }, // 首頁
-  { name: "票務管理", path: "/tickets" }, // 票務管理頁面
-  { name: "票卷詳情", path: "/ticketInfo" }, // 目前頁面：票券詳情
+  { name: "首頁", path: "/" }, // 第一層：首頁，並指定路徑
+  { name: "票務管理", path: "/tickets" }, // 第二層：票務管理頁面，並指定路徑
+  { name: "票券詳情" }, // 第三層：目前頁面名稱 (票券詳情)，通常最後一層不設路徑
 ];
 
 // 3. 定義主要的函數式組件：TicketDetailPage
+// 此組件負責顯示單張票券的詳細資訊
 const TicketDetailPage = () => {
   // 4. 鉤子 (Hooks) 和狀態 (State) 初始化
-  const { id } = useParams(); // 從當前 URL 獲取 'id' 參數 (例如，若 URL 為 /ticketInfo/123，則 id 為 "123")
-  // 雖然提取了 'id'，但在下面的模擬資料獲取邏輯中並未直接使用它來改變資料。
-  // 在實際應用中，這個 'id' 會被用來獲取特定的票券資料。
+  const { id: orderId } = useParams(); // 從當前 URL 獲取路徑參數 'id'，並將其重新命名為 'orderId' 以增加可讀性
+  const { userToken } = useAuth(); // 從 AuthContext 中獲取使用者登入後產生的 token
+  const navigate = useNavigate(); // 獲取 navigate 函數，用於在程式邏輯中跳轉頁面
 
-  const [ticketData, setTicketData] = useState(null); // 狀態，用於儲存獲取到的票券資料。初始值為 null。
-  const [loading, setLoading] = useState(true); // 狀態，用於管理載入狀態。預設為 true。
-  const [currentTicketIndex, setCurrentTicketIndex] = useState(0); // 狀態，用於追蹤當訂單中有多張票券時，目前顯示的是哪一張。
+  // --- 狀態變數定義 ---
+  // ticketData: 用於儲存從 API 獲取到的票券詳細資料，初始值為 null
+  const [ticketData, setTicketData] = useState(null);
+  // loading: 布林值，用於管理資料是否正在載入中，預設為 true (一進入頁面就開始載入)
+  const [loading, setLoading] = useState(true);
+  // currentTicketIndex: 數字，當一個訂單包含多張票券時，用於追蹤目前顯示的是第幾張票券 (基於 0 的索引)，預設為 0
+  const [currentTicketIndex, setCurrentTicketIndex] = useState(0);
+  // errorMessage: 字串，用於儲存載入資料過程中發生的錯誤訊息，初始為空字串
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // 5. useEffect 鉤子用於資料獲取 (模擬)
+  // 5. useEffect 鉤子用於資料獲取等副作用操作
+  // 當 orderId, userToken, 或 navigate 函數發生變化時，此 effect 會重新執行
   useEffect(() => {
-    setLoading(true); // 當 effect 執行時 (例如組件掛載或 'id' 改變時) 將載入狀態設為 true
+    // --- 前置檢查 ---
+    // 如果 orderId 不存在 (例如 URL 不正確)，則設定錯誤訊息並停止後續操作
+    if (!orderId) {
+      setLoading(false); // 停止載入狀態
+      setErrorMessage("無效的訂單ID");
+      return; // 結束 effect 執行
+    }
 
-    // 使用 setTimeout 模擬 API 呼叫
-    const timer = setTimeout(() => {
-      // 添加 timer 以便在組件卸載時清除
-      // 模擬票券資料。在實際應用中，這些資料會透過 'id' 從 API 獲取。
-      setTicketData({
-        coverImage: "https://placehold.co/600x250/6c757d/white?text=活動封面照", // 活動封面圖片 URL
-        qrCodeImage: "https://placehold.co/120x120/e0f2e9/198754?text=", // QR code 圖片 URL (文字為空，可能顯示預設的佔位 QR code)
-        ticketNumberMaster: "112255688", // 訂單的主票券編號
-        tickets: [
-          // 此訂單中包含的多張獨立票券陣列
-          {
-            id: "TICKET_001",
-            type: "全票", // 票券類型 (例如：成人票)
-            price: "1500 TWD", // 票價
-            seat: "C區 2-F號", // 座位資訊 (標註為暫定)
+    // 如果 userToken 不存在 (使用者未登入)，則設定錯誤訊息並導向到登入頁面
+    if (!userToken) {
+      setLoading(false); // 停止載入狀態
+      setErrorMessage("請先登入"); // 雖然會馬上導航，但還是可以設定一下
+      navigate("/login"); // 導向登入頁
+      return; // 結束 effect 執行
+    }
+
+    // --- 定義異步函數以獲取票券詳細資料 ---
+    const fetchTicketDetails = async () => {
+      setLoading(true); // 開始載入，設定載入狀態為 true
+      setErrorMessage(""); // 清除任何先前的錯誤訊息
+
+      try {
+        // 使用 axios 發送 GET 請求到後端 API
+        const response = await axios.get(`https://n7-backend.onrender.com/api/v1/orders/${orderId}`, {
+          headers: {
+            Authorization: `Bearer ${userToken}`, // 在請求標頭中加入 Bearer Token 進行身份驗證
           },
-          {
-            id: "TICKET_002",
-            type: "全票",
-            price: "1200 TWD",
-            seat: "D區 1-A號",
-          },
-        ],
-        orderDetails: {
-          // 關於訂單本身的詳細資訊
-          orderNumber: "223345678",
-          activityName: "台北愛樂《春之頌》交響音樂會", // 活動名稱
-          activityTime: "2025-05-05（三）18:00~21:00", // 活動時間
-          activityLocation: "臺北國家音樂廳", // 活動地點
-        },
-        participantInfo: {
-          // 關於持票人/購買者的資訊
-          name: "王小明",
-          email: "wang123@gmail.com",
-        },
-      });
-      setLoading(false); // 資料 "獲取" 完成後將載入狀態設為 false
-    }, 1000); // 模擬 1 秒的延遲
+        });
 
-    // 清理函數：如果組件卸載或 'id' 在 setTimeout 完成前改變，則清除 setTimeout。
-    return () => clearTimeout(timer);
-  }, [id]); // 依賴陣列：此 effect 會在組件掛載時以及 'id' 參數改變時執行。
+        // --- 處理 API 成功回應 ---
+        if (response.data && response.data.status === true) {
+          const apiData = response.data.data; // 從回應中取出實際的資料部分
 
-  // 6. 票券導覽的事件處理函數
+          // --- 時間格式化處理 ---
+          // 處理 start_at: 確保有值，替換 'T' 為空格，並取 YYYY-MM-DD HH:MM 部分
+          const rawStartTimeString = apiData.event.start_at || "";
+          const formattedStartTime = rawStartTimeString.replace("T", " ").substring(0, 16);
+
+          // 處理 end_at: 確保有值，替換 'T' 為空格，並只取 HH:MM 部分
+          const rawEndTimeString = apiData.event.end_at || "";
+          const formattedEndTime = rawEndTimeString.replace("T", " ").substring(11, 16);
+
+          // --- 資料轉換 ---
+          // 將從 API 獲取的資料 (apiData) 轉換為前端組件更容易使用的結構 (transformedData)
+          const transformedData = {
+            coverImage: apiData.event.cover_image_url, // 活動封面圖片 URL
+            ticketNumberMaster: apiData.order_no, // 主訂單編號
+            tickets: apiData.tickets.map((ticket) => ({
+              // 遍歷訂單中的每張票券
+              id: ticket.ticket_no, // 每張票的獨立票號
+              type: ticket.type, // 票種 (例如：全票)
+              price: `${ticket.price} TWD`, // 票價，並加上貨幣單位
+              seat: ticket.seat_no, // 座位資訊
+              status: ticket.status, // 票券狀態 (例如：unused, used)
+              qrcode: ticket.qrcode_image, // 每張票獨立的 QR Code 圖片資料 (Base64)
+            })),
+            orderDetails: {
+              // 訂單相關的詳細資訊
+              orderNumber: apiData.order_no, // 訂單編號 (同 ticketNumberMaster)
+              activityName: apiData.event.title, // 活動名稱 
+              activityTime: `${formattedStartTime} ~ ${formattedEndTime}`, // 格式化後的活動時間區間
+              activityLocation: apiData.event.location, // 活動地點
+              activityAddress: apiData.event.address, // 活動詳細地址
+            },
+            participantInfo: {
+              // 參加者/購買者資訊
+              name: apiData.user.name, // 姓名
+              email: apiData.user.email, // 電子郵件
+            },
+          };
+          setTicketData(transformedData); // 更新 ticketData 狀態，觸發組件重新渲染以顯示資料
+        } else {
+          // --- 處理 API 回應但 status 為 false 的情況 (例如：後端邏輯錯誤) ---
+          const message = response.data?.message || "無法取得票券資訊"; // 從回應中獲取錯誤訊息，或使用預設訊息
+          setErrorMessage(message); // 設定錯誤訊息狀態
+          console.error("API Error:", message); // 在主控台印出 API 錯誤
+          // 如果是特定錯誤 (訂單不存在、權限不足)，延遲後導回票券列表頁
+          if (message === "訂單不存在" || message === "使用者權限不足") {
+            setTimeout(() => navigate("/tickets"), 3000); // 3秒後導航
+          }
+        }
+      } catch (error) {
+        // --- 處理請求過程中的其他錯誤 (例如：網路問題、伺服器 500 錯誤等) ---
+        console.error("Fetch Ticket Details Error:", error); // 在主控台印出捕獲到的錯誤對象
+        let message = "發生未知錯誤"; // 預設錯誤訊息
+        if (error.response) {
+          // 如果錯誤包含 response 物件，表示是伺服器回傳的 HTTP 錯誤 (4xx, 5xx)
+          message = error.response.data?.message || `錯誤碼：${error.response.status}`; // 優先使用後端提供的錯誤訊息
+          // 如果是 401 未授權或特定訊息 "尚未登入"，導向登入頁
+          if (error.response.status === 401 || error.response.data?.message === "尚未登入") {
+            navigate("/login");
+            return; // 結束函式執行，避免後續的 setLoading(false) 被錯誤地調用
+          }
+          // 如果是 403 權限不足、404 找不到或訊息為 "訂單不存在"，延遲後導回票券列表
+          if (
+            error.response.status === 403 ||
+            error.response.status === 404 ||
+            error.response.data?.message === "訂單不存在"
+          ) {
+            setTimeout(() => navigate("/tickets"), 3000);
+          }
+        } else if (error.request) {
+          // 如果錯誤包含 request 物件但沒有 response，表示請求已發出但未收到回應 (例如網路斷線)
+          message = "無法連接到伺服器，請檢查您的網路連線";
+        }
+        // 其他 setup 錯誤 (例如請求配置錯誤) 會使用預設的 "發生未知錯誤"
+        setErrorMessage(message); // 設定錯誤訊息狀態
+      } finally {
+        // --- 無論成功或失敗，最後都會執行的區塊 ---
+        setLoading(false); // 設定載入狀態為 false，表示資料獲取流程結束
+      }
+    };
+
+    fetchTicketDetails(); // 呼叫異步函數開始獲取資料
+  }, [orderId, userToken, navigate]); // useEffect 的依賴陣列：當這些值改變時，effect 會重新執行
+
+  // 6. 票券導覽的事件處理函數 (用於多張票券時切換上一張)
   const handlePrevTicket = () => {
-    // 將 currentTicketIndex 減 1，但不小於 0
+    // 更新 currentTicketIndex，使其減 1，但最小不小於 0
     setCurrentTicketIndex((prev) => (prev > 0 ? prev - 1 : 0));
   };
 
+  // 票券導覽的事件處理函數 (用於多張票券時切換下一張)
   const handleNextTicket = () => {
-    // 將 currentTicketIndex 加 1，但不超過最後一張票券的索引
+    // 確保 ticketData 存在且目前不是最後一張票
     if (ticketData && currentTicketIndex < ticketData.tickets.length - 1) {
+      // 更新 currentTicketIndex，使其加 1
       setCurrentTicketIndex((prev) => prev + 1);
     }
   };
 
-  // 7. 載入狀態的條件渲染
-  // 如果仍在載入中或 ticketData 為 null (例如獲取失敗或尚未完成)，則顯示 Loading 組件。
-  if (loading || !ticketData) return <Loading />;
+  // 7. 條件渲染：根據載入狀態或錯誤訊息顯示不同內容
+  // 如果正在載入中，顯示 Loading 組件
+  if (loading) return <Loading />;
 
-  // 8. 為渲染準備資料
-  // 從 tickets 陣列中獲取當前選定票券的詳細資訊
+  // 如果有錯誤訊息，顯示錯誤提示區塊
+  if (errorMessage) {
+    return (
+      <div className="container py-3 text-center">
+        {/* 麵包屑，標題顯示錯誤狀態 */}
+        <Breadcrumb
+          breadcrumbs={breadcrumb.map((b) => (b.name === "票券詳情" ? { ...b, name: `票券詳情 - 錯誤` } : b))}
+        />
+        <div className="alert alert-danger mt-4" role="alert">
+          <h4>載入失敗</h4>
+          <p>{errorMessage}</p>
+          <button onClick={() => navigate("/tickets")} className="btn btn-primary">
+            返回票務管理
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 如果沒有載入錯誤，但 ticketData 仍為 null (例如 API 回應異常但未被 catch 捕獲為 error，或資料為空)
+  // 則顯示查無票券資料的提示
+  if (!ticketData)
+    return (
+      <div className="container py-3 text-center">
+        {/* 麵包屑，標題顯示查無資料狀態 */}
+        <Breadcrumb
+          breadcrumbs={breadcrumb.map((b) => (b.name === "票券詳情" ? { ...b, name: `票券詳情 - 查無資料` } : b))}
+        />
+        <div className="alert alert-warning mt-4" role="alert">
+          查無票券資料。
+        </div>
+        <button onClick={() => navigate("/tickets")} className="btn btn-primary">
+          返回票務管理
+        </button>
+      </div>
+    );
+
+  // 8. 為渲染準備資料：從 ticketData 中獲取當前選定要顯示的票券
   const currentTicket = ticketData.tickets[currentTicketIndex];
 
-  // 9. JSX 用於渲染組件的 UI 介面
+  // 9. JSX 用於渲染組件的 UI 介面 (當資料成功載入且無錯誤時)
   return (
     <div className="container py-3">
-      {/* 主要容器，帶有垂直方向的 padding */}
-      <Breadcrumb breadcrumbs={breadcrumb} /> {/* 顯示麵包屑 */}
-      {/* 主要票券資訊卡片 (QR code、座位等) */}
+      {/* 主要容器，帶有垂直內邊距 */}
+      {/* 麵包屑組件，動態顯示活動名稱作為票券詳情頁的標題 */}
+      <Breadcrumb
+        breadcrumbs={breadcrumb.map((b) =>
+          b.name === "票券詳情" ? { ...b, name: `票券詳情 - ${ticketData.orderDetails.activityName}` } : b
+        )}
+      />
+      {/* 主要票券資訊卡片 */}
       <div className="card mb-4 shadow-sm">
         {/* 活動封面圖片區塊 */}
         <div className="text-center bg-light py-3">
           <img
-            src={ticketData.coverImage}
-            alt="活動封面" // 無障礙文字描述："Event Cover"
-            className="img-fluid" // Bootstrap class，使圖片自適應
-            style={{ maxHeight: "150px", objectFit: "contain" }} // 樣式，限制最大高度並確保圖片內容完整顯示
+            src={ticketData.coverImage || "https://placehold.co/600x250/6c757d/white?text=無封面圖片"} // 活動封面圖，若無則顯示預設圖
+            alt="活動封面" // 圖片的替代文字描述
+            className="img-fluid" // Bootstrap class，使圖片自適應寬度
+            style={{ maxHeight: "600px", objectFit: "contain" }} // 限制最大高度並確保圖片內容完整顯示
             onError={(e) => {
-              // 若圖片載入失敗時的備用處理
+              // 圖片載入失敗時的處理
               e.target.onerror = null; // 防止無限迴圈 (如果備用圖片也失敗)
-              e.target.src = "https://placehold.co/600x250/6c757d/white?text=圖片載入失敗"; // 備用圖片："Image load failed"
+              e.target.src = "https://placehold.co/600x250/6c757d/white?text=圖片載入失敗"; // 顯示載入失敗的備用圖
             }}
           />
         </div>
 
-        {/* 卡片內容：QR Code、主票號、單張票券詳情 */}
+        {/* 卡片內容區域 */}
         <div className="card-body text-center">
-          {/* QR Code 顯示 */}
+          {/* QR Code 顯示區塊 */}
           <div className="d-inline-block p-2 rounded mb-2" style={{ backgroundColor: "#D1FAE5" }}>
             {/* QR Code 的樣式化容器 */}
             <img
-              src={ticketData.qrCodeImage}
-              alt="入場 QRCODE" // 無障礙文字描述："Entry QRCODE"
-              style={{ width: "100px", height: "100px" }} // 固定 QR Code 大小
+              src={currentTicket.qrcode || "https://placehold.co/120x120/e0f2e9/198754?text=無QR"} // 當前票券的 QR Code，若無則顯示預設圖
+              alt="入場 QRCODE" // 圖片的替代文字描述
+              style={{ width: "300px", height: "300px" }} // 設定 QR Code 圖片大小
               onError={(e) => {
-                // QR Code 圖片載入失敗時的備用處理
+                // QR Code 圖片載入失敗時的處理
                 e.target.onerror = null;
-                e.target.src = "https://placehold.co/120x120/e0f2e9/198754?text=QR"; // 備用 QR Code 圖片
+                e.target.src = "https://placehold.co/120x120/e0f2e9/198754?text=QR失效"; // 顯示載入失敗的備用圖
               }}
             />
           </div>
+          {/* QR Code 下方文字及票券狀態 */}
           <p className="mb-2 text-muted" style={{ fontSize: "1rem" }}>
-            入場QRCODE {/* 標籤："Entry QRCODE" */}
+            入場QRCODE ({currentTicket.status === "used" ? "已使用" : "未使用"}) {/* 根據票券狀態顯示文字 */}
           </p>
-          <p className="mb-3" style={{ fontSize: "1rem" }}>
-            票券編號：{ticketData.ticketNumberMaster} {/* 主票券編號，標籤："Ticket Number:" */}
+          {/* 訂單編號和票券編號 */}
+          <p className="mb-1" style={{ fontSize: "1rem" }}>
+            訂單編號：{ticketData.ticketNumberMaster}
+          </p>
+          <p className="mb-3" style={{ fontSize: "0.9rem", color: "#6c757d" }}>
+            票券編號：{currentTicket.id} {/* 顯示當前單張票券的編號 */}
           </p>
 
-          {/* 單張票券詳情：票種、票價、座位 */}
+          {/* 票種、票價、座位資訊 (格線系統排列) */}
           <div className="row border-top border-bottom py-3 mx-1 text-center" style={{ fontSize: "1.5rem" }}>
             <div className="col-4">
+              {/* 票種 */}
               <div className="text-muted" style={{ fontSize: "1rem" }}>
                 票種
               </div>
-              {/* 標籤："Type" */}
               <div>{currentTicket.type}</div>
             </div>
             <div className="col-4 border-start border-end">
+              {/* 票價 */}
               <div className="text-muted" style={{ fontSize: "1rem" }}>
                 票價
               </div>
-              {/* 標籤："Price" */}
               <div>{currentTicket.price}</div>
             </div>
             <div className="col-4">
+              {/* 座位 */}
               <div className="text-muted" style={{ fontSize: "1rem" }}>
                 座位
               </div>
-              {/* 標籤："Seat" */}
               <div>{currentTicket.seat}</div>
             </div>
           </div>
 
-          {/* 多張票券的導覽控制 */}
-          <div className="d-flex justify-content-center align-items-center mt-3 px-3">
-            <button
-              className="btn btn-lg btn-link text-secondary px-4"
-              onClick={handlePrevTicket}
-              disabled={currentTicketIndex === 0 || ticketData.tickets.length <= 1} // 若是第一張票或只有一張票則禁用
-              aria-label="上一張" // Aria 標籤："Previous Ticket"
-            >
-              <i class="bi bi-arrow-left-circle fs-1"></i> {/*表示上一張 */}
-            </button>
-            <span style={{ fontSize: "1.5rem" }}>
-              第 {currentTicketIndex + 1} / {ticketData.tickets.length} 張 {/* 顯示目前第幾張/總共幾張 */}
-            </span>
-            <button
-              className="btn btn-lg btn-link text-secondary px-4"
-              onClick={handleNextTicket}
-              disabled={currentTicketIndex === ticketData.tickets.length - 1 || ticketData.tickets.length <= 1} // 若是最後一張票或只有一張票則禁用
-              aria-label="下一張" // Aria 標籤："Next Ticket"
-            >
-              <i class="bi bi-arrow-right-circle fs-1"></i>
-              {/*表示下一張 */}
-            </button>
-          </div>
+          {/* 多張票券的導覽控制按鈕 (僅當訂單中票券數量大於1時顯示) */}
+          {ticketData.tickets.length > 1 && (
+            <div className="d-flex justify-content-center align-items-center mt-3 px-3">
+              {/* 上一張票按鈕 */}
+              <button
+                className="btn btn-lg btn-link text-secondary px-4"
+                onClick={handlePrevTicket} // 點擊時觸發切換到上一張票的函數
+                disabled={currentTicketIndex === 0} // 如果是第一張票，則禁用此按鈕
+                aria-label="上一張" // 無障礙標籤
+              >
+                <i className="bi bi-arrow-left-circle fs-1"></i> {/* Bootstrap Icon: 左箭頭 */}
+              </button>
+              {/* 顯示目前是第幾張/總共幾張 */}
+              <span style={{ fontSize: "1.5rem" }}>
+                第 {currentTicketIndex + 1} / {ticketData.tickets.length} 張
+              </span>
+              {/* 下一張票按鈕 */}
+              <button
+                className="btn btn-lg btn-link text-secondary px-4"
+                onClick={handleNextTicket} // 點擊時觸發切換到下一張票的函數
+                disabled={currentTicketIndex === ticketData.tickets.length - 1} // 如果是最後一張票，則禁用此按鈕
+                aria-label="下一張" // 無障礙標籤
+              >
+                <i className="bi bi-arrow-right-circle fs-1"></i> {/* Bootstrap Icon: 右箭頭 */}
+              </button>
+            </div>
+          )}
         </div>
       </div>
       {/* 詳細資訊區塊標題 */}
       <h6 className="card-title mb-3 text-start" style={{ fontSize: "1.5rem" }}>
-        詳細資訊 {/* 標題："Detailed Information" */}
+        詳細資訊
       </h6>
-      {/* 額外訂單和參與者詳細資訊的卡片 */}
+      {/* 包含訂單和參與者詳細資訊的卡片 */}
       <div className="card">
         <div className="card-body py-2 px-3">
-          <div className="mb-3 d-flex flex-column  border-bottom pb-2">
+          {/* 訂單詳細資訊 */}
+          <div className="mb-3 d-flex flex-column border-bottom pb-2">
             <span className="text-muted">訂單編號</span>
             <span>{ticketData.orderDetails.orderNumber}</span>
           </div>
-          <div className="mb-3 d-flex flex-column  border-bottom pb-2">
+          <div className="mb-3 d-flex flex-column border-bottom pb-2">
             <span className="text-muted">活動名稱</span>
             <span>{ticketData.orderDetails.activityName}</span>
           </div>
-          <div className="mb-3 d-flex flex-column  border-bottom pb-2">
+          <div className="mb-3 d-flex flex-column border-bottom pb-2">
             <span className="text-muted">活動時間</span>
             <span>{ticketData.orderDetails.activityTime}</span>
           </div>
-          <div className="mb-3 d-flex flex-column  border-bottom pb-2">
+          <div className="mb-3 d-flex flex-column border-bottom pb-2">
             <span className="text-muted">活動地點</span>
-            <span>{ticketData.orderDetails.activityLocation}</span>
+            <span>
+              {/* 顯示地點和地址 */}
+              {ticketData.orderDetails.activityLocation} ({ticketData.orderDetails.activityAddress})
+            </span>
           </div>
 
+          {/* 參與者資訊 */}
           <div className="mt-4 mb-2">
             <p className="mb-3 text-muted">參加者資訊</p>
-            <div className="mb-3 d-flex flex-column  border-bottom pb-2">
+            <div className="mb-3 d-flex flex-column border-bottom pb-2">
               <span className="text-muted">姓名</span>
               <span>{ticketData.participantInfo.name}</span>
             </div>
-            <div className="mb-3 d-flex flex-column  border-bottom pb-2">
+            <div className="mb-3 d-flex flex-column">
+              {/* 最後一項資訊，通常不需要底線 */}
+              {/* 這個空字串 " " 可能是為了格式或某些特殊渲染目的，可以檢查是否必要 */}
               <span className="text-muted">電子郵件</span>
               <span>{ticketData.participantInfo.email}</span>
             </div>
@@ -229,5 +366,5 @@ const TicketDetailPage = () => {
   );
 };
 
-// 11. 導出主組件
+// 導出主組件，使其可以在其他地方被引入和使用
 export default TicketDetailPage;
