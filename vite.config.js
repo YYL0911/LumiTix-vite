@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 
 export default defineConfig({
   plugins: [react()],
-  base: "/LumTix-vite/",
+  base: "/LumiTix-vite/",
   resolve: {
     alias: {
       // '@': path.resolve(__dirname, './src'),
