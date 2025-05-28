@@ -91,24 +91,25 @@ function TicketScaner() {
 
 
   const handleScan = (data) => {
-    let ticket400 = false
+    let ticket403 = false
 
     //由DATA抓到QRCORD資訊
     // 你可以改成呼叫後端驗證會員入場
     fetch(`https://n7-backend.onrender.com/api/v1/organizer/events/${eventIDRef.current}/verify/?token=${data}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      "Authorization": `Bearer ${userToken}`, // token 放這
-    })
+      headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${userToken}`, // token 放這
+    }}) 
     .then((res) =>{
-      if(res.status == 400) ticket400 = true
+      if(res.status == 403 ) ticket403 = true
       return res.json()
     } )
     .then((res) => {
       if (res.status) navigate('/ticketScanerResult', { state: { result: res.data} });
-      else if(ticket400) navigate('/ticketScanerResult', { state: { result: res} });
       else if(res.message == "尚未登入" )navigate("/login");
-      else navigate('/');
+      else if(ticket403 ) navigate('/');
+      else navigate('/ticketScanerResult', { state: { result: res} });
     })
     .catch(() => {});
   };
