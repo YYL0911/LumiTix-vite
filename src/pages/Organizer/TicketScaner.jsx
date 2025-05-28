@@ -22,9 +22,8 @@ function TicketScaner() {
   const [isMobile, setIsMobile] = useState(false);
   const modalRef = useRef(); // 彈窗ref
 
-
-  const [eventsInfo, setEventsInfo] = useState(null);
   const [eventID, setEventID] = useState("");
+  const eventIDRef = useRef("");
 
   useEffect(() => {
     setIsMobile(isMobileDevice())
@@ -37,8 +36,8 @@ function TicketScaner() {
   
   useEffect(() => {
     if (isFirstRender.current) {
-      
       isFirstRender.current = false; // 更新為 false，代表已執行過
+    
       // console.log("✅ useEffect 只執行一次");
       setApiLoading(true)
       fetch("https://n7-backend.onrender.com/api/v1/organizer/events/by-status?status=holding",{
@@ -50,18 +49,29 @@ function TicketScaner() {
         .then(res => res.json())
         .then(result => {
           setApiLoading(false)
-
+          
           if(!result.status){
             if(result.message == "尚未登入") navigate("/login");
             else navigate("/");
           }
           else{
             setOptions(result.data)
-
-            const eventID = localStorage.getItem("scanEventID");
-            if(eventID){
-              if (!result.data.some((item) => item.id == eventID) ) setEventID("")
-              else setEventID(eventID)
+            const eventIDStorage = localStorage.getItem("scanEventID");
+            if(eventIDStorage){
+              setEventID(eventIDStorage)
+              eventIDRef.current = eventIDStorage; // 同步更新 ref
+              if (!result.data.some((item) => item.id == eventIDStorage) ){
+                setEventID("")
+                eventIDRef.current = ""; // 同步更新 ref
+                if(result.data.length > 0){
+                  setEventID(result.data[0].id)
+                  eventIDRef.current = result.data[0].id; // 同步更新 ref
+                } 
+              } 
+              else{
+                setEventID(eventIDStorage)
+                eventIDRef.current = eventIDStorage; 
+              } 
             } 
           }
         })
@@ -73,39 +83,19 @@ function TicketScaner() {
 
 
 
-  useEffect(() => {
-    localStorage.setItem("scanEventID", eventID);
-  }, [eventID]);
-
+  const changeSelectActive = (e) =>{
+    localStorage.setItem("scanEventID", e.target.value);
+    setEventID(e.target.value)
+    eventIDRef.current = e.target.value; 
+  }
 
 
   const handleScan = (data) => {
-    // const fake = {
-    //   "status": true,
-    //   "message": "驗票成功",
-    //   "data": {
-    //     "ticket_no": "T250510RZrFHpgeYd", //因為是針對票券掃描，線稿圖好像應改為票券編號
-    //     "event":{
-    //        "tilte": "台北愛樂《春之頌》交響音樂會",
-    //        "location": "臺北國家音樂廳",
-    //        "start_at": "2025-05-05 18:00",
-    //        "end_at": "2025-05-05 20:00"
-    //     },
-    //     "user": {
-    //       "name": "王小明",
-    //       "email": "wang123@gmail.com"
-    //     }
-    //   }
-    // }
-
-    // // console.log(data)
-    // navigate('/ticketScanerResult', { state: { result: fake} });
-
     let ticket400 = false
 
     //由DATA抓到QRCORD資訊
     // 你可以改成呼叫後端驗證會員入場
-    fetch(`https://n7-backend.onrender.com/api/v1/organizer/events/${eventID}/verify/?token=${data}`, {
+    fetch(`https://n7-backend.onrender.com/api/v1/organizer/events/${eventIDRef.current}/verify/?token=${data}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       "Authorization": `Bearer ${userToken}`, // token 放這
@@ -135,9 +125,9 @@ function TicketScaner() {
     scanner.render(success, error)
 
     function success(result){
+      const currentEventID = eventIDRef.current;
       
-
-      if(eventID == ""){
+      if(currentEventID == ""){
         modalRef.current.open();
       }
       else{
@@ -157,13 +147,14 @@ function TicketScaner() {
     <div className='container py-3'>
       <div className="input-group mb-5 mt-2">
         <label className="form-label m-auto me-2 fs-4" htmlFor="inputGroupSelect01">
-          活動名稱
+         {/* {eventID}  */}
+          選擇活動
         </label>
 
         <select
           id="inputGroupSelect01"
           value={eventID}
-          onChange={(e) => setEventID(e.target.value)}
+          onChange={(e) => changeSelectActive(e)}
           className="form-select rounded-0 form-select-lg bg-secondary text-white holdingEventsList"
           style={{ whiteSpace: 'normal' }}
         >
@@ -178,9 +169,7 @@ function TicketScaner() {
         </select>
       </div>
 
-      
       <div id = "reader"></div>
-
 
       { !loading && apiLoading && (<Loading></Loading>)}
 
