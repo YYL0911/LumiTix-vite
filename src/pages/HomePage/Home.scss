@@ -164,6 +164,7 @@
     position: relative;
     border: 1px solid white; // 將預設邊框改為白色，這會應用於非 active 的 slide
     padding: 2rem;
+    aspect-ratio: 16 / 9; // 您可以試試常見的比例，如 16/9 (寬螢幕) 或 4/3，根據您的圖片內容選擇
     transition: filter 0.5s ease, border-color 0.3s ease, padding 0.3s ease, opacity 0.5s ease;
     opacity: 0.6; // 非 active slide 的基礎透明度
     filter: blur(1px) brightness(0.7); // 非 active slide 的模糊和變暗效果
@@ -222,10 +223,17 @@
 // --- Section 3 RWD ---
 @media (max-width: 767.98px) {
 .home-main-carousel {
+    aspect-ratio: 3 / 4;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
+    .slide-title-category-wrapper{
+      flex-direction: column;     // 將 flex 方向改為垂直堆疊
+      justify-content: flex-start;
+      align-items: flex-start;
+      width: 100%;
+    }
     .swiper-slide {
-      width: 80%; // 手機版讓每個 slide 寬一點
+      width: 60%; // 手機版讓每個 slide 寬一點
       opacity: 1;
       filter: none;
       .carousel-slide-content {
@@ -266,7 +274,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 10; // 確保在 slide 之上
+  z-index: 1; // 確保在 slide 之上
   cursor: pointer;
   color: #fff; // 箭頭圖示顏色
   background-color: rgba(0, 0, 0, 0.3); // 半透明背景使其更易見
@@ -335,7 +343,7 @@
       border: 1px solid #000000;
       padding: 1.5rem; // <<<<<<< 調整這個值來控制間距大小，例如 0.5rem 或 10px
       background-color: #fff; // <<<<<<< 這個是間距區域的背景色，通常是白色，
-      aspect-ratio: 4 / 3; // 這是整個 wrapper (包含邊框和padding) 的長寬比，
+      aspect-ratio: 3 / 4; // 這是整個 wrapper (包含邊框和padding) 的長寬比，
       .event-card-main-img {
         display: block; // 移除預設的行內元素底部空白
         width: 100%;    // 填滿 .event-card-img-wrapper 的內容區域 (padding 的內部)
@@ -371,7 +379,7 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
-        min-height: calc(1.1rem * 1.3 * 2);
+        min-height: calc(1.4rem * 1.3 * 2);
       }
       .event-category-tag { // 樣式保持不變 (紅色文字與邊框)
         display: inline-block;
@@ -429,7 +437,7 @@
     position: absolute;
     top: 45%;
     transform: translateY(-50%);
-    z-index: 10; // 確保在 slide 之上
+    z-index: 1; // 確保在 slide 之上
     cursor: pointer;
     color: #fff; // 箭頭圖示顏色
     background-color: rgba(0, 0, 0, 0.3); // 半透明背景使其更易見
@@ -496,7 +504,7 @@
     .event-card-img-wrapper {
       width: 100%;
       position: relative;
-      aspect-ratio: 4 / 3; // 這是整個 wrapper (包含邊框和padding) 的長寬比，
+      aspect-ratio: 3 / 4; // 這是整個 wrapper (包含邊框和padding) 的長寬比，
       .event-card-main-img {
         display: block; // 移除預設的行內元素底部空白
         width: 100%;    // 填滿 .event-card-img-wrapper 的內容區域 (padding 的內部)
@@ -532,7 +540,7 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
-        min-height: calc(1.1rem * 1.3 * 2);
+        min-height: calc(1.4rem * 1.3 * 2);
       }
       .event-category-tag { // 樣式保持不變 (紅色文字與邊框)
         display: inline-block;
@@ -610,7 +618,7 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 10; // 確保在 slide 之上
+    z-index: 1; // 確保在 slide 之上
     cursor: pointer;
     color: #fff; // 箭頭圖示顏色
     background-color: rgba(0, 0, 0, 0.3); // 半透明背景使其更易見
