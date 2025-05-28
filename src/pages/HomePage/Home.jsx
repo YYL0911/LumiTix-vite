@@ -1,5 +1,9 @@
-import React, { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import "./Home.scss"; // 首頁樣式匯入
+import axios from "axios"; // 用於發送 HTTP 請求的函式庫
+import { parseISO, format, addMinutes } from "date-fns"; // 在檔案頂部引入 date-fns 的相關函數
 // --- Swiper Core and modules imports ---
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, EffectCoverflow, A11y } from "swiper/modules"; // 引入需要的模組
@@ -16,10 +20,6 @@ import encryptedIcon from "../../assets/img/Home/features/encrypted.png";
 import groupsIcon from "../../assets/img/Home/features/groups.png";
 import taiwanMap from "../../assets/img/Home/features/Vector.png";
 // --- Section 3 的圖片 import ---
-import carouselImg1 from "../../assets/img/Home/carousel/carousel-01.png";
-import carouselImg2 from "../../assets/img/Home/carousel/carousel-02.png";
-import carouselImg3 from "../../assets/img/Home/carousel/carousel-03.png";
-import carouselImg4 from "../../assets/img/Home/carousel/carousel-04.png";
 import arrowLeftBlackOnLight from "../../assets/img/Home/carousel/arrow_left_black_on_light.png";
 import arrowRightBlackOnLight from "../../assets/img/Home/carousel/arrow_right_black_on_light.png";
 // --- Section 4 5 的圖片 import (請將圖片放置於建議路徑或自行修改) ---
@@ -27,64 +27,182 @@ import recommendedHeaderIcon from "../../assets/img/Home/recommended/Recommended
 import upcomingHeaderIcon from "../../assets/img/Home/recommended/Upcoming_Header_Icon.png";
 import arrowLeftRecommended from "../../assets/img/Home/recommended/arrow_left_white_on_dark.png";
 import arrowRightRecommended from "../../assets/img/Home/recommended/arrow_right_white_on_dark.png";
-import eventImg1 from "../../assets/img/Home/recommended/event-01.png";
-import eventImg2 from "../../assets/img/Home/recommended/event-02.png";
-import eventImg3 from "../../assets/img/Home/recommended/event-03.png";
-import eventImg4 from "../../assets/img/Home/recommended/event-04.png";
-import eventImg5 from "../../assets/img/Home/recommended/event-05.png";
-import eventImg6 from "../../assets/img/Home/recommended/event-06.png";
-import eventImg7 from "../../assets/img/Home/recommended/event-07.png";
-import eventImg8 from "../../assets/img/Home/recommended/event-08.png";
-import eventImg9 from "../../assets/img/Home/recommended/event-09.png";
-import eventImg10 from "../../assets/img/Home/recommended/event-10.png";
-import eventImg11 from "../../assets/img/Home/recommended/event-11.png";
 function Home() {
-  // --- 狀態管理和資料 (保持不變) ---
-  const [locationData, setLocationData] = useState(["全部地區", "台北市", "台中市", "高雄市"]);
-  const [categoryData, setCategoryData] = useState(["全部類型", "演唱會", "舞台劇", "音樂會"]);
-  const [dateData, setDatesData] = useState(["全部時間", "今天", "一週內", "一個月內", "兩個月內"]);
-  const [priceData, setPriceData] = useState([
-    "全部價格",
-    "免費",
-    "TWD 1-1000",
-    "TWD 1000-2000",
-    "TWD 2000-3000",
-    "TWD 3000 以上",
+  const navigate = useNavigate(); // 初始化 useNavigate
+
+  // --- 狀態管理和資料 ---
+  const [locationData] = useState([
+    "全部地區",
+    "台北市",
+    "新北市",
+    "桃園市",
+    "台中市",
+    "台南市",
+    "高雄市",
+    "基隆市",
+    "新竹市",
+    "嘉義市",
+    "新竹縣",
+    "苗栗縣",
+    "彰化縣",
+    "南投縣",
+    "雲林縣",
+    "嘉義縣",
+    "屏東縣",
+    "宜蘭縣",
+    "花蓮縣",
+    "台東縣",
+    "澎湖縣",
+    "金門縣",
+    "連江縣",
   ]);
+  const [categoryData] = useState(["全部種類", "演唱會", "舞台劇", "音樂會"]);
+  const [dateData] = useState(["全部時間", "今天", "一週內", "一個月內", "兩個月內"]);
   const [keyword, setKeyword] = useState("");
-  const [locationSelect, setLocationSelect] = useState("");
-  const [categorySelect, setCategorySelect] = useState("");
-  const [dateSelect, setDateSelect] = useState("");
-  const [priceSelect, setPriceSelect] = useState("");
+  const [locationSelect, setLocationSelect] = useState(""); // 初始為空，代表未選擇
+  const [categorySelect, setCategorySelect] = useState(""); // 初始為空
+  const [dateSelect, setDateSelect] = useState(""); // 初始為空
+  // --- Section 3 (大型輪播) 的狀態 ---
+  const [carouselSlides, setCarouselSlides] = useState([]);
+  // --- Section 4 (熱門推薦) 的狀態 ---
+  const [recommendedEvents, setRecommendedEvents] = useState([]);
+  const [loadingRecommended, setLoadingRecommended] = useState(true);
+  const [errorRecommended, setErrorRecommended] = useState(null);
+  // --- Section 5 (即將登場) 的狀態 ---
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [loadingUpcoming, setLoadingUpcoming] = useState(true);
+  const [errorUpcoming, setErrorUpcoming] = useState(null);
 
   const handleSearch = (event) => {
     event.preventDefault();
-    console.log("搜尋條件:", {
-      keyword,
-      date: dateSelect || "全部時間",
-      location: locationSelect || "全部地區",
-      category: categorySelect || "全部類型",
-      price: priceSelect || "全部價格",
-    });
+    const newParams = new URLSearchParams();
+    if (keyword) {
+      newParams.set("keyword", keyword);
+    }
+    // 如果使用者未選擇 (state 為空字串)，則傳遞對應的「全部」選項值
+    newParams.set("date", dateSelect || "全部時間");
+    newParams.set("location", locationSelect || "全部地區");
+    newParams.set("category", categorySelect || "全部種類");
+    navigate(`/allEvents?${newParams.toString()}`);
   };
+  useEffect(() => {
+    const fetchRecommendedAndCarouselEvents = async () => {
+      // 合併獲取熱門推薦和輪播資料
+      setLoadingRecommended(true); // 同時作為輪播的載入指示
+      setErrorRecommended(null); // 重置錯誤狀態
+      try {
+        const response = await axios.get("https://n7-backend.onrender.com/api/v1/events/trend");
+        if (response.data && response.data.status && Array.isArray(response.data.data)) {
+          const mappedTrendEvents = response.data.data.map((apiEvent) => {
+            // --- 使用 date-fns 進行時間格式化 ---
+            const dateObj = parseISO(apiEvent.start_at); // 1. 解析 ISO 字串
+            // 2. 調整 Date 物件，確保後續 format 函數能正確提取出原始 UTC 日期對應的年月日
+            const dateAdjustedForUtcDisplay = addMinutes(dateObj, dateObj.getTimezoneOffset());
+            // 3. 格式化調整後的日期物件為 'yyyy-MM-dd'
+            const formattedDate = format(dateAdjustedForUtcDisplay, "yyyy-MM-dd"); // 修改格式化字串
+            // --- 時間格式化結束 ---
+            return {
+              id: apiEvent.id,
+              img: apiEvent.cover_image_url,
+              date: formattedDate, // 使用 'yyyy-MM-dd' 格式
+              location: apiEvent.city,
+              title: apiEvent.title,
+              category: apiEvent.type,
+              view_count: apiEvent.view_count,
+            };
+          });
+          setRecommendedEvents(mappedTrendEvents); // 設定 Section 4 的資料
+          // 從已排序的熱門推薦中選取前五名作為 Section 3 輪播資料
+          // 確保這些欄位符合 renderCarouselSection 中 SwiperSlide 的需求
+          const topThreeForCarousel = mappedTrendEvents.slice(0, 5);
+          setCarouselSlides(topThreeForCarousel);
+        } else {
+          const errorMsg = response.data.message || "無法取得熱門/輪播活動資料，回應格式不符。";
+          setErrorRecommended(errorMsg); // 同時影響 Section 3 和 4
+          setRecommendedEvents([]);
+          setCarouselSlides([]);
+        }
+      } catch (error) {
+        console.error("Error fetching recommended/carousel (trend) events:", error);
+        let specificErrorMsg = "讀取熱門/輪播活動時發生未知錯誤。";
+        if (error.response && error.response.data && error.response.data.message) {
+          specificErrorMsg = error.response.data.message;
+        } else if (error.request) {
+          specificErrorMsg = "無法連線至伺服器(熱門/輪播)，請檢查網路。";
+        }
+        setErrorRecommended(specificErrorMsg); // 同時影響 Section 3 和 4
+        setRecommendedEvents([]);
+        setCarouselSlides([]);
+      } finally {
+        setLoadingRecommended(false); // Section 3 和 4 的載入都結束
+      }
+    };
+
+    const fetchUpcomingEvents = async () => {
+      setLoadingUpcoming(true);
+      setErrorUpcoming(null);
+      try {
+        const response = await axios.get("https://n7-backend.onrender.com/api/v1/events/coming-soon");
+        // axios 會將成功的 JSON 回應直接放在 response.data
+        if (response.data && response.data.status && Array.isArray(response.data.data)) {
+          const mappedEvents = response.data.data.map((event) => {
+            // --- 使用 date-fns 進行時間格式化 ---
+            const dateObj = parseISO(event.start_at); // 1. 解析 ISO 字串
+            // 2. 調整 Date 物件，確保後續 format 函數能正確提取出原始 UTC 日期對應的年月日
+            const dateAdjustedForUtcDisplay = addMinutes(dateObj, dateObj.getTimezoneOffset());
+            // 3. 格式化調整後的日期物件為 'yyyy-MM-dd'
+            const formattedDate = format(dateAdjustedForUtcDisplay, "yyyy-MM-dd"); // 修改格式化字串
+            // --- 時間格式化結束 ---
+            return {
+              id: event.id,
+              img: event.cover_image_url,
+              date: formattedDate, // 使用 'yyyy-MM-dd' 格式
+              location: event.city,
+              title: event.title,
+              category: event.type,
+            };
+          });
+          setUpcomingEvents(mappedEvents);
+        } else {
+          // 即使 HTTP 狀態是 200，但如果 API 回應的 status: false 或 data 格式不符
+          throw new Error(response.data.message || "無法取得即將登場活動的資料，回應格式不符。");
+        }
+      } catch (error) {
+        console.error("Error fetching upcoming events:", error);
+        if (error.response && error.response.data && error.response.data.message) {
+          // 後端回傳的錯誤 (例如您提供的 500 錯誤 JSON)
+          setErrorUpcoming(error.response.data.message);
+        } else if (error.request) {
+          // 請求已發出，但沒有收到回應 (網路問題)
+          setErrorUpcoming("無法連線至伺服器，請檢查您的網路連線。");
+        } else {
+          // 設定請求時發生錯誤或其他未知錯誤
+          setErrorUpcoming("讀取活動時發生未知錯誤，請稍後再試。");
+        }
+        setUpcomingEvents([]); // 清空資料
+      } finally {
+        setLoadingUpcoming(false);
+      }
+    };
+
+    fetchRecommendedAndCarouselEvents();
+    fetchUpcomingEvents();
+  }, []); // 空依賴陣列，只在掛載時執行
+
   // --- 狀態管理和資料結束 ---
   // --- Section 1: 搜尋列 ---
   const renderHeroSection = () => {
     return (
       <section className="hero-section">
-        {/* 主要容器 */}
         <div
           className="container d-flex flex-column justify-content-center align-items-center"
           style={{ minHeight: "70vh" }}
         >
-          {/* 副標題 */}
           <p className="hero-subtitle">即刻玩賞台灣藝文</p>
-          {/* --- 搜尋/篩選列 --- */}
           <form className="w-100" onSubmit={handleSearch}>
-            {/* row 直接放在主 container 下 */}
             <div className="row g-0 mt-3 search-row">
-              {/* 關鍵字輸入 */}
-              <div className="col-md-3 col-12">
+              {/* 關鍵字輸入 - 調整欄寬以適應移除價格後的佈局 */}
+              <div className="col-md-5 col-12">
                 <input
                   type="text"
                   className="form-control-customer form-control bg-dark text-white"
@@ -94,7 +212,7 @@ function Home() {
                 />
               </div>
               {/* 參加時間 */}
-              <div className="col-md-2 col-6">
+              <div className="col-md-2 col-sm-4 col-6">
                 <select
                   className="form-control-customer form-select bg-dark text-white"
                   value={dateSelect}
@@ -111,7 +229,7 @@ function Home() {
                 </select>
               </div>
               {/* 地區 */}
-              <div className="col-md-2 col-6">
+              <div className="col-md-2 col-sm-4 col-6">
                 <select
                   className="form-control-customer form-select bg-dark text-white"
                   value={locationSelect}
@@ -128,7 +246,7 @@ function Home() {
                 </select>
               </div>
               {/* 活動類型 */}
-              <div className="col-md-2 col-6">
+              <div className="col-md-2 col-sm-4 col-12">
                 <select
                   className="form-control-customer form-select bg-dark text-white"
                   value={categorySelect}
@@ -144,23 +262,6 @@ function Home() {
                   ))}
                 </select>
               </div>
-              {/* 價格 */}
-              <div className="col-md-2 col-6">
-                <select
-                  className="form-control-customer form-select bg-dark text-white"
-                  value={priceSelect}
-                  onChange={(e) => setPriceSelect(e.target.value)}
-                >
-                  <option value="" disabled>
-                    價格
-                  </option>
-                  {priceData.map((item) => (
-                    <option value={item} key={`price-${item}`}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </div>
               {/* 搜尋按鈕 */}
               <div className="col-md-1 col-12">
                 <button
@@ -168,12 +269,11 @@ function Home() {
                   className="btn form-control-customer d-flex align-items-center justify-content-center bg-white w-100"
                 >
                   <img src={searchIcon} alt="搜尋" />
-                  <p className=" m-0 ms-1 d-inline d-md-none">搜尋</p>
+                  <p className="m-0 ms-1 d-inline d-md-none">搜尋</p>
                 </button>
               </div>
             </div>
           </form>
-          {/* --- 搜尋/篩選列 結束 --- */}
         </div>
       </section>
     );
@@ -256,216 +356,166 @@ function Home() {
   };
   // --- Section 3: 大型輪播區塊 ---
   const renderCarouselSection = () => {
-    // 輪播資料 (使用匯入的圖片，其他資訊用 placeholder)
-    const slidesData = [
-      {
-        id: 1,
-        img: carouselImg1,
-        date: "2025-05-05",
-        title: "經典再現《紅樓夢》沉浸式劇場",
-        location: "台中市",
-        category: "舞台劇",
-      },
-      {
-        id: 2,
-        img: carouselImg2,
-        date: "2025-05-05",
-        title: "台北愛樂《春之頌》交響音樂會",
-        location: "高雄市",
-        category: "音樂會",
-      },
-      {
-        id: 3,
-        img: carouselImg3,
-        date: "2025-05-05",
-        title: "當代戲劇《鏡中謎影》懸疑大戲",
-        location: "台中市",
-        category: "舞台劇",
-      },
-      {
-        id: 4,
-        img: carouselImg4,
-        date: "2025-05-05",
-        title: "Moonstruck《月光迷途》音樂旅程",
-        location: "台北市",
-        category: "演唱會",
-      },
-    ];
+    // Section 3 的載入和錯誤狀態可以依賴 Section 4 (loadingRecommended, errorRecommended)
+    if (loadingRecommended) {
+      // 使用 loadingRecommended 作為輪播的載入指示
+      return (
+        <section className="carousel-section py-5">
+          <div className="container text-center py-5">
+            <p>載入輪播中，請稍候...</p>
+          </div>
+        </section>
+      );
+    }
+
+    if (errorRecommended) {
+      // 使用 errorRecommended 作為輪播的錯誤指示
+      return (
+        <section className="carousel-section py-5">
+          <div className="container text-center text-danger py-5">
+            <p>讀取輪播活動時發生錯誤：{errorRecommended}</p>
+          </div>
+        </section>
+      );
+    }
+
+    if (!carouselSlides || carouselSlides.length === 0) {
+      return (
+        <section className="carousel-section py-5">
+          <div className="container text-center py-5">
+            <p>目前沒有輪播活動。</p>
+          </div>
+        </section>
+      );
+    }
 
     return (
       <section className="carousel-section py-5">
-        {/* Swiper 組件 */}
         <Swiper
-          // --- 通用設定 ---
-          modules={[Navigation, Pagination, EffectCoverflow, A11y]} // 啟用模組
-          loop={true} // 循環播放
-          grabCursor={true} // 顯示抓取鼠標
-          pagination={{ clickable: true, el: ".swiper-custom-pagination" }} // 使用自訂分頁元素
+          modules={[Navigation, Pagination, EffectCoverflow, A11y]}
+          loop={true} // 只有一張時 loop 無意義，多於一張即可
+          grabCursor={true}
+          pagination={{ clickable: true, el: ".swiper-custom-pagination" }}
           navigation={{
-            // 使用自訂導航按鈕元素
             nextEl: ".swiper-button-next-custom",
             prevEl: ".swiper-button-prev-custom",
           }}
           a11y={{
-            // 無障礙設定
             prevSlideMessage: "Previous slide",
             nextSlideMessage: "Next slide",
           }}
-          // --- RWD 設定 (breakpoints) ---
           breakpoints={{
-            // --- 行動裝置 (768px 以下) ---
             320: {
-              effect: "slide", // 使用基本滑動效果
-              slidesPerView: 1, // 一次顯示一張
-              spaceBetween: 15, // Slide 間距
-              centeredSlides: false, // 不需置中
+              effect: "slide",
+              slidesPerView: 1,
+              spaceBetween: 15,
+              centeredSlides: carouselSlides.length === 1, // 只有一張時置中
             },
-            // --- 桌面裝置 (768px 以上) ---
             768: {
-              effect: "coverflow", // 使用 Coverflow 效果
-              slidesPerView: "auto", // 自動計算顯示數量 (通常配合 CSS) 或設為 3
-              centeredSlides: true, // Coverflow 需要置中
-              spaceBetween: 30, // Slide 間距
+              effect: "coverflow",
+              slidesPerView: "auto", // Coverflow 通常用 auto 或固定數量如 2 或 3
+              centeredSlides: true,
+              spaceBetween: 30,
               coverflowEffect: {
-                rotate: 50, // 旋轉角度
-                stretch: 0, // 拉伸
-                depth: 100, // 深度
-                modifier: 1, // 倍率
-                slideShadows: true, // 顯示陰影
+                rotate: 50,
+                stretch: 0,
+                depth: 100,
+                modifier: 1,
+                slideShadows: true,
               },
             },
           }}
-          className="home-main-carousel" // 自訂 class 以便添加樣式
+          className="home-main-carousel"
         >
-          {/* 渲染 Slides */}
-          {slidesData.map((slide) => (
-            <SwiperSlide key={slide.id} className="carousel-slide">
-              {/* 背景圖片 */}
-              <img src={slide.img} alt={slide.title} className="carousel-slide-img" />
-              {/* 疊加內容 */}
-              <div className="carousel-slide-content p-3">
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <span className="slide-date small">{slide.date}</span>
-                  <span className="slide-location small d-flex align-items-center">
-                    {/* 可以加上地點圖示 */}
-                    <i className="bi bi-geo-alt-fill me-1"></i> {/* 假設使用 Bootstrap Icons */}
-                    {slide.location}
-                  </span>
+          {carouselSlides.map(
+            (
+              slide // 使用 carouselSlides state
+            ) => (
+              <SwiperSlide key={slide.id} className="carousel-slide">
+                <img src={slide.img} alt={slide.title} className="carousel-slide-img" />
+                <div className="carousel-slide-content p-3">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <span className="slide-date small">{slide.date}</span>
+                    <span className="slide-location small d-flex align-items-center">
+                      <i className="bi bi-geo-alt-fill me-1"></i>
+                      {slide.location}
+                    </span>
+                  </div>
+                  <div className="slide-title-category-wrapper d-flex justify-content-between mb-3">
+                    <h5 className="slide-title mb-2 text-start">{slide.title}</h5>
+                    {/* 確保 slide.category 存在且有值才顯示 */}
+                    {slide.category && <span className="slide-category">{slide.category}</span>}
+                  </div>
                 </div>
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h5 className="slide-title mb-2 text-start">{slide.title}</h5>
-                  <span className="slide-category">{slide.category}</span>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
+              </SwiperSlide>
+            )
+          )}
         </Swiper>
-        {/* --- 自訂導航按鈕和分頁 --- */}
-        <div className="swiper-controls container mt-3 d-flex justify-content-center align-items-center">
-          <div className="swiper-button-prev-custom me-3">
-            {/* 可以使用圖示字體或 SVG */}
-            <img src={arrowLeftBlackOnLight} alt="上一張" />
+        {/* 自訂導航按鈕和分頁 (只有在有輪播項目時顯示) */}
+        {carouselSlides.length > 0 && (
+          <div className="swiper-controls container mt-3 d-flex justify-content-center align-items-center">
+            <div className="swiper-button-prev-custom me-3">
+              <img src={arrowLeftBlackOnLight} alt="上一張" />
+            </div>
+            <div className="swiper-custom-pagination"></div> {/* 分頁容器 */}
+            <div className="swiper-button-next-custom ms-3">
+              <img src={arrowRightBlackOnLight} alt="下一張" />
+            </div>
           </div>
-          <div className="swiper-custom-pagination"></div> {/* 分頁容器 */}
-          <div className="swiper-button-next-custom ms-3">
-            <img src={arrowRightBlackOnLight} alt="下一張" />
-          </div>
-        </div>
+        )}
       </section>
     );
   };
   // --- Section 4: 熱門推薦 ---
   const renderRecommendedSection = () => {
-    const recommendedEventsData = [
-      {
-        id: 1,
-        img: eventImg1,
-        date: "2025-05-05",
-        location: "台北市",
-        title: "Moonstruck《月光迷途》音樂旅程",
-        category: "演唱會",
-      },
-      {
-        id: 2,
-        img: eventImg2,
-        date: "2025-05-05",
-        location: "台中市",
-        title: "當代戲劇《鏡中謎影》懸疑大戲",
-        category: "舞台劇",
-      },
-      {
-        id: 3,
-        img: eventImg3,
-        date: "2025-05-05",
-        location: "高雄市",
-        title: "台北愛樂《春之頌》交響音樂會",
-        category: "音樂會",
-      },
-      {
-        id: 4,
-        img: eventImg4,
-        date: "2025-05-05",
-        location: "台北市",
-        title: "夜行少女《無盡之夜》全台巡演",
-        category: "演唱會",
-      },
-      {
-        id: 5,
-        img: eventImg5,
-        date: "2025-05-05",
-        title: "Moonstruck《月光迷途》音樂旅程",
-        location: "台北市",
-        category: "演唱會",
-      },
-      {
-        id: 6,
-        img: eventImg6,
-        date: "2025-05-05",
-        location: "台中市",
-        title: "黑色幽默劇《辦公室奇談》人生如戲",
-        category: "舞台劇",
-      },
-      {
-        id: 7,
-        img: eventImg7,
-        date: "2025-05-05",
-        location: "高雄市",
-        title: "國樂團《絲竹共鳴》東方韻味特場",
-        category: "音樂會",
-      },
-      {
-        id: 8,
-        img: eventImg8,
-        date: "2025-05-05",
-        location: "台北市",
-        title: "Retro Groove《復古風暴》現場演唱會",
-        category: "演唱會",
-      },
-      {
-        id: 9,
-        img: eventImg9,
-        date: "2025-05-05",
-        title: "經典再現《紅樓夢》沉浸式劇場",
-        location: "台中市",
-        category: "舞台劇",
-      },
-      {
-        id: 10,
-        img: eventImg10,
-        date: "2025-05-05",
-        title: "鋼琴獨奏會《浪漫派之聲》蕭邦與李斯特",
-        location: "高雄市",
-        category: "音樂會",
-      },
-      {
-        id: 11,
-        img: eventImg11,
-        date: "2025-05-05",
-        title: "原創戲劇《時光書簡》跨世代親情故事",
-        location: "台中市",
-        category: "舞台劇",
-      },
-    ];
+    if (loadingRecommended) {
+      return (
+        <section className="recommended-section py-0 position-relative">
+          <div className="border p-3 border-secondary position-relative z-1">
+            <div className="container d-flex align-items-center justify-content-between">
+              <h2 className="section-title mb-0">熱門推薦</h2>
+              <img src={recommendedHeaderIcon} alt="熱門推薦圖示" className="section-title-icon" />
+            </div>
+          </div>
+          <div className="container py-4 text-center">
+            <p>載入中，請稍候...</p>
+          </div>
+        </section>
+      );
+    }
+
+    if (errorRecommended) {
+      return (
+        <section className="recommended-section py-0 position-relative">
+          <div className="border p-3 border-secondary position-relative z-1">
+            <div className="container d-flex align-items-center justify-content-between">
+              <h2 className="section-title mb-0">熱門推薦</h2>
+              <img src={recommendedHeaderIcon} alt="熱門推薦圖示" className="section-title-icon" />
+            </div>
+          </div>
+          <div className="container py-4 text-center text-danger">
+            <p>讀取熱門推薦時發生錯誤：{errorRecommended}</p>
+            <p>請稍後再試或聯絡客服人員。</p>
+          </div>
+        </section>
+      );
+    }
+
+    if (!recommendedEvents || recommendedEvents.length === 0) {
+      return (
+        <section className="recommended-section py-0 position-relative">
+          <div className="border p-3 border-secondary position-relative z-1">
+            <div className="container d-flex align-items-center justify-content-between">
+              <h2 className="section-title mb-0">熱門推薦</h2>
+              <img src={recommendedHeaderIcon} alt="熱門推薦圖示" className="section-title-icon" />
+            </div>
+          </div>
+          <div className="container py-4 text-center">
+            <p>目前沒有熱門推薦的活動。</p>
+          </div>
+        </section>
+      );
+    }
 
     return (
       <section className="recommended-section py-0 position-relative">
@@ -478,7 +528,6 @@ function Home() {
         </div>
         {/* Swiper 區塊 */}
         <div className="container position-relative z-1 py-4">
-          {/* Swiper 組件 */}
           <Swiper
             modules={[Navigation, Pagination, A11y]}
             loop={true}
@@ -497,12 +546,13 @@ function Home() {
               768: { slidesPerView: 2, spaceBetween: 20, centeredSlides: false },
               992: { slidesPerView: 4, spaceBetween: 30, centeredSlides: false },
             }}
-            className="recommended-swiper" // 自訂 class 以便添加樣式
+            className="recommended-swiper"
           >
-            {/* 渲染 Slides */}
-            {recommendedEventsData.map((event) => (
+            {recommendedEvents.map((event) => (
               <SwiperSlide key={event.id} className="recommended-slide">
                 <div className="event-card mt-5">
+                  {" "}
+                  {/* 注意 Section 4 的卡片有 mt-5 */}
                   <div className="event-card-img-wrapper">
                     <img src={event.img} alt={event.title} className="event-card-main-img" />
                   </div>
@@ -515,7 +565,8 @@ function Home() {
                       </span>
                     </div>
                     <h4 className="event-title mt-2 mb-2">{event.title}</h4>
-                    <span className="event-category-tag">{event.category}</span>
+                    {/* 根據 API 是否有分類欄位以及您的決定來調整此處 */}
+                    {event.category && <span className="event-category-tag">{event.category}</span>}
                   </div>
                 </div>
               </SwiperSlide>
@@ -523,145 +574,99 @@ function Home() {
           </Swiper>
         </div>
         {/* Swiper 控制按鈕與分頁 */}
-        <div className="swiper-controls-recommended mb-5 d-flex justify-content-center align-items-center">
-          <div className="swiper-button-prev-recommended me-3">
-            <img src={arrowLeftRecommended} alt="上一個" />
+        {recommendedEvents.length > 0 && (
+          <div className="swiper-controls-recommended mb-5 d-flex justify-content-center align-items-center">
+            {/* ... 控制按鈕 JSX 維持不變 ... */}
+            <div className="swiper-button-prev-recommended me-3">
+              <img src={arrowLeftRecommended} alt="上一個" />
+            </div>
+            <div className="swiper-pagination-recommended"></div>
+            <div className="swiper-button-next-recommended ms-3">
+              <img src={arrowRightRecommended} alt="下一個" />
+            </div>
           </div>
-          <div className="swiper-pagination-recommended"></div>
-          <div className="swiper-button-next-recommended ms-3">
-            <img src={arrowRightRecommended} alt="下一個" />
-          </div>
-        </div>
+        )}
       </section>
     );
   };
   // --- Section 5: 即將登場 ---
   const renderUpcomingSection = () => {
-    const upcomingEventsData = [
-      {
-        id: 1,
-        img: eventImg1,
-        date: "2025-05-05",
-        location: "台北市",
-        title: "Moonstruck《月光迷途》音樂旅程",
-        category: "演唱會",
-      },
-      {
-        id: 2,
-        img: eventImg2,
-        date: "2025-05-05",
-        location: "台中市",
-        title: "當代戲劇《鏡中謎影》懸疑大戲",
-        category: "舞台劇",
-      },
-      {
-        id: 3,
-        img: eventImg3,
-        date: "2025-05-05",
-        location: "高雄市",
-        title: "台北愛樂《春之頌》交響音樂會",
-        category: "音樂會",
-      },
-      {
-        id: 4,
-        img: eventImg4,
-        date: "2025-05-05",
-        location: "台北市",
-        title: "夜行少女《無盡之夜》全台巡演",
-        category: "演唱會",
-      },
-      {
-        id: 5,
-        img: eventImg5,
-        date: "2025-05-05",
-        title: "Moonstruck《月光迷途》音樂旅程",
-        location: "台北市",
-        category: "演唱會",
-      },
-      {
-        id: 6,
-        img: eventImg6,
-        date: "2025-05-05",
-        location: "台中市",
-        title: "黑色幽默劇《辦公室奇談》人生如戲",
-        category: "舞台劇",
-      },
-      {
-        id: 7,
-        img: eventImg7,
-        date: "2025-05-05",
-        location: "高雄市",
-        title: "國樂團《絲竹共鳴》東方韻味特場",
-        category: "音樂會",
-      },
-      {
-        id: 8,
-        img: eventImg8,
-        date: "2025-05-05",
-        location: "台北市",
-        title: "Retro Groove《復古風暴》現場演唱會",
-        category: "演唱會",
-      },
-      {
-        id: 9,
-        img: eventImg9,
-        date: "2025-05-05",
-        title: "經典再現《紅樓夢》沉浸式劇場",
-        location: "台中市",
-        category: "舞台劇",
-      },
-      {
-        id: 10,
-        img: eventImg10,
-        date: "2025-05-05",
-        title: "鋼琴獨奏會《浪漫派之聲》蕭邦與李斯特",
-        location: "高雄市",
-        category: "音樂會",
-      },
-      {
-        id: 11,
-        img: eventImg11,
-        date: "2025-05-05",
-        title: "原創戲劇《時光書簡》跨世代親情故事",
-        location: "台中市",
-        category: "舞台劇",
-      },
-    ];
+    if (loadingUpcoming) {
+      return (
+        <section className="upcoming-section py-0 position-relative">
+          <div className="border my-5 p-3 border-secondary position-relative z-1">
+            <div className="container d-flex align-items-center justify-content-between">
+              <h2 className="section-title mb-0">即將登場</h2>
+              <img src={upcomingHeaderIcon} alt="即將登場圖示" className="section-title-icon" />
+            </div>
+          </div>
+          <div className="container py-4 text-center">
+            <p>載入中，請稍候...</p>
+          </div>
+        </section>
+      );
+    }
+
+    if (errorUpcoming) {
+      return (
+        <section className="upcoming-section py-0 position-relative">
+          <div className="border my-5 p-3 border-secondary position-relative z-1">
+            <div className="container d-flex align-items-center justify-content-between">
+              <h2 className="section-title mb-0">即將登場</h2>
+              <img src={upcomingHeaderIcon} alt="即將登場圖示" className="section-title-icon" />
+            </div>
+          </div>
+          <div className="container py-4 text-center text-danger">
+            <p>讀取活動時發生錯誤：{errorUpcoming}</p>
+            <p>請稍後再試或聯絡客服人員。</p>
+          </div>
+        </section>
+      );
+    }
+
+    if (!upcomingEvents || upcomingEvents.length === 0) {
+      return (
+        <section className="upcoming-section py-0 position-relative">
+          <div className="border my-5 p-3 border-secondary position-relative z-1">
+            <div className="container d-flex align-items-center justify-content-between">
+              <h2 className="section-title mb-0">即將登場</h2>
+              <img src={upcomingHeaderIcon} alt="即將登場圖示" className="section-title-icon" />
+            </div>
+          </div>
+          <div className="container py-4 text-center">
+            <p>目前沒有即將登場的活動。</p>
+          </div>
+        </section>
+      );
+    }
 
     return (
       <section className="upcoming-section py-0 position-relative">
-        {/* 上方標題區 */}
         <div className="border my-5 p-3 border-secondary position-relative z-1">
           <div className="container d-flex align-items-center justify-content-between">
             <h2 className="section-title mb-0">即將登場</h2>
             <img src={upcomingHeaderIcon} alt="即將登場圖示" className="section-title-icon" />
           </div>
         </div>
-        {/* Swiper 區塊 */}
         <div className="container position-relative z-1 py-4">
-          {/* Swiper 組件 */}
           <Swiper
             modules={[Navigation, Pagination, A11y]}
-            loop={false}
+            loop={false} // 假設 slidesPerView@992px 是 4
             grabCursor={true}
             pagination={{ clickable: true, el: ".swiper-pagination-upcoming" }}
             navigation={{
               nextEl: ".swiper-button-next-upcoming",
               prevEl: ".swiper-button-prev-upcoming",
             }}
-            a11y={{
-              prevSlideMessage: "上一組推薦",
-              nextSlideMessage: "下一組推薦",
-            }}
+            a11y={{ prevSlideMessage: "上一組推薦", nextSlideMessage: "下一組推薦" }}
             breakpoints={{
               320: { slidesPerView: 1, spaceBetween: 0, centeredSlides: true },
               768: { slidesPerView: 2, spaceBetween: 0, centeredSlides: false },
               992: { slidesPerView: 4, spaceBetween: 0, centeredSlides: false },
             }}
-            className="upcoming-swiper" // 自訂 class 以便添加樣式
+            className="upcoming-swiper"
           >
-            {/* 渲染 Slides */}
-            {upcomingEventsData.map((event) => (
+            {upcomingEvents.map((event) => (
               <SwiperSlide key={event.id} className="upcoming-slide">
                 <div className="event-card">
                   <div className="event-card-img-wrapper">
@@ -683,16 +688,17 @@ function Home() {
             ))}
           </Swiper>
         </div>
-        {/* Swiper 控制按鈕與分頁 */}
-        <div className="swiper-controls-upcoming mb-5 d-flex justify-content-center align-items-center">
-          <div className="swiper-button-prev-upcoming me-3">
-            <img src={arrowLeftRecommended} alt="上一個" />
+        {upcomingEvents.length > 0 && (
+          <div className="swiper-controls-upcoming mb-5 d-flex justify-content-center align-items-center">
+            <div className="swiper-button-prev-upcoming me-3">
+              <img src={arrowLeftRecommended} alt="上一個" />
+            </div>
+            <div className="swiper-pagination-upcoming"></div>
+            <div className="swiper-button-next-upcoming ms-3">
+              <img src={arrowRightRecommended} alt="下一個" />
+            </div>
           </div>
-          <div className="swiper-pagination-upcoming"></div>
-          <div className="swiper-button-next-upcoming ms-3">
-            <img src={arrowRightRecommended} alt="下一個" />
-          </div>
-        </div>
+        )}
       </section>
     );
   };

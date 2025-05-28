@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"; // React 核心鉤子 (hooks)，用
 import { useParams, useNavigate } from "react-router-dom"; // React Router 鉤子，分別用於獲取 URL 參數和進行程式化導航
 import { useAuth } from "../../contexts/AuthContext"; // 自訂鉤子，用於從身份驗證上下文中獲取認證相關資訊 (例如 userToken)
 import axios from "axios"; // 用於發送 HTTP 請求的函式庫
+import { format, parseISO } from "date-fns"; // 導入 date-fns 的 format 和 parseISO
 import Breadcrumb from "../../conponents/Breadcrumb"; // 自訂組件，用於顯示麵包屑導航
 import Loading from "../../conponents/Loading"; // 自訂組件，用於顯示載入指示器
 
@@ -66,16 +67,48 @@ const TicketDetailPage = () => {
         // --- 處理 API 成功回應 ---
         if (response.data && response.data.status === true) {
           const apiData = response.data.data; // 從回應中取出實際的資料部分
-
-          // --- 時間格式化處理 ---
-          // 處理 start_at: 確保有值，替換 'T' 為空格，並取 YYYY-MM-DD HH:MM 部分
-          const rawStartTimeString = apiData.event.start_at || "";
-          const formattedStartTime = rawStartTimeString.replace("T", " ").substring(0, 16);
-
-          // 處理 end_at: 確保有值，替換 'T' 為空格，並只取 HH:MM 部分
-          const rawEndTimeString = apiData.event.end_at || "";
-          const formattedEndTime = rawEndTimeString.replace("T", " ").substring(11, 16);
-
+          // --- 時間格式化處理 (使用 date-fns) ---
+          let formattedStartTime = "N/A";
+          if (apiData.event.start_at) {
+            // 確保 API 有回傳 start_at
+            try {
+              let isoString = apiData.event.start_at;
+              // 檢查是否為字串且以 'Z' 結尾
+              if (typeof isoString === "string" && isoString.endsWith("Z")) {
+                isoString = isoString.slice(0, -1); // 移除 'Z'
+              }
+              // parseISO 現在會將（可能已修改的）isoString 解讀為本地時間
+              const startDate = parseISO(isoString);
+              formattedStartTime = format(startDate, "yyyy-MM-dd HH:mm");
+            } catch (e) {
+              console.error("Error formatting start_at:", apiData.event.start_at, e);
+              // 解析失敗的備援機制，盡可能接近原始的簡易格式化方式
+              if (typeof apiData.event.start_at === "string") {
+                formattedStartTime = apiData.event.start_at.replace("T", " ").substring(0, 16);
+              } else {
+                formattedStartTime = "無效日期";
+              }
+            }
+          }
+          let formattedEndTime = "N/A";
+          if (apiData.event.end_at) {
+            // 確保 API 有回傳 end_at
+            try {
+              let isoString = apiData.event.end_at;
+              if (typeof isoString === "string" && isoString.endsWith("Z")) {
+                isoString = isoString.slice(0, -1); // 移除 'Z'
+              }
+              const endDate = parseISO(isoString);
+              formattedEndTime = format(endDate, "HH:mm");
+            } catch (e) {
+              console.error("Error formatting end_at:", apiData.event.end_at, e);
+              if (typeof apiData.event.end_at === "string") {
+                formattedEndTime = apiData.event.end_at.replace("T", " ").substring(11, 16);
+              } else {
+                formattedEndTime = "無效時間";
+              }
+            }
+          }
           // --- 資料轉換 ---
           // 將從 API 獲取的資料 (apiData) 轉換為前端組件更容易使用的結構 (transformedData)
           const transformedData = {
@@ -93,7 +126,7 @@ const TicketDetailPage = () => {
             orderDetails: {
               // 訂單相關的詳細資訊
               orderNumber: apiData.order_no, // 訂單編號 (同 ticketNumberMaster)
-              activityName: apiData.event.title, // 活動名稱 
+              activityName: apiData.event.title, // 活動名稱
               activityTime: `${formattedStartTime} ~ ${formattedEndTime}`, // 格式化後的活動時間區間
               activityLocation: apiData.event.location, // 活動地點
               activityAddress: apiData.event.address, // 活動詳細地址
