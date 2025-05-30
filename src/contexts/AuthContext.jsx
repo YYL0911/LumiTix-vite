@@ -87,17 +87,16 @@ export const AuthProvider = ({ children }) => {
           setUserRole(role)
           setUserName(name)
           setUserToken(token)
-
-          getEventTypeApi()
         }
       
+        getEventTypeApi()
       })
       .catch(err => {
         navigate("/ErrorPage")
       });
     }
     else if(!token){
-      setLoading(false); // 驗證結束
+      getEventTypeApi()
     }
   
   }, []);
