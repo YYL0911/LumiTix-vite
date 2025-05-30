@@ -25,6 +25,7 @@ import EventsList from './pages/Admin/EventsList';
 import UserManagementList from './pages/Admin/UserManagementList';
 
 const NotFound = () => <h1>404 - 頁面不存在</h1>;
+const ErrorPage = () => <h1>error - 伺服器發生錯誤，請稍後再試</h1>;
 
 function App() {
 
@@ -61,6 +62,8 @@ function App() {
             <Route path="/eventsList" element={<EventsList></EventsList>}></Route>
           </Route>
 
+          
+          <Route path="/ErrorPage" element={<ErrorPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

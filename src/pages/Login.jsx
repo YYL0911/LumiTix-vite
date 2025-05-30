@@ -74,7 +74,7 @@ function Login() {
       }
     })
     .catch(err => {
-      console.log(err);
+      navigate("/ErrorPage")
     });
 
   };
