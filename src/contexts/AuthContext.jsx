@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [headerHeight, setHeaderHeight] = useState(0);
 
   const [eventTypes, setEventTypes] = useState([]);
+  const [eventTypesOri, setEventTypesOri] = useState([]);
   
   
 
@@ -53,8 +54,8 @@ export const AuthProvider = ({ children }) => {
           if (b.name === '其他') return -1;
           return 0;
         });
-
-        setEventTypes([customType, , ...sorted])
+        setEventTypesOri([...sorted])
+        setEventTypes([customType, ...sorted])
       } 
       setLoading(false); // 驗證結束
     })
@@ -105,7 +106,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{ 
       userRole, login, logout, userName, userToken, setUserName, loading,
-      headerHeight, setHeaderHeight, eventTypes }}>
+      headerHeight, setHeaderHeight, eventTypes, eventTypesOri }}>
       {children}
 
 
