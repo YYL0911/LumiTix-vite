@@ -14,6 +14,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const [headerHeight, setHeaderHeight] = useState(0);
+
+  const [eventTypes, setEventTypes] = useState([]);
+  
   
 
   const login = (role, name, token) =>{
@@ -32,6 +35,31 @@ export const AuthProvider = ({ children }) => {
   } 
 
  
+  const getEventTypeApi  = () => {
+    fetch("https://n7-backend.onrender.com/api/v1/event-types",{
+      method: "GET", headers: {"Content-Type": "application/json"}}) 
+    .then(res => res.json())
+    .then(result => {
+      if(!result.status){navigate("/ErrorPage")}
+      else{
+         // 新增一個自定義類別
+        const customType = {
+          id: 'all', // 可自定義為固定值，前端辨識用途
+          name: '全部種類',
+        };
+
+        const sorted = [...result.data].sort((a, b) => {
+          if (a.name === '其他') return 1;
+          if (b.name === '其他') return -1;
+          return 0;
+        });
+
+        setEventTypes([customType, , ...sorted])
+      } 
+      setLoading(false); // 驗證結束
+    })
+    .catch(err => navigate("/ErrorPage") );
+  }
 
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
   //取得使用者資料
@@ -58,12 +86,13 @@ export const AuthProvider = ({ children }) => {
           setUserRole(role)
           setUserName(name)
           setUserToken(token)
+
+          getEventTypeApi()
         }
-        setLoading(false); // 驗證結束
       
       })
       .catch(err => {
-        console.log(err);
+        navigate("/ErrorPage")
       });
     }
     else if(!token){
@@ -76,7 +105,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{ 
       userRole, login, logout, userName, userToken, setUserName, loading,
-      headerHeight, setHeaderHeight }}>
+      headerHeight, setHeaderHeight, eventTypes }}>
       {children}
 
 

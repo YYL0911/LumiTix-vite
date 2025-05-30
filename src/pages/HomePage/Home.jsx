@@ -28,6 +28,7 @@ import upcomingHeaderIcon from "../../assets/img/Home/recommended/Upcoming_Heade
 import arrowLeftRecommended from "../../assets/img/Home/recommended/arrow_left_white_on_dark.png";
 import arrowRightRecommended from "../../assets/img/Home/recommended/arrow_right_white_on_dark.png";
 function Home() {
+  const { eventTypes } = useAuth();
   const navigate = useNavigate(); // 初始化 useNavigate
 
   // --- 狀態管理和資料 ---
@@ -56,7 +57,7 @@ function Home() {
     "金門縣",
     "連江縣",
   ]);
-  const [categoryData] = useState(["全部種類", "演唱會", "舞台劇", "音樂會"]);
+  // const [categoryData] = useState(["全部種類", "演唱會", "舞台劇", "音樂會"]);
   const [dateData] = useState(["全部時間", "今天", "一週內", "一個月內", "兩個月內"]);
   const [keyword, setKeyword] = useState("");
   const [locationSelect, setLocationSelect] = useState(""); // 初始為空，代表未選擇
@@ -255,9 +256,9 @@ function Home() {
                   <option value="" disabled>
                     活動類型
                   </option>
-                  {categoryData.map((item) => (
-                    <option value={item} key={`cat-${item}`}>
-                      {item}
+                  {eventTypes.map((item) => (
+                    <option value={item.name} key={`cat-${item.name}`}>
+                      {item.name}
                     </option>
                   ))}
                 </select>

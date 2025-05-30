@@ -46,13 +46,12 @@ const CardItem = ({ id, imgSrc, title, showTime, location, category, handleNavig
       </div>
 
       <div className="fw-bold text-black mb-3">{title}</div>
-
-      <div className="mt-auto pt-2" >
-        <span className=" border-bottom border-top border-danger border-3 p-2" >{category}</span>
-      </div>
+      
     </div>
-    
-    
+
+    <div className="mt-auto pt-2" >
+      <span className=" border-bottom border-top border-danger border-3 p-2" >{category}</span>
+    </div>
   </a>
 
 );
@@ -69,8 +68,8 @@ const DataTable = ({ filterProducts, handleNavigate, currentPage }) => {
     <>
       {
         pageProducts.length === 0 ? (
-          currentPage==0 ? "" : <h1>無符合資料</h1>
-        ) : (
+          currentPage==0 ? "" : <h1>無符合資料</h1>) 
+        : (
           pageProducts.map((product) => (
             <CardItem
               key={product.id}
@@ -98,7 +97,7 @@ const breadcrumb = [
 
 
 function AllEvents() {
-  const { loading } = useAuth();
+  const { loading, eventTypes } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   //跳轉頁面
@@ -135,7 +134,6 @@ function AllEvents() {
     "金門縣",
     "連江縣",
   ]);
-  const [categoryData, setCategoryData] = useState(["全部種類", "演唱會", "舞台劇", "音樂會"]);
   const [dateData, setDatesData] = useState(["全部時間", "今天", "一週內", "一個月內", "兩個月內"]);
 
   const [keyword, setKeyword] = useState(searchParams.get("keyword") || "");
@@ -155,7 +153,7 @@ function AllEvents() {
     else setLocationSelect(""); // 預設值
 
     const paramCategory = searchParams.get("category") || "";
-    if (categoryData.includes(paramCategory)) setCategorySelect(paramCategory);
+    if (eventTypes.includes(paramCategory)) setCategorySelect(paramCategory);
     else setCategorySelect(""); // 預設值
 
     const paramDate = searchParams.get("date") || "";
@@ -213,10 +211,11 @@ function AllEvents() {
           setCurrentPage(1);
         })
         .catch((err) => {
-          console.log(err);
+          navigate("/ErrorPage")
         });
     }
   }, []);
+
 
   return (
     <>
@@ -290,10 +289,10 @@ function AllEvents() {
                 <option value="" disabled>
                   活動類型
                 </option>
-                {categoryData.map((item) => {
+                {eventTypes.map((item) => {
                   return (
-                    <option value={item} key={item}>
-                      {item}
+                    <option value={item.name} key={item.name}>
+                      {item.name}
                     </option>
                   );
                 })}
