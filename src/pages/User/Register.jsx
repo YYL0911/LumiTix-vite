@@ -86,7 +86,7 @@ function Register() {
       }
     })
     .catch(err => {
-      console.log(err);
+      navigate("/ErrorPage")
     });
 
   };
@@ -117,7 +117,7 @@ function Register() {
       }
     })
     .catch(err => {
-      console.log(err);
+      navigate("/ErrorPage")
     });
   };
   

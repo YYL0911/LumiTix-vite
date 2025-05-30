@@ -58,7 +58,7 @@ function Personal() {
           }
         })
         .catch(err => {
-          console.log(err);
+          navigate("/ErrorPage")
         });
     }
   }, []);
@@ -104,7 +104,7 @@ function Personal() {
       successModalRef.current.open();
     })
     .catch(err => {
-      console.log(err);
+      navigate("/ErrorPage")
     });
   };
 
@@ -203,9 +203,9 @@ function Personal() {
       
     })
     .catch(err => {
-      setErrMessage("伺服器錯誤")
-      setShowErrorInfo(true)
-      console.log(err);
+      navigate("/ErrorPage")
+      // setErrMessage("伺服器錯誤")
+      // setShowErrorInfo(true)
     });
   };
 

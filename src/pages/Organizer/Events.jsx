@@ -93,7 +93,7 @@ function Events() {
             }
           })
           .catch(err => {
-            console.log(err);
+            navigate("/ErrorPage")
           });
       }
     }, []);

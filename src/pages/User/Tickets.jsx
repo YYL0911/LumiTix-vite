@@ -200,7 +200,7 @@ function Tickets() {
             }
           })
           .catch(err => {
-            console.log(err);
+            navigate("/ErrorPage")
           });
       }
     }, []);
