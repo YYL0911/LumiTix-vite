@@ -164,6 +164,13 @@ ul.footer-list{
   }
 }
 
+.required-label::after {
+  content: ' *';
+  color: red;
+}
 
+.bind-btn:hover .icon {
+  color: white;
+}
 
 

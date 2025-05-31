@@ -17,9 +17,9 @@ export const AuthProvider = ({ children }) => {
 
   const [eventTypes, setEventTypes] = useState([]);
   const [eventTypesOri, setEventTypesOri] = useState([]);
-  
-  
 
+
+  
   const login = (role, name, token) =>{
     setUserRole(role)
     setUserName(name)

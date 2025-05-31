@@ -11,6 +11,7 @@ import ButtonTipModal from "../../conponents/TipModal";
 import Breadcrumb from '../../conponents/Breadcrumb';
 import Loading from '../../conponents/Loading';
 
+import signupBG from "../../assets/img/signup.png"
 
 
 // 麵包屑資訊
@@ -144,107 +145,134 @@ function Register() {
         {/* 麵包屑 */}
         <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
-        {/* 註冊表單
-        - 使用者名稱
-        - 信箱
-        - 密碼
-        - 確認密碼 */}
-        <form action='' onSubmit={handleSubmit(onSubmit)}>
-          <div className='mb-3 w-100' style={{maxWidth: 600+"px"}}>
-            <Input
-              id='username'
-              type='text'
-              errors={errors}
-              labelText='使用者名稱'
-              register={formRegister}
-              rules={{
-                //必填
-                required: '使用者名稱為必填', 
-                minLength: {
-                  value: 2,
-                  message: '使用者名稱不少於 2'
-                },
-                maxLength: {
-                  value: 50,
-                  message: '使用者名稱長度不超過 10',
-                },
-              }}
-              placeholderTet = "使用者名稱"
-            ></Input>
-          </div>
-          <div className='mb-3 w-100' style={{maxWidth: 600+"px"}}>
-            <Input
-              id='email'
-              labelText='Email'
-              type='email'
-              errors={errors}
-              register={formRegister}
-              rules={{
-                required: 'Email 為必填',
-                pattern: {
-                  value: /^\S+@\S+$/i,
-                  message: 'Email 格式不正確',
-                },
-              }}
-              placeholderTet = "Email"
-            ></Input>
-          </div>
-          <div className='mb-3 w-100' style={{maxWidth: 600+"px"}}>
-            <Input
-              id='password'
-              labelText='密碼'
-              type='password'
-              errors={errors}
-              register={formRegister}
-              rules={{
-                required: '密碼為必填',
-                minLength: {
-                  value: 8,
-                  message: '密碼不少於 8 碼'
-                },
-                maxLength: {
-                  value: 32,
-                  message: '密碼不超過 32 碼'
-                },
-                onChange: () => setIsPasswordTouched(true)
-              }}
-              placeholderTet = "密碼"
-            ></Input>
-          </div>
-          <div className='mb-3 w-100' style={{maxWidth: 600+"px"}}>
-            <Input
-              id='confirmPassword'
-              labelText='確認密碼'
-              type='password'
-              errors={errors}
-              register={formRegister}
-              rules={{
-                required: '確認密碼為必填',
-                validate: (value) => {
-                  if (!isPasswordTouched && !isConfirmTouched) return true;
-                  return value === getValues("password") || "兩次密碼不一致";
-                },
-                onChange: () => setIsConfirmTouched(true)
-              }}
-              placeholderTet = "再次輸入密碼"
-            ></Input>
-          </div>
-          
-          {/* 錯誤訊息 */}
-          {showErrorInfo && <div className='mt-4 text-danger'>{errMessage}</div>}
+        <div className="w-100 d-flex">
 
-          <button type='submit' className={`btn btn-dark mt-3 ${checkOk ? "" : "disabled"}`} >
-            註冊
-          </button>
+          <div className=" w-100 w-md-50" style={{maxWidth: 500+"px"}}>
+            {/* card shadow p-3 mb-5 bg-white rounded mx-auto */}
+            <div className="w-100" >
+              <h3 className='mb-3 text-secondary mx-auto'>會員註冊</h3>
+              {/* 註冊表單
+              - 使用者名稱
+              - 信箱
+              - 密碼
+              - 確認密碼 */}
+              <form action='' onSubmit={handleSubmit(onSubmit)}>
+                <div className='mb-3 w-100' >
+                  <Input
+                    id='username'
+                    type='text'
+                    errors={errors}
+                    labelText='使用者名稱'
+                    register={formRegister}
+                    rules={{
+                      //必填
+                      required: '使用者名稱為必填', 
+                      minLength: {
+                        value: 2,
+                        message: '使用者名稱不少於 2'
+                      },
+                      maxLength: {
+                        value: 50,
+                        message: '使用者名稱長度不超過 10',
+                      },
+                    }}
+                    placeholderTet = "使用者名稱"
+                  ></Input>
+                </div>
+                <div className='mb-3 w-100' >
+                  <Input
+                    id='email'
+                    labelText='Email'
+                    type='email'
+                    errors={errors}
+                    register={formRegister}
+                    rules={{
+                      required: 'Email 為必填',
+                      pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: 'Email 格式不正確',
+                      },
+                    }}
+                    placeholderTet = "Email"
+                  ></Input>
+                </div>
+                <div className='mb-3 w-100' >
+                  <Input
+                    id='password'
+                    labelText='密碼'
+                    type='password'
+                    errors={errors}
+                    register={formRegister}
+                    rules={{
+                      required: '密碼為必填',
+                      minLength: {
+                        value: 8,
+                        message: '密碼不少於 8 碼'
+                      },
+                      maxLength: {
+                        value: 32,
+                        message: '密碼不超過 32 碼'
+                      },
+                      onChange: () => setIsPasswordTouched(true)
+                    }}
+                    placeholderTet = "密碼"
+                  ></Input>
+                </div>
+                <div className='mb-3 w-100' >
+                  <Input
+                    id='confirmPassword'
+                    labelText='確認密碼'
+                    type='password'
+                    errors={errors}
+                    register={formRegister}
+                    rules={{
+                      required: '確認密碼為必填',
+                      validate: (value) => {
+                        if (!isPasswordTouched && !isConfirmTouched) return true;
+                        return value === getValues("password") || "兩次密碼不一致";
+                      },
+                      onChange: () => setIsConfirmTouched(true)
+                    }}
+                    placeholderTet = "再次輸入密碼"
+                  ></Input>
+                </div>
+                
+                {/* 錯誤訊息 */}
+                {showErrorInfo && <div className='mt-4 text-danger'>{errMessage}</div>}
 
-          {/* 彈窗 */}
-          <ButtonTipModal  ref={modalRef}
-            title = "註冊結果" 
-            info = "註冊成功，即將跳轉到首頁" 
-            navigatePath = "/" 
-            changePage = {true}>
-          </ButtonTipModal>
-        </form>
+                <button type='submit' className={`btn btn-dark mt-3 w-100 ${checkOk ? "" : "disabled"}`} >
+                  註冊
+                </button>
+
+                {/* 彈窗 */}
+                <ButtonTipModal  ref={modalRef}
+                  title = "註冊結果" 
+                  info = "註冊成功，即將跳轉到首頁" 
+                  navigatePath = "/" 
+                  changePage = {true}>
+                </ButtonTipModal>
+              </form>
+
+
+            </div>
+          </div>
+
+          {/* 右側圖片區 */} 
+          <div className="d-none d-md-flex w-50 d-flex justify-content-end align-items-end">
+            <img
+              src={signupBG}
+              alt="Login Visual"
+              className="img-fluid"
+              style={{
+                objectFit: 'contain',
+                maxWidth: '100%',
+                maxHeight: '100%',
+              }}
+            />
+          </div>
+
+
+        </div>
 
         {loading && (<Loading></Loading>)}
     </div>
