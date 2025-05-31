@@ -2,7 +2,7 @@ const Input = ({ id, labelText, register, type, errors, rules, placeholderTet, d
   
     return (
       <>
-        <label htmlFor={id} className='form-label'>
+        <label htmlFor={id} className={`form-label ${(rules) ? "required-label" : ""} `}>
           {labelText}
         </label>
         <input
