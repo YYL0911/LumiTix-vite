@@ -21,8 +21,11 @@ import ActiveInfo from './pages/Organizer/ActiveInfo';
 import TicketScaner from './pages/Organizer/TicketScaner';
 import TicketScanerResult from './pages/Organizer/TicketScanerResult';
 
+import Callback from './pages/Callback';
+
 import EventsList from './pages/Admin/EventsList';
 import UserManagementList from './pages/Admin/UserManagementList';
+
 
 const NotFound = () => <h1>404 - 頁面不存在</h1>;
 const ErrorPage = () => <h1>error - 伺服器發生錯誤，請稍後再試</h1>;
@@ -40,6 +43,7 @@ function App() {
           <Route path="/login" element={<Login></Login>}></Route>
           <Route path="/register" element={<Register></Register>}></Route>
           <Route path="/allEvents" element={<AllEvents></AllEvents>}></Route>
+          <Route path="/callback" element={<Callback></Callback>}></Route>
           <Route path="/evevtInfo/:id" element={<EventInfo />} />
 
           {/* 只有使用者可以看的頁面 */}
