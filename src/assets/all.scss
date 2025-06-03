@@ -7,6 +7,7 @@
 
 
 @import "./scss/base/base";
+@import "./scss/pages/TipModal.scss";
 
 @import "./scss/pages/EventInfo.scss";
 @import "./scss/pages/UserManagementList";
@@ -19,8 +20,11 @@
   flex-direction: column;
   min-height: 100vh;
 }
+
 .page-main {
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 // 麵包屑文字顏色 (全部)
