@@ -153,8 +153,10 @@ function AllEvents() {
     else setLocationSelect(""); // 預設值
 
     const paramCategory = searchParams.get("category") || "";
-    if (eventTypes.includes(paramCategory)) setCategorySelect(paramCategory);
-    else setCategorySelect(""); // 預設值
+    if (eventTypes.some(item => item.name == paramCategory)) setCategorySelect(paramCategory);
+    else{
+      setCategorySelect(""); // 預設值
+    } 
 
     const paramDate = searchParams.get("date") || "";
     if (dateData.includes(paramDate)) setDateSelect(paramDate);
@@ -166,6 +168,7 @@ function AllEvents() {
     else if (paramDate == "一個月內") tmpDelt = 30;
     else if (paramDate == "兩個月內") tmpDelt = 60;
 
+    
     const result = sampleData.filter((product) => {
       return (
         (paramKeyword === "" || product.title.match(paramKeyword)) &&
@@ -178,7 +181,7 @@ function AllEvents() {
     setFilteredProducts(result); // 更新顯示的資料
     if (Math.ceil(result.length / 8) < 1) setTotalPages(1);
     else setTotalPages(Math.ceil(result.length / 8));
-  }, [searchParams, sampleData, apiLoading]); // 原為 [searchParams]
+  }, [searchParams, sampleData, apiLoading, eventTypes]); // 原為 [searchParams]
 
   const handleSeach = () => {
     const newParams = new URLSearchParams();
@@ -292,7 +295,7 @@ function AllEvents() {
                 {eventTypes.map((item) => {
                   return (
                     <option value={item.name} key={item.name}>
-                      {item.name}
+                       {item.name}
                     </option>
                   );
                 })}
