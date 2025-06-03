@@ -46,7 +46,7 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
 
                     <div className=" my-2 text-muted">
                       <p className=" m-0" >{product.start_at}</p>
-                      <h4 className="fw-bold text-start my-2">{product.name}</h4>
+                      <h4 className="fw-bold text-start my-3 text-black">{product.title}</h4>
 
                       <div className="d-flex align-items-center">
                         <img src={locationIcon} alt="icon" />
