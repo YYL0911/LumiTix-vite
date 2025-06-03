@@ -18,76 +18,6 @@ const breadcrumb = [
 
 
 
-// 假資料
-const sampleData = [
-  {
-    order_id: "1c8da31a-5fd2-44f3-897e-4a259e7ec62b",
-    name: "台北愛樂《春之頌》交響音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-05-05 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: '待審核',
-    sale_rate: null
-  },
-  {
-    order_id: "1c8da31a-5fd2-44f3-897e-4a257ec62b",
-    name: "台北愛樂交響音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-05-06 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: '銷售中',
-    sale_rate: 0.95
-  },
-  {
-    order_id: "1c8da31a-5fd2-44f897e-4a259e7ec62b",
-    name: "台北愛樂《下下之頌》交響音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-07-05 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: '待審核',
-    sale_rate: null
-  },{
-    order_id: "1c8da31a-5fd2-44f3-897e-4a25ec62b",
-    name: "台北愛樂《春頌》交響音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-07-15 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: '銷售結束',
-    sale_rate: 0.93
-  },{
-    order_id: "1c8da31a-5fd2-4f3-897e-4a259ec62b",
-    name: "愛樂《春》交響音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-08-05 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: '銷售結束',
-    sale_rate: 0.9
-  },{
-    order_id: "1cda31a-5f2-44f3-897e-4a2e7ec62b",
-    name: "台北愛樂《頌》音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-09-20 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: '銷售中',
-    sale_rate: 0.98
-  },{
-    order_id: "1c8da31a-5f2-4f3-89e-4a259e762b",
-    name: "台樂《春之頌》交響音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-10-05 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    status: '銷售中',
-    sale_rate: 0.9
-  },
-  
-];
 
 // 製造表格
 const DataTable = memo(({filterProducts, handleNavigate}) => {
@@ -98,16 +28,17 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
     <>  
       {filterProducts.map((product) =>{
         return(
-          <div  key={product.order_id}>
+          <div  key={product.id}>
 
             <a className="text-decoration-none" href="#" onClick={(e) => {
               e.preventDefault();
-              // handleNavigate(`/evevtInfo/${product.order_id}`)
+              // if(product.sale_status != "待審核") handleNavigate(`/evevtInfo/${product.id}`)
+              // else handleNavigate(`/evevtInfo/${product.id}`)
             }}>
 
               <div  className="bg-white my-3 d-flex align-items-center border border-2 border-black p-3">
-                <div className="flex-shrink-0">
-                  <img src={ product.cover_image_url} alt="..."/>
+                <div className="flex-shrink-0 " style={{width:120+'px', height:160+'px'}}>
+                  <img src={ product.cover_image_url} className="img-fluid object-fit-cover h-100 " alt="..."/>
                 </div>
                 <div className="flex-grow-1 ms-3">
                   <div className="d-flex flex-column-reverse flex-sm-row justify-content-between 
@@ -122,18 +53,18 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
                         <p className=" m-0 ms-1 align-self-end" >{product.location}</p>
                       </div>
 
-                      {product.sale_rate && <p className=" m-0 mt-2" >售票率：{product.sale_rate*100}</p>}
+                      {product.sale_status != "待審核" && <p className=" m-0 mt-2" >售票率：{product.sale_rate*100}%</p>}
                       
                     </div>
                     
                     <div className=" my-2 flex-shrink-0 text-black justify-content-sm-end justify-content-start d-flex" style={{minWidth:75+'px'}}>
 
-                      {product.status == "銷售結束" ?
+                      {product.sale_status == "銷售結束" ?
                       <p className=" border-bottom border-top border-gray-dark border-3 p-1 m-0" >
                         銷售結束
                       </p>
                       :
-                      product.status == "待審核" ?
+                      product.sale_status == "待審核" ?
                       <p className=" border-bottom border-top border-danger border-3 p-1 m-0 fw-bold" >
                         待審核
                       </p>
@@ -167,16 +98,51 @@ const tabs = [
 ];
 
 function EventsList() {
-  const { headerHeight } = useAuth();
+  const { headerHeight, loading, userToken } = useAuth();
   const navigate = useNavigate();
   const [activeState, setActiveState] = useState('全部'); 
+  const [allData, setAllData] = useState([]); 
+
+
+  const isFirstRender = useRef(true); // 記錄是否是第一次渲染
+  const [apiLoading, setApiLoading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
+    useEffect(() => {
+      if (isFirstRender.current) {
+        isFirstRender.current = false; // 更新為 false，代表已執行過
+        // console.log("✅ useEffect 只執行一次");
+        setApiLoading(true)
+        fetch("https://n7-backend.onrender.com/api/v1/admin/events",{
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${userToken}`, // token 放這
+          }}) 
+          .then(res => res.json())
+          .then(result => {
+            setApiLoading(false)
+
+            if(!result.status){
+              if(result.message == "尚未登入") navigate("/login");
+              else navigate("/");
+            }
+            else{
+              setAllData(result.data.events)
+            }
+          })
+          .catch(err => {
+            navigate("/ErrorPage")
+          });
+      }
+    }, []);
+
+
 
   const filterProducts = useMemo(() => {
-    return [...sampleData]
+    return allData ? [...allData]
       .filter((product) => {
-        return  (product.status == (activeState) || activeState == '全部');
-      });
-  }, [activeState]);
+        return  (product.sale_status == (activeState) || activeState == '全部');
+      }):[];
+  }, [activeState, allData]);
 
 
   // 滑到頂部
@@ -191,6 +157,7 @@ function EventsList() {
   const handleNavigate = (path => navigate(path) ); 
   const tabRef = useRef(null);
   const [isFixed, setIsFixed] = useState(false);
+  const [tabHeight, setTabHeight] = useState(0);
 
 
   useEffect(() => {
@@ -208,28 +175,42 @@ function EventsList() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (tabRef.current) setTabHeight(tabRef.current.offsetHeight);
+    
+    const handleResize = () => {
+      if (tabRef.current) setTabHeight(tabRef.current.offsetHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
 
 
 
   return (
-    <div className='bg-body-tertiary ' style={{minHeight:405+'px'}}>
+    <div className='bg-body-tertiary flex-grow-1 ' >
       <div  className='container py-3 px-md-5' >
         {/* 麵包屑 */}
         <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
-        {isFixed && <div style={{top: `${headerHeight}px`}}></div>}
+        {/* 撐高假區塊 */}
+        <div 
+          style={{ height: `${tabHeight}px` }} className={`'  ${isFixed ?"d-block":"d-none"} '`}>
+        </div>
+
+        {/* tab欄位 */}
         <div ref={tabRef} 
-         style={{
+        style={{
           position: isFixed ? 'fixed' : 'static',
           top: `${headerHeight}px`,
         }}
-
-        className={`${isFixed ? 
-          ` start-0 end-0 bg-white py-2 border-bottom border-dark-subtle`
-          : 
-          'py-2 border border-3 border-dark-subtle bg-white my-4 '}
+        className={`   bg-white py-2   border-dark-subtle 
+          ${isFixed ? 
+          ` start-0 end-0 border-bottom ` : ' border border-3  my-4'}
         `}>
-          <ul className={`nav ${isFixed?"container px-md-5":"" }`}>
+          <ul className={`nav ${isFixed?"container ":"" }`}>
             {tabs.map((tab) => (
                 <li className="nav-item" key={tab.key}>
                   <button
