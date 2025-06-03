@@ -9,79 +9,13 @@ import { useAuth } from '../../contexts/AuthContext';
 import Breadcrumb from "../../conponents/Breadcrumb";
 import Loading from "../../conponents/Loading";
 
-
+// 圖片
 import locationIcon from "../../assets/img/location_on.png"
 
 //麵包屑
 const breadcrumb = [
   { name: "首頁", path: "/" },
   { name: "票務管理", path: "/tickets" },
-];
-
-
-
-// 假資料
-const sampleData = [
-  {
-    order_id: "1c8da31a-5fd2-44f3-897e-4a259e7ec62b",
-    title: "台北愛樂《春之頌》交響音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-05-05 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    ticket_status: "used"
-  },
-  {
-    order_id: "1c8da31a-5fd2-44f3-897e-4a257ec62b",
-    title: "台北愛樂交響音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-05-06 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    ticket_status: "unused"
-  },
-  {
-    order_id: "1c8da31a-5fd2-44f897e-4a259e7ec62b",
-    title: "台北愛樂《下下之頌》交響音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-07-05 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    ticket_status: "used"
-  },{
-    order_id: "1c8da31a-5fd2-44f3-897e-4a25ec62b",
-    title: "台北愛樂《春頌》交響音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-07-15 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    ticket_status: "unused"
-  },{
-    order_id: "1c8da31a-5fd2-4f3-897e-4a259ec62b",
-    title: "愛樂《春》交響音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-08-05 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    ticket_status: "used"
-  },{
-    order_id: "1cda31a-5f2-44f3-897e-4a2e7ec62b",
-    title: "台北愛樂《頌》音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-09-20 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    ticket_status: "used"
-  },{
-    order_id: "1c8da31a-5f2-4f3-89e-4a259e762b",
-    title: "台樂《春之頌》交響音樂會",
-    location: "臺北國家音樂廳",
-    start_at: "2025-10-05 18:00",
-    end_at: "2025-05-05 20:00",
-    cover_image_url: "https://fakeimg.pl/120x160/?text=PICTURE",
-    ticket_status: "used"
-  },
-  
 ];
 
 // 製造表格
@@ -102,7 +36,7 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
           <div  key={product.order_id}>
 
             { changeMonth ? 
-            <div className="mt-5 text-muted fw-bold">
+            <div className="mt-5 text-muted fw-bold fs-5">
               {month}
             </div>
             :<></>
@@ -124,7 +58,7 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
                       {/* <p className=" m-0" >{product.start_at}</p> */}
                       <p className=" m-0" >{product.start_at.substring(0,10)} {product.start_at.substring(11,16)}</p>
                       
-                      <h4 className="fw-bold text-start my-2">{product.title}</h4>
+                      <h4 className="fw-bold text-start my-3 text-black">{product.title}</h4>
 
                       <div className="d-flex align-items-center">
                         <img src={locationIcon} alt="icon" />
@@ -135,7 +69,7 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
                     
                     <div className=" my-2 flex-shrink-0 text-black">
                       {product.ticket_status == 'used'?
-                      <p className=" border-bottom border-top border-gray-dark border-3 p-1 m-0" >
+                      <p className=" border-bottom border-top  border-secondary border-3 p-1 m-0" >
                         已使用
                       </p>
                       :
@@ -171,8 +105,6 @@ function Tickets() {
   const navigate = useNavigate();
   const [activeState, setActiveState] = useState(null);
   const [allData, setAllData] = useState(null); 
-
-
 
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
   const [apiLoading, setApiLoading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
@@ -215,25 +147,17 @@ function Tickets() {
   },[activeState])
 
   const filterProducts = useMemo(() => {
-    // return [...sampleData]
-    //   .filter((product) => {
-    //     return  activeState==null ? true : product.ticket_status == (activeState);
-    //   });
-
-
     return allData ? [...allData]
       .filter((product) => {
         return  activeState==null ? true : product.ticket_status == (activeState);
-      })
-      :[];
-
-
+      }):[];
   }, [activeState, allData]);
 
 
   const handleNavigate = (path => navigate(path) ); 
   const tabRef = useRef(null);
   const [isFixed, setIsFixed] = useState(false);
+  const [tabHeight, setTabHeight] = useState(0);
 
 
   useEffect(() => {
@@ -242,31 +166,45 @@ function Tickets() {
       if (tabTop < window.scrollY) setIsFixed(true);
       else setIsFixed(false);
     };
-
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (tabRef.current) setTabHeight(tabRef.current.offsetHeight);
+    
+    const handleResize = () => {
+      if (tabRef.current) setTabHeight(tabRef.current.offsetHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
 
 
   return (
-    <div className='bg-body-tertiary ' style={{minHeight:405+'px'}}>
+    <div className="bg-body-tertiary flex-grow-1" >
       <div  className='container py-3' >
         {/* 麵包屑 */}
         <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
-        {isFixed && <div style={{top: `${headerHeight}px`}}></div>}
+
+        {/* 撐高假區塊 */}
+        <div 
+          style={{ height: `${tabHeight}px` }} className={`'  ${isFixed ?"d-block":"d-none"} '`}>
+        </div>
+
+        {/* tab欄位 */}
         <div ref={tabRef} 
         style={{
           position: isFixed ? 'fixed' : 'static',
           top: `${headerHeight}px`,
         }}
-
-        className={`${isFixed ? 
-          ` start-0 end-0 bg-white py-2 border-bottom border-dark-subtle`
-          : 
-          'py-2 border border-3 border-dark-subtle bg-white my-4 '}
+        className={`   bg-white py-2   border-dark-subtle 
+          ${isFixed ? 
+          ` start-0 end-0 border-bottom ` : ' border border-3  my-4'}
         `}>
           <ul className={`nav ${isFixed?"container ":"" }`}>
             {tabs.map((tab) => (
@@ -282,8 +220,7 @@ function Tickets() {
           </ul>
         </div>
 
-
-
+        
         {/* 根據狀態產生活動列表 */}
         <DataTable 
           filterProducts={filterProducts} 
