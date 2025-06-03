@@ -63,7 +63,7 @@ function Personal() {
 
             const googleInfo = localStorage.getItem("googleInfo");
             if(googleInfo){
-              if(googleInfo == "bind") setErrMessage("綁定已取消") 
+              if(googleInfo == "bind") setUpdateNameResult("已取消綁定") 
               else setUpdateNameResult(googleInfo); 
               setModalTitle("綁定結果")
               successModalRef.current.open();
@@ -319,7 +319,7 @@ function Personal() {
 
 
   return (
-    <div className='bg-body-tertiary '>
+    <div className='bg-body-tertiary flex-grow-1' >
       <div className='container py-3'>
         {/* 麵包屑 */}
         <Breadcrumb breadcrumbs={breadcrumb} />

@@ -49,10 +49,10 @@ export default function Navbar() {
                     {userName}
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end">
-                    <li className="nav-item ps-3"><Link className="nav-link"  to='/activeInfo/0'>活動新增/管理</Link></li>
-                    <li className="nav-item ps-3"><Link className="nav-link"  to='/events'>活動清單</Link></li>
-                    <li className="nav-item ps-3"><Link className="nav-link"  to='/ticketScaner'>驗票</Link></li>
-                    <li className="nav-item ps-3" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
+                    <li className="nav-item ps-3 dropdown-item"><Link className="nav-link"  to='/organizer/event/new'>活動新增/管理</Link></li>
+                    <li className="nav-item ps-3 dropdown-item"><Link className="nav-link "  to='/events'>活動清單</Link></li>
+                    <li className="nav-item ps-3 dropdown-item"><Link className="nav-link"  to='/ticketScaner'>驗票</Link></li>
+                    <li className="nav-item ps-3 dropdown-item" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
                   </ul>
                 </li>
               }
@@ -66,9 +66,9 @@ export default function Navbar() {
                     {userName}
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end">
-                    <li className="nav-item ps-3"><Link className="nav-link"  to=''>一般會員管理</Link></li>
-                    <li className="nav-item ps-3"><Link className="nav-link"  to='/eventsList'>活動管理</Link></li>
-                    <li className="nav-item ps-3" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
+                    <li className="nav-item ps-3 dropdown-item"><Link className="nav-link"  to=''>一般會員管理</Link></li>
+                    <li className="nav-item ps-3 dropdown-item"><Link className="nav-link"  to='/eventsList'>活動管理</Link></li>
+                    <li className="nav-item ps-3 dropdown-item" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
                   </ul>
                 </li>
               }
@@ -82,9 +82,9 @@ export default function Navbar() {
                       {userName}
                     </a>
                     <ul className="dropdown-menu dropdown-menu-end">
-                      <li className="nav-item ps-3"><Link className="nav-link"  to='/personal'>會員資料</Link></li>
-                      <li className="nav-item ps-3"><Link className="nav-link"  to='/tickets'>票卷管理</Link></li>
-                      <li className="nav-item ps-3" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
+                      <li className="nav-item ps-3 dropdown-item"><Link className="nav-link"  to='/personal'>會員資料</Link></li>
+                      <li className="nav-item ps-3 dropdown-item"><Link className="nav-link"  to='/tickets'>票卷管理</Link></li>
+                      <li className="nav-item ps-3 dropdown-item" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
                     </ul>
                 </li>
               }

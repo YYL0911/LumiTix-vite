@@ -17,7 +17,7 @@ import Personal from './pages/User/Personal';
 import Tickets from './pages/User/Tickets';
 import TicketDetailPage from "./pages/User/TicketDetailPage";
 import Events from './pages/Organizer/Events';
-import ActiveInfo from './pages/Organizer/ActiveInfo';
+import EventDetail from './pages/Organizer/EventDetail';
 import TicketScaner from './pages/Organizer/TicketScaner';
 import TicketScanerResult from './pages/Organizer/TicketScanerResult';
 
@@ -25,6 +25,8 @@ import Callback from './pages/Callback';
 
 import EventsList from './pages/Admin/EventsList';
 import UserManagementList from './pages/Admin/UserManagementList';
+import UserInfo from './pages/Admin/UserInfo';
+
 
 
 const NotFound = () => <h1>404 - 頁面不存在</h1>;
@@ -58,7 +60,7 @@ function App() {
             <Route path="/events" element={<Events />}></Route>
             <Route path="/ticketScaner" element={<TicketScaner />}></Route>
             <Route path="/ticketScanerResult" element={<TicketScanerResult />}></Route>
-            <Route path="/activeInfo/:id" element={<ActiveInfo />} />
+            <Route path="/eventDetail/:id" element={<EventDetail />} />
           </Route>
 
           {/* 只有活動方可以看的頁面 */}
