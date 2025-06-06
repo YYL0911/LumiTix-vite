@@ -11,6 +11,8 @@ function EventInfo() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const { userToken } = useAuth();
+
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
   const [apiLoading, setApiLoading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
   const [event, setEvent] = useState({})
@@ -32,14 +34,18 @@ function EventInfo() {
 
   // 前往購票
   const handleNavigate = (section) => {
-    navigate(`/eventInfo/${id}/payments`, {
-      state: {
-        sectionId: section.id,
-        sectionName: section.section,
-        price: section.price_default
-      }
-    });
-    // console.log(section)
+    if (!userToken) {
+      alert("請先登入，再購買票券");
+      navigate('/login')
+    } else {
+      navigate(`/eventInfo/${id}/payments`, {
+        state: {
+          sectionId: section.id,
+          sectionName: section.section,
+          price: section.price_default
+        }
+      });
+    }
   };
 
   // 取得單一活動資訊
