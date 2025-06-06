@@ -45,7 +45,6 @@ function CreatOrder() {
             } catch (err) {
                 setApiLoading(false);
                 console.error('取得訂單失敗', err);
-                navigate('/ErrorPage');
             }
         };
 
