@@ -107,6 +107,7 @@ function Tickets() {
   const [allData, setAllData] = useState(null); 
 
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
+  const [userBlock, setUserBlock] = useState(0);
   const [apiLoading, setApiLoading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
     useEffect(() => {
       if (isFirstRender.current) {
@@ -125,10 +126,12 @@ function Tickets() {
 
             if(!result.status){
               if(result.message == "尚未登入") navigate("/login");
+              else if(result.message == "使用者已被封鎖") setUserBlock(-1)
               else navigate("/");
             }
             else{
               setAllData(result.data)
+              setUserBlock(1)
             }
           })
           .catch(err => {
@@ -190,42 +193,47 @@ function Tickets() {
         {/* 麵包屑 */}
         <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
+        {userBlock == -1 && (<h3 className='mb-3 text-secondary text-center '>帳號已被封鎖</h3>)}
 
-        {/* 撐高假區塊 */}
-        <div 
-          style={{ height: `${tabHeight}px` }} className={`'  ${isFixed ?"d-block":"d-none"} '`}>
+        <div className={`${userBlock == 1 ? "d-block": "d-none"}`}>
+          {/* 撐高假區塊 */}
+          <div 
+            style={{ height: `${tabHeight}px` }} className={`'  ${isFixed ?"d-block":"d-none"} '`}>
+          </div>
+
+          {/* tab欄位 */}
+          <div ref={tabRef} 
+          style={{
+            position: isFixed ? 'fixed' : 'static',
+            top: `${headerHeight}px`,
+          }}
+          className={`   bg-white py-2   border-dark-subtle 
+            ${isFixed ? 
+            ` start-0 end-0 border-bottom ` : ' border border-3  my-4'}
+          `}>
+            <ul className={`nav ${isFixed?"container ":"" }`}>
+              {tabs.map((tab) => (
+                  <li className="nav-item" key={tab.key}>
+                    <button
+                      className={`nav-underline-custom nav-link ${activeState === tab.key ? 'active' : ''}`}
+                      onClick={() => setActiveState(tab.key)}
+                    >
+                      {tab.label}
+                    </button>
+                  </li>
+                ))}
+            </ul>
+          </div>
+
+          
+          {/* 根據狀態產生活動列表 */}
+          <DataTable 
+            filterProducts={filterProducts} 
+            handleNavigate={handleNavigate}>
+          </DataTable>
+
         </div>
 
-        {/* tab欄位 */}
-        <div ref={tabRef} 
-        style={{
-          position: isFixed ? 'fixed' : 'static',
-          top: `${headerHeight}px`,
-        }}
-        className={`   bg-white py-2   border-dark-subtle 
-          ${isFixed ? 
-          ` start-0 end-0 border-bottom ` : ' border border-3  my-4'}
-        `}>
-          <ul className={`nav ${isFixed?"container ":"" }`}>
-            {tabs.map((tab) => (
-                <li className="nav-item" key={tab.key}>
-                  <button
-                    className={`nav-underline-custom nav-link ${activeState === tab.key ? 'active' : ''}`}
-                    onClick={() => setActiveState(tab.key)}
-                  >
-                    {tab.label}
-                  </button>
-                </li>
-              ))}
-          </ul>
-        </div>
-
-        
-        {/* 根據狀態產生活動列表 */}
-        <DataTable 
-          filterProducts={filterProducts} 
-          handleNavigate={handleNavigate}>
-        </DataTable>
 
       </div>
 

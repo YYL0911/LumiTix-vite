@@ -58,6 +58,9 @@ function Callback() {
               case "signup_failed":
                 localStorage.setItem("googleInfo", "註冊失敗");
                 break;
+              case "blocked":
+                localStorage.setItem("googleInfo", "此帳號已被封鎖");
+                break;
             
               default:
                 localStorage.setItem("googleInfo", "未預期之錯誤");

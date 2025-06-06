@@ -79,6 +79,10 @@ export const AuthProvider = ({ children }) => {
       .then(result => {
         if(!result.status){
           localStorage.clear();
+          if(result.message == "使用者已被封鎖"){
+            logout();
+            alert("此帳號已被封鎖");
+          }
           navigate("/")
         }
         else{
