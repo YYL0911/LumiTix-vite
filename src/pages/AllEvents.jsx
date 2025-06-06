@@ -29,7 +29,7 @@ const daysFromToday = (dateStr, targetDelt) => {
 const CardItem = ({ id, imgSrc, title, showTime, location, category, handleNavigate }) => (
   <a className="allEventHover card mb-5 col-md-3 col-6 text-decoration-none" style={{ border: 'none' }} href="#" onClick={(e) => {
     e.preventDefault();
-    handleNavigate(`/evevtInfo/${id}`)
+    handleNavigate(`/eventInfo/${id}`)
   }}>
     
     <div className="allEventImg border border-2 border-secondary ratio" style={{ '--bs-aspect-ratio': '145.78%' }}>

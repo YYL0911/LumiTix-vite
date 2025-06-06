@@ -1,0 +1,18 @@
+
+.cover-width {
+    max-width: 43%;
+}
+
+.order-width {
+    max-width: 60%;
+}
+
+@media (max-width: 992px) {
+    .cover-width {
+        max-width: 80%;
+    }
+
+    .order-width {
+        max-width: 100%;
+    }
+}
