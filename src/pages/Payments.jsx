@@ -285,8 +285,8 @@ function Payments() {
                             }
 
                             if (paymentMethod === "creditCard") {
-                                console.log(selectedArea)
-                                // createOrder();
+                                // console.log(selectedArea)
+                                createOrder();
                             } else {
                                 alert("目前只支援信用卡付款");
                             }
