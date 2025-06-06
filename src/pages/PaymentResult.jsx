@@ -44,7 +44,9 @@ function CreatOrder() {
                 }
             } catch (err) {
                 setApiLoading(false);
-                console.error('取得訂單失敗', err);
+                // console.error('取得訂單失敗', err);
+                alert('無法取得訂單資訊');
+                navigate('/tickets')
             }
         };
 
