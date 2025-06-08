@@ -54,7 +54,6 @@ function App() {
             <Route path="/personal" element={<Personal />}></Route>
             <Route path="/tickets" element={<Tickets></Tickets>}></Route>
             <Route path="/ticketInfo/:id" element={<TicketDetailPage />} />
-
             <Route path="/eventInfo/:id/payments" element={<Payments />} />
             <Route path="/tickets/:id/payment_result" element={<PaymentResult />} />
           </Route>
