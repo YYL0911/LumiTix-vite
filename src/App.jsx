@@ -20,6 +20,7 @@ import Events from './pages/Organizer/Events';
 import ActiveInfo from './pages/Organizer/ActiveInfo';
 import TicketScaner from './pages/Organizer/TicketScaner';
 import TicketScanerResult from './pages/Organizer/TicketScanerResult';
+import EventFormPage from './pages/Organizer/EventFormPage';
 
 import Callback from './pages/Callback';
 
@@ -59,6 +60,8 @@ function App() {
             <Route path="/ticketScaner" element={<TicketScaner />}></Route>
             <Route path="/ticketScanerResult" element={<TicketScanerResult />}></Route>
             <Route path="/activeInfo/:id" element={<ActiveInfo />} />
+            <Route path="/organizer/event/new" element={<EventFormPage />} />
+            <Route path="/organizer/event/edit/:eventId" element={<EventFormPage />} />
           </Route>
 
           {/* 只有活動方可以看的頁面 */}
@@ -66,7 +69,6 @@ function App() {
             <Route path="/eventsList" element={<EventsList></EventsList>}></Route>
           </Route>
 
-          
           <Route path="/ErrorPage" element={<ErrorPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
