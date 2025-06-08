@@ -20,6 +20,7 @@ import Events from './pages/Organizer/Events';
 import EventDetail from './pages/Organizer/EventDetail';
 import TicketScaner from './pages/Organizer/TicketScaner';
 import TicketScanerResult from './pages/Organizer/TicketScanerResult';
+import EventFormPage from './pages/Organizer/EventFormPage';
 
 import Payments from './pages/Payments';
 import PaymentResult from './pages/PaymentResult';
@@ -53,7 +54,6 @@ function App() {
             <Route path="/personal" element={<Personal />}></Route>
             <Route path="/tickets" element={<Tickets></Tickets>}></Route>
             <Route path="/ticketInfo/:id" element={<TicketDetailPage />} />
-
             <Route path="/eventInfo/:id/payments" element={<Payments />} />
             <Route path="/tickets/:id/payment_result" element={<PaymentResult />} />
           </Route>
@@ -63,6 +63,8 @@ function App() {
             <Route path="/events" element={<Events />}></Route>
             <Route path="/ticketScaner" element={<TicketScaner />}></Route>
             <Route path="/ticketScanerResult" element={<TicketScanerResult />}></Route>
+            <Route path="/organizer/event/new" element={<EventFormPage />} />
+            <Route path="/organizer/event/edit/:eventId" element={<EventFormPage />} />
             <Route path="/eventDetail/:id" element={<EventDetail />} />
           </Route>
 
