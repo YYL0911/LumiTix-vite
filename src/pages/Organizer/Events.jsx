@@ -19,11 +19,12 @@ const breadcrumb = [
 
 
 // 製造表格
-const DataTable = memo(({filterProducts, handleNavigate}) => {
+const DataTable = memo(({ filterProducts, handleNavigate }) => {
   return (
-<<<<<<< HEAD
-    <div className="table-responsive">
-      <table className="table table-striped text-center align-middle">
+    // style={{ maxHeight: '500px', overflowY: 'auto' }}
+    <div className="table-responsive ">
+      <table className="table table-striped text-center align-middle table-hover">
+        {/* className="position-sticky top-0" */}
         <thead>
           <tr>
             <th scope="col" className="text-wrap text-break" style={{ minWidth: "150px" }}>
@@ -38,46 +39,6 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
             <th scope="col" className="text-wrap text-break" style={{ minWidth: "220px" }}>
               操作
             </th>
-=======
-    // style={{ maxHeight: '500px', overflowY: 'auto' }}
-    <div className="table-responsive " >
-    <table className="table table-striped text-center align-middle table-hover">
-      {/* className="position-sticky top-0" */}
-      <thead >
-        <tr>
-          <th scope="col" className="text-wrap text-break" style={{ minWidth: '150px'}}>活動名稱</th>
-          <th scope="col" className="text-wrap text-break" style={{ minWidth: '120px'}}>表演時段</th>
-          <th scope="col" className="text-wrap text-break" style={{ minWidth: '120px'}}>購票人數</th>
-          <th scope="col" className="text-wrap text-break" style={{ minWidth: '220px'}}>操作</th>
-        </tr>
-      </thead>
-      <tbody>
-        {filterProducts.map((product) => (
-          <tr key={product.id}>
-            <td className="text-wrap text-break">{product.title}</td>
-            <td className="text-wrap text-break">
-              {product.start_at.substring(0,10)}<br />{product.start_at.substring(11,16)}~{product.end_at.substring(11,16)}
-            </td>
-            <td>{product.ticket_purchaced}/{product.ticket_total}</td>
-            <td>
-              {console.log(activeState)}
-              <button
-                type="button"
-                className={`btn btn-dark mx-1 
-                  ${ ['checkin', 'holding', ""].includes(activeState) ? '' : 'd-none'}`}
-                onClick={() => handleNavigate(`/activeInfo/${product.id}`)}
-              >
-                編輯資訊
-              </button>
-              <button
-                type="button"
-                className="btn btn-outline-secondary mx-1"
-                onClick={() => handleNavigate(`/activeInfo/${product.id}`)}
-              >
-                詳細內容
-              </button>
-            </td>
->>>>>>> main
           </tr>
         </thead>
         <tbody>
@@ -93,10 +54,12 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
                 {product.ticket_purchaced}/{product.ticket_total}
               </td>
               <td>
+                {console.log(activeState)}
                 <button
                   type="button"
-                  className="btn btn-dark mx-1 "
-                  onClick={() => handleNavigate(`/organizer/event/edit/${product.id}`)}
+                  className={`btn btn-dark mx-1 
+                  ${["checkin", "holding", ""].includes(activeState) ? "" : "d-none"}`}
+                  onClick={() => handleNavigate(`/activeInfo/${product.id}`)}
                 >
                   編輯資訊
                 </button>
@@ -114,7 +77,7 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
       </table>
     </div>
   );
-})
+});
 
 function Events() {
   const { userToken, loading} = useAuth(); // [變更使用者名稱, token]
@@ -217,15 +180,10 @@ function Events() {
       <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
       {/* 新增活動 */}
-<<<<<<< HEAD
-      <button type=' button' className='btn btn-danger btn-lg my-3' onClick={() => navigate('/organizer/event/new')}>
-        新增活動
-=======
       <button type=' button' 
       className='btn btn-danger btn-lg my-4 d-flex align-items-center justify-content-center'
       onClick={() => {handleNavigate(`/organizer/event/new`)}} >
         新增活動<FaRegPlusSquare size={22}  className={`ms-2`}/>
->>>>>>> main
       </button>
 
       {/* 活動狀態 */}

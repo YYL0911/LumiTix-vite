@@ -49,17 +49,10 @@ export default function Navbar() {
                     {userName}
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end">
-<<<<<<< HEAD
-                    <li className="nav-item ps-3"><Link className="nav-link"  to='/organizer/event/new'>活動新增</Link></li>
-                    <li className="nav-item ps-3"><Link className="nav-link"  to='/events'>活動訂單</Link></li>
-                    <li className="nav-item ps-3"><Link className="nav-link"  to='/ticketScaner'>驗票</Link></li>
-                    <li className="nav-item ps-3" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
-=======
-                    <li className="nav-item ps-3 dropdown-item"><Link className="nav-link"  to='/organizer/event/new'>活動新增/管理</Link></li>
+                    <li className="nav-item ps-3 dropdown-item"><Link className="nav-link"  to='/organizer/event/new'>活動新增</Link></li>
                     <li className="nav-item ps-3 dropdown-item"><Link className="nav-link "  to='/events'>活動清單</Link></li>
                     <li className="nav-item ps-3 dropdown-item"><Link className="nav-link"  to='/ticketScaner'>驗票</Link></li>
                     <li className="nav-item ps-3 dropdown-item" onClick={() => logout()}><Link className="nav-link"  to='/'>登出</Link></li>
->>>>>>> main
                   </ul>
                 </li>
               }

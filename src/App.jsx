@@ -64,7 +64,6 @@ function App() {
             <Route path="/events" element={<Events />}></Route>
             <Route path="/ticketScaner" element={<TicketScaner />}></Route>
             <Route path="/ticketScanerResult" element={<TicketScanerResult />}></Route>
-            <Route path="/activeInfo/:id" element={<ActiveInfo />} />
             <Route path="/organizer/event/new" element={<EventFormPage />} />
             <Route path="/organizer/event/edit/:eventId" element={<EventFormPage />} />
             <Route path="/eventDetail/:id" element={<EventDetail />} />
