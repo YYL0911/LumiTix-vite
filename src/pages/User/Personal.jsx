@@ -32,6 +32,8 @@ function Personal() {
   const [isBindGoogle, setIsBindGoogle] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
 
+  const [userBlock, setUserBlock] = useState(0);
+
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
   //取得使用者資料
   useEffect(() => {
@@ -51,6 +53,9 @@ function Personal() {
           setApiLoading(false)
           if(!result.status){
             if(result.message == "尚未登入") navigate("/login");
+
+            if(result.message == "使用者已被封鎖") setUserBlock(-1)
+            else setUserBlock(1)
           }
           else{
             // ✅ 用 reset 動態設定預設值
@@ -60,10 +65,11 @@ function Personal() {
               name: result.data.name,
             });
             setIsBindGoogle(result.data.google_bind)
+            setUserBlock(1)
 
             const googleInfo = localStorage.getItem("googleInfo");
             if(googleInfo){
-              if(googleInfo == "bind") setErrMessage("綁定已取消") 
+              if(googleInfo == "bind") setUpdateNameResult("已取消綁定") 
               else setUpdateNameResult(googleInfo); 
               setModalTitle("綁定結果")
               successModalRef.current.open();
@@ -215,8 +221,6 @@ function Personal() {
     })
     .catch(err => {
       navigate("/ErrorPage")
-      // setErrMessage("伺服器錯誤")
-      // setShowErrorInfo(true)
     });
   };
 
@@ -318,14 +322,15 @@ function Personal() {
 
 
 
+
   return (
-    <div className='bg-body-tertiary '>
+    <div className='bg-body-tertiary flex-grow-1' >
       <div className='container py-3'>
         {/* 麵包屑 */}
         <Breadcrumb breadcrumbs={breadcrumb} />
 
-        <div className="card shadow p-3 mb-5 bg-white rounded mx-auto" style={{maxWidth: 500+"px"}}>
-          
+        {userBlock == -1 && (<h3 className='mb-3 text-secondary text-center '>帳號已被封鎖</h3>)}
+        <div className={`card shadow p-3 mb-5 bg-white rounded mx-auto ${userBlock == 1 ? "d-block": "d-none"}`} style={{maxWidth: 500+"px"}}>
             <h3 className='mb-3 text-secondary mx-auto'>會員資訊</h3>
             <form onSubmit={mainHandleSubmit(onMainSubmit)}>
               <div className="mb-3 w-100 " >
@@ -366,15 +371,6 @@ function Personal() {
               </div>
 
               <div className="d-flex justify-content-between mb-3 w-100" >
-                {/* <div className="col-6 pe-2">
-                  <button
-                    type="button"
-                    className="btn btn-outline-dark w-100"
-                    onClick={() => navigate("/")}
-                  >
-                    取消
-                  </button>
-                </div> */}
                 <div className="col-12 mx-auto">
                     <button
                       type="submit"
@@ -388,12 +384,9 @@ function Personal() {
               </div>
             </form>
 
-
             <ButtonTipModal ref={successModalRef} title={modalTitle} info={updateNameResult} />
 
-
             <hr className="flex-grow-1" />
-            
             <button
               type="button"
               className="btn btn-outline-dark mt-3 w-100  d-flex align-items-center justify-content-center"
@@ -401,7 +394,6 @@ function Personal() {
             >
               修改密碼 <RiEdit2Fill size={22} color="#C41508" className={`ms-2`}/>
             </button>
-
 
             {isBindGoogle ? 
               <button
@@ -419,7 +411,6 @@ function Personal() {
               >
                 綁定Google帳號 <HiOutlineLink size={22}  className={`ms-2 icon`}/>
               </button>
-
             }
       
 
@@ -510,10 +501,7 @@ function Personal() {
                 </div>
               </div>
             </div>
-
         </div>
-
-
 
         {(!loading && apiLoading && !apiPasLoading) && (<Loading></Loading>)}
       </div>

@@ -9,6 +9,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import Breadcrumb from "../../conponents/Breadcrumb";
 import Loading from "../../conponents/Loading";
 
+import { FaRegPlusSquare } from "react-icons/fa";
+
 //麵包屑
 const breadcrumb = [
   { name: '首頁', path: "/" },
@@ -19,6 +21,7 @@ const breadcrumb = [
 // 製造表格
 const DataTable = memo(({filterProducts, handleNavigate}) => {
   return (
+<<<<<<< HEAD
     <div className="table-responsive">
       <table className="table table-striped text-center align-middle">
         <thead>
@@ -35,6 +38,46 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
             <th scope="col" className="text-wrap text-break" style={{ minWidth: "220px" }}>
               操作
             </th>
+=======
+    // style={{ maxHeight: '500px', overflowY: 'auto' }}
+    <div className="table-responsive " >
+    <table className="table table-striped text-center align-middle table-hover">
+      {/* className="position-sticky top-0" */}
+      <thead >
+        <tr>
+          <th scope="col" className="text-wrap text-break" style={{ minWidth: '150px'}}>活動名稱</th>
+          <th scope="col" className="text-wrap text-break" style={{ minWidth: '120px'}}>表演時段</th>
+          <th scope="col" className="text-wrap text-break" style={{ minWidth: '120px'}}>購票人數</th>
+          <th scope="col" className="text-wrap text-break" style={{ minWidth: '220px'}}>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filterProducts.map((product) => (
+          <tr key={product.id}>
+            <td className="text-wrap text-break">{product.title}</td>
+            <td className="text-wrap text-break">
+              {product.start_at.substring(0,10)}<br />{product.start_at.substring(11,16)}~{product.end_at.substring(11,16)}
+            </td>
+            <td>{product.ticket_purchaced}/{product.ticket_total}</td>
+            <td>
+              {console.log(activeState)}
+              <button
+                type="button"
+                className={`btn btn-dark mx-1 
+                  ${ ['checkin', 'holding', ""].includes(activeState) ? '' : 'd-none'}`}
+                onClick={() => handleNavigate(`/activeInfo/${product.id}`)}
+              >
+                編輯資訊
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline-secondary mx-1"
+                onClick={() => handleNavigate(`/activeInfo/${product.id}`)}
+              >
+                詳細內容
+              </button>
+            </td>
+>>>>>>> main
           </tr>
         </thead>
         <tbody>
@@ -121,10 +164,6 @@ function Events() {
   const handleNavigate = (path => navigate(path) ); 
 
 
-
-
-
-
   const ref = useRef(null);
   let isDown = false;
   let startX;
@@ -172,20 +211,21 @@ function Events() {
   }, []);
 
 
-
-
-
-
-
-
   return (
     <div  className='container py-3'>
       {/* 麵包屑 */}
       <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
 
       {/* 新增活動 */}
+<<<<<<< HEAD
       <button type=' button' className='btn btn-danger btn-lg my-3' onClick={() => navigate('/organizer/event/new')}>
         新增活動
+=======
+      <button type=' button' 
+      className='btn btn-danger btn-lg my-4 d-flex align-items-center justify-content-center'
+      onClick={() => {handleNavigate(`/organizer/event/new`)}} >
+        新增活動<FaRegPlusSquare size={22}  className={`ms-2`}/>
+>>>>>>> main
       </button>
 
       {/* 活動狀態 */}
@@ -193,10 +233,10 @@ function Events() {
         ref={ref}
         className="scroll-container d-flex overflow-auto my-3 text-nowrap "
       >
-        {['holding', 'finished', 'checking', 'rejected'].map((key, index) => (
+        {['checking', 'holding', 'finished', 'rejected'].map((key, index) => (
           <button
             key={index}
-            className={`btn me-2   ${activeState === key ? 'btn-secondary' : 'btn-light'}   `}
+            className={`btn me-3   ${activeState === key ? 'btn-secondary' : 'btn-outline-dark'}   `}
             onClick={() => setActiveState(key)}
           >
             {key === 'holding' && `正在舉辦 (${allData?.holding.length ?? 0})`}
@@ -209,10 +249,48 @@ function Events() {
 
 
       {/* 根據狀態產生活動列表 */}
-      <DataTable 
-        filterProducts={filterProducts} 
-        handleNavigate={handleNavigate}>
-      </DataTable>
+      {/* // style={{ maxHeight: '500px', overflowY: 'auto' }} */}
+      <div className="table-responsive " >
+        <table className="table table-striped text-center align-middle table-hover">
+          {/* className="position-sticky top-0" */}
+          <thead >
+            <tr>
+              <th scope="col" className="text-wrap text-break" style={{ minWidth: '150px'}}>活動名稱</th>
+              <th scope="col" className="text-wrap text-break" style={{ minWidth: '120px'}}>表演時段</th>
+              <th scope="col" className="text-wrap text-break" style={{ minWidth: '120px'}}>購票人數</th>
+              <th scope="col" className="text-wrap text-break" style={{ minWidth: '220px'}}>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filterProducts.map((product) => (
+              <tr key={product.id}>
+                <td className="text-wrap text-break">{product.title}</td>
+                <td className="text-wrap text-break">
+                  {product.start_at.substring(0,10)}<br />{product.start_at.substring(11,16)}~{product.end_at.substring(11,16)}
+                </td>
+                <td>{product.ticket_purchaced}/{product.ticket_total}</td>
+                <td>
+                  <button
+                    type="button"
+                    className={`btn btn-dark mx-1 
+                      ${ ['checking', 'holding'].includes(activeState) ? '' : 'd-none'}`}
+                    onClick={() => handleNavigate(`/organizer/event/edit/${product.id}`)}
+                  >
+                    編輯資訊
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary mx-1"
+                    onClick={() => handleNavigate(`/eventDetail/${product.id}`)}
+                  >
+                    詳細內容
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>   
 
 
       {(!loading && apiLoading) && (<Loading></Loading>)}

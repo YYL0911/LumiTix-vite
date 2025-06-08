@@ -17,16 +17,18 @@ import Personal from './pages/User/Personal';
 import Tickets from './pages/User/Tickets';
 import TicketDetailPage from "./pages/User/TicketDetailPage";
 import Events from './pages/Organizer/Events';
-import ActiveInfo from './pages/Organizer/ActiveInfo';
+import EventDetail from './pages/Organizer/EventDetail';
 import TicketScaner from './pages/Organizer/TicketScaner';
 import TicketScanerResult from './pages/Organizer/TicketScanerResult';
 import EventFormPage from './pages/Organizer/EventFormPage';
 
+import Payments from './pages/Payments';
+import PaymentResult from './pages/PaymentResult';
 import Callback from './pages/Callback';
 
 import EventsList from './pages/Admin/EventsList';
-import UserManagementList from './pages/Admin/UserManagementList';
-
+import UserList from './pages/Admin/UserList';
+// import UserInfo from './pages/Admin/UserInfo';
 
 const NotFound = () => <h1>404 - 頁面不存在</h1>;
 const ErrorPage = () => <h1>error - 伺服器發生錯誤，請稍後再試</h1>;
@@ -45,13 +47,16 @@ function App() {
           <Route path="/register" element={<Register></Register>}></Route>
           <Route path="/allEvents" element={<AllEvents></AllEvents>}></Route>
           <Route path="/callback" element={<Callback></Callback>}></Route>
-          <Route path="/evevtInfo/:id" element={<EventInfo />} />
+          <Route path="/eventInfo/:id" element={<EventInfo />} />
 
           {/* 只有使用者可以看的頁面 */}
           <Route element={<PrivateRoute roles={["General"]} />}>
             <Route path="/personal" element={<Personal />}></Route>
             <Route path="/tickets" element={<Tickets></Tickets>}></Route>
             <Route path="/ticketInfo/:id" element={<TicketDetailPage />} />
+
+            <Route path="/eventInfo/:id/payments" element={<Payments />} />
+            <Route path="/tickets/:id/payment_result" element={<PaymentResult />} />
           </Route>
 
           {/* 只有活動方可以看的頁面 */}
@@ -62,10 +67,12 @@ function App() {
             <Route path="/activeInfo/:id" element={<ActiveInfo />} />
             <Route path="/organizer/event/new" element={<EventFormPage />} />
             <Route path="/organizer/event/edit/:eventId" element={<EventFormPage />} />
+            <Route path="/eventDetail/:id" element={<EventDetail />} />
           </Route>
 
-          {/* 只有活動方可以看的頁面 */}
+          {/* 只有平台方可以看的頁面 */}
           <Route element={<PrivateRoute roles={["Admin"]} />}>
+            <Route path="/userList" element={<UserList />} />
             <Route path="/eventsList" element={<EventsList></EventsList>}></Route>
           </Route>
 

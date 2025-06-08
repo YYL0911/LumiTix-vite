@@ -1,0 +1,186 @@
+import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect, useRef  } from 'react';
+
+// Context
+import { useAuth } from '../../contexts/AuthContext';
+
+// 元件
+import Breadcrumb from "../../conponents/Breadcrumb";
+import Loading from '../../conponents/Loading';
+
+import { BsQrCodeScan } from "react-icons/bs";
+import { BsPencilSquare } from "react-icons/bs";
+
+
+const EventDetail = () => {
+  const navigate = useNavigate();
+  const { id: evendId } = useParams();
+
+  const { userToken, loading,  } = useAuth();
+
+  const [apiLoading, setApiLoading] = useState(false);
+  const [eventInfo, setEventInfo] = useState({});
+
+  //麵包屑
+  const breadcrumb = [
+    { name: '首頁', path: "/" },
+    { name: '活動訂單', path: "/events" },
+    { name: `${eventInfo.title}詳情`, path: "/" },
+  ];
+
+  const isFirstRender = useRef(true); // 記錄是否是第一次渲染
+  //取得使用者資料
+  useEffect(() => {
+
+    if (isFirstRender.current) {
+      isFirstRender.current = false; // 更新為 false，代表已執行過
+      setApiLoading(true)
+      fetch(`https://n7-backend.onrender.com/api/v1/organizer/events/${evendId}`,{
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${userToken}`, // token 放這
+        }}) 
+      .then(res => res.json())
+      .then(result => {
+        setApiLoading(false)
+        if(!result.status){
+          if(result.message == "尚未登入") navigate("/login");
+          else{
+            
+          }
+        }
+        else{
+          setEventInfo(result.data)
+        }
+      })
+      .catch(err => {
+        navigate("/ErrorPage")
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+  }, [eventInfo]);
+
+
+  const scanEvent = () => {
+    localStorage.setItem("scanEventID", evendId);
+    navigate(`/ticketScaner`)
+  }
+  
+
+
+  return (
+    <div className='container py-3 d-flex flex-column '>
+
+      {/* 麵包屑 */}
+      <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
+      <div className='mt-3'>
+        <div className="border border-2 border-secondary p-3">
+         <img src={eventInfo.cover_image_url} alt={eventInfo.title} className="img-fluid " />
+        </div>
+        
+        <div className="fs-5">
+          <div className="d-flex my-3">
+            <div className="fw-semibold text-nowrap">活動名稱：</div>
+            <div className=" flex-grow-1 ms-2">{eventInfo.title}</div>
+          </div>
+          <div className="d-flex mb-3">
+            <div className="fw-semibold text-nowrap">活動地點：</div>
+            <div className=" flex-grow-1 ms-2">{eventInfo.location}</div>
+          </div>
+          <div className="d-flex mb-3">
+            <div className="fw-semibold text-nowrap">地　　址：</div>
+            <div className=" flex-grow-1 ms-2">{eventInfo.address}</div>
+          </div>
+          <div className="d-flex mb-3">
+            <div className="fw-semibold text-nowrap">演出時間：</div>
+            <div className=" flex-grow-1 ms-2">{eventInfo.start_at?.substring(0,10)} {eventInfo.start_at?.substring(11,16)}</div>
+            
+          </div>
+          <div className="d-flex mb-3">
+            <div className="fw-semibold text-nowrap">表演人員：</div>
+            <div className=" flex-grow-1 ms-2">{eventInfo.performance_group}</div>
+          </div>
+          <div className="d-flex mb-3">
+            <div className="fw-semibold text-nowrap">類　　型：</div>
+            <div className=" flex-grow-1 ms-2">{eventInfo.type}</div>
+          </div>
+          <div className="d-flex mb-3">
+            <div className="pe-2 fw-semibold text-nowrap" >活動介紹：</div>
+            <div className=" ">{eventInfo.description}</div>
+          </div>
+
+          <div className='mb-3'> 
+            <p className="fs-5 fw-semibold">分區設定：</p>
+
+
+              <div className="row  justify-content-between  align-items-start">
+
+                <div className=" col-12 col-md-7">
+                  <img src={eventInfo.section_image_url} alt={eventInfo.title} className="img-fluid " />
+                </div>
+
+                <div className=" col-12 col-md-5">
+                  <div className="table-responsive" >
+                    <table className="table  text-center align-middle table-hover">
+                      <thead >
+                        <tr>
+                          <th scope="col" className="text-wrap text-break" style={{ minWidth: '90px'}}>分區名稱</th>
+                          <th scope="col" className="text-wrap text-break" style={{ minWidth: '70px'}}>票價</th>
+                          <th scope="col" className="text-wrap text-break" style={{ minWidth: '110px'}}>購票人數</th>
+                        </tr>
+                      </thead>
+                      <tbody className="table-group-divider">
+                
+                        {eventInfo.sections?.map((product) => (
+                          <tr key={product.section_name}>
+                            <td className="text-wrap text-break">{product.section_name}</td>
+                            <td >{product.price}</td>
+                            <td>{product.ticket_purchaced}/{product.ticket_total}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div>
+
+
+            
+          </div>
+        </div>
+      </div>
+
+    
+      <div className="d-flex justify-content-between my-5  px-sm-5" >
+          <div className="col-6 col-sm-4 pe-2 mx-auto">
+            <button
+              type="button"
+              className="btn btn-dark w-100 d-flex align-items-center justify-content-center"
+              onClick={() => navigate(`/organizer/event/edit/${evendId}`)}
+            >
+              編輯資訊 <BsPencilSquare size={20}  className={`ms-2`}/>
+            </button>
+          </div>
+          <div className="col-6 col-sm-4 ps-2 mx-auto">
+              <button
+                type="button"
+                className={`btn  w-100 btn-danger d-flex align-items-center justify-content-center`}
+                onClick={() => scanEvent()}
+              >
+                驗票 <BsQrCodeScan size={20}  className={`ms-2`}/>
+              </button>
+          </div>
+      </div>
+
+      
+
+      {(!loading && apiLoading ) && (<Loading></Loading>)}
+    </div>
+  );
+}
+
+export default EventDetail;

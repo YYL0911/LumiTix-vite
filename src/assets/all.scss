@@ -7,11 +7,15 @@
 
 
 @import "./scss/base/base";
+@import "./scss/pages/TipModal.scss";
 
 @import "./scss/pages/EventInfo.scss";
-@import "./scss/pages/UserManagementList";
+// @import "./scss/pages/UserManagementList";
 @import "./scss/pages/TicketScaner.scss";
 @import "./scss/pages/AllEvents.scss";
+// @import "./scss/pages/Payments.scss";
+@import "./scss/pages/PaymentResult.scss";
+@import "./scss/pages/UserList.scss";
 
  // 資訊要撐到完整頁面
 .page {
@@ -19,8 +23,11 @@
   flex-direction: column;
   min-height: 100vh;
 }
+
 .page-main {
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 // 麵包屑文字顏色 (全部)

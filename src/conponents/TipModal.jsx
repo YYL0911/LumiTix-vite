@@ -1,65 +1,53 @@
-import { Modal } from "bootstrap"; // 手動導入 Bootstrap 的 Modal
-import { useEffect, useRef, forwardRef, useImperativeHandle, } from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 import { useNavigate } from "react-router-dom";
+// import "./TipModal.css"; // 👈 自行控制動畫與樣式（見下方）
 
-const TipModal = forwardRef(
-  ({ title, info,  navigatePath = "/", changePage = false}, ref) => {
+const TipModal = forwardRef(({ title, info, navigatePath = "/", changePage = false }, ref) => {
+  const [show, setShow] = useState(false);
   const navigate = useNavigate();
-  const modalRef = useRef(null)
-  const myModal = useRef(null);
-  const isFirstRender = useRef(true); // 記錄是否是第一次渲染
 
-  // 暴露給父元件的函式
   useImperativeHandle(ref, () => ({
-    open: () =>{
-      myModal.current.show()
-      if(changePage){
+    open: () => {
+      setShow(true);
+
+      if (changePage) {
         setTimeout(() => {
-          myModal.current.hide()
-          navigate(navigatePath); // 未登入則跳轉到  頁面
-        }, 3000)
+          setShow(false); // 關閉 modal
+          setTimeout(() => {
+            navigate(navigatePath); // 等動畫結束再跳頁
+          }, 300); // 動畫時間需和 CSS 一致
+        }, 3000); // 顯示時間
       }
-    } 
+    }
   }));
 
-  useEffect(() => {
-    myModal.current = new Modal(modalRef.current);
+  const handleClose = () => {
+    setShow(false);
+  };
 
-    if (isFirstRender.current) {
-      isFirstRender.current = false; // 更新為 false，代表已執行過
-      // console.log("✅ useEffect 只執行一次");
+  if (!show) return null;
 
-      myModal.current._element.addEventListener("hidden.bs.modal", () => {
-        if(changePage){
-            navigate(navigatePath); // 未登入則跳轉到  頁面
-        }
-      });
-      return () => {
-        // 移除事件監聽
-        myModal.current._element.removeEventListener("hidden.bs.modal", () => {
-        });
-      };
-    }
-      
-    }, []);
-  
   return (
     <>
-        <div className="modal fade" ref={modalRef} tabIndex="-1">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h1 className="modal-title fs-5" id="exampleModalLabel">{title}</h1>
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div className="modal-body">
-                <pre>{info}</pre>
-              </div>
+      {/* Backdrop */}
+      <div className="modal-backdrop fade show" />
+
+      {/* Modal */}
+      <div className="modal fade show d-block" tabIndex="-1" role="dialog">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">{title}</h5>
+              <button type="button" className="btn-close" onClick={handleClose} />
+            </div>
+            <div className="modal-body">
+              <pre>{info}</pre>
             </div>
           </div>
         </div>
+      </div>
     </>
-  )
-})
+  );
+});
 
 export default TipModal;
