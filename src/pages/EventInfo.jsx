@@ -11,7 +11,7 @@ function EventInfo() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { userToken } = useAuth();
+  const { userToken, userRole } = useAuth();
 
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
   const [apiLoading, setApiLoading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
@@ -37,7 +37,11 @@ function EventInfo() {
     if (!userToken) {
       alert("請先登入，再購買票券");
       navigate('/login')
-    } else {
+    } else if (userRole != 'General') {
+      alert("請先登入一般會員，再購買票券");
+      navigate('/login')
+    }
+    else {
       navigate(`/eventInfo/${id}/payments`, {
         state: {
           sectionId: section.id,
@@ -340,7 +344,7 @@ function EventInfo() {
 
           {/* 活動封面 */}
           <div className="border border-2 border-black p-lg-7 p-2 mb-4">
-            <img className="p-lg-0 p-1 w-100" src={event.cover_image_url} alt="活動封面" />
+            <img className="p-lg-0 p-1 w-100" src={event.cover_image_url} alt={event.title || "活動封面"} />
           </div>
 
           {/* 活動標題 */}
