@@ -29,6 +29,7 @@ import Callback from './pages/Callback';
 import EventsList from './pages/Admin/EventsList';
 import UserList from './pages/Admin/UserList';
 // import UserInfo from './pages/Admin/UserInfo';
+import EventRevenue from './pages/Admin/EventRevenue';
 
 const NotFound = () => <h1>404 - 頁面不存在</h1>;
 const ErrorPage = () => <h1>error - 伺服器發生錯誤，請稍後再試</h1>;
@@ -72,6 +73,7 @@ function App() {
           <Route element={<PrivateRoute roles={["Admin"]} />}>
             <Route path="/userList" element={<UserList />} />
             <Route path="/eventsList" element={<EventsList></EventsList>}></Route>
+            <Route path="/eventRevenue/:id" element={<EventRevenue></EventRevenue>}></Route>
           </Route>
 
           <Route path="/ErrorPage" element={<ErrorPage />} />
