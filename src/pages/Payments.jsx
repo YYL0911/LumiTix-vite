@@ -19,8 +19,7 @@ function Payments() {
     const isFirstRender = useRef(true); // 記錄是否是第一次渲染
     const { userToken } = useAuth();
     const [event, setEvent] = useState({})
-    
-    const [quantity, setQuantity] = useState(1);
+
     const [paymentMethod, setPaymentMethod] = useState("");
     const { sectionId, sectionName, price } = location.state || {};
 
@@ -32,12 +31,22 @@ function Payments() {
         { name: `購票`, path: `/eventInfo/${id}/payments` }
     ];
 
+    // 防止直接貼上網址進入頁面
+    useEffect(() => {
+        if (!sectionId || !sectionName || !price) {
+            alert("尚未選擇票券區域，請重新選擇");
+            navigate(`/eventInfo/${id}`);
+        }
+    }, []);
+
     const [selectedArea, setSelectedArea] = useState({
         id: sectionId,
         section: sectionName,
-        price_default: price
+        price_default: price,
     });
+    const [quantity, setQuantity] = useState(1);
 
+    // 總金額
     const total = selectedArea.price_default * quantity;
 
     // 取得單一活動資訊
@@ -115,6 +124,16 @@ function Payments() {
         }
     };
 
+    // console.log("送出訂單資料", {
+    //     event_id: id,
+    //     tickets: [
+    //         {
+    //             section_id: selectedArea.id,
+    //             quantity: quantity,
+    //         },
+    //     ],
+    // });
+
     // 前往藍星
     const sendToNewebPay = ({ MerchantID, TradeInfo, TradeSha, Version }) => {
         const form = document.createElement('form');
@@ -182,7 +201,7 @@ function Payments() {
 
     // 載入
     if (loading || !event) {
-        return <Loading/>
+        return <Loading />
     }
 
     return (
@@ -198,7 +217,7 @@ function Payments() {
                     <div className="col card mb-3 border-0">
                         <div className="row g-0 align-items-center p-3">
                             <div className="col-md-4">
-                                <img className="p-lg-0 p-1 w-100" src={event.cover_image_url} alt="活動封面" />
+                                <img className="p-lg-0 p-1 w-100" src={event.cover_image_url} alt={event.title || "活動封面"} />
                             </div>
                             <div className="col-md-8">
                                 <div className="card-body">
@@ -237,7 +256,7 @@ function Payments() {
                         </div>
                         <div className="g-0 p-3 row align-items-center">
                             <div className="col-md-4">
-                                <img className="p-lg-0 p-1 w-100" src={event.cover_image_url} alt="活動封面" />
+                                <img className="p-lg-0 p-1 w-100" src={event.cover_image_url} alt={event.title || "活動封面"} />
                             </div>
                             <div className="col-md-8">
                                 <div className="card-body">
@@ -285,7 +304,10 @@ function Payments() {
                             }
 
                             if (paymentMethod === "creditCard") {
-                                // console.log(selectedArea)
+                                // console.log({
+                                //     ...selectedArea,
+                                //     quantity,
+                                // });
                                 createOrder();
                             } else {
                                 alert("目前只支援信用卡付款");
