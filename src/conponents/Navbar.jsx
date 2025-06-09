@@ -27,7 +27,7 @@ export default function Navbar() {
   })
   
   return (
-    <div ref ={headerRef} className="position-sticky z-2 top-0 bg-white" >
+    <div ref ={headerRef} className="position-sticky z-3 top-0 bg-white" >
       <nav className="navbar bg-white container d-flex align-items-center" >
         <div className="container-fluid ">
           <Link className="navbar-brand" to='/'>

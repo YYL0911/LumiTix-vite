@@ -12,6 +12,9 @@ import "swiper/css"; // 核心樣式
 import "swiper/css/navigation"; // 導航箭頭樣式
 import "swiper/css/pagination"; // 分頁圓點樣式
 import "swiper/css/effect-coverflow"; // Coverflow 效果樣式
+// --- 首頁粉塵效果模組 ---
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { loadSlim } from "@tsparticles/slim"; // 或 loadFull, loadBasic 等，取決於您安裝的包
 // --- Section 1 的 import ---
 import searchIcon from "../../assets/img/Search.png";
 // --- Section 2 的圖片 import ---
@@ -30,7 +33,79 @@ import arrowRightRecommended from "../../assets/img/Home/recommended/arrow_right
 function Home() {
   const { eventTypes } = useAuth();
   const navigate = useNavigate(); // 初始化 useNavigate
-
+  const [particlesInit, setParticlesInit] = useState(false); // 來追蹤粉塵效果引擎是否已初始化
+  // 放在 Home 組件外部或內部均可，如果不需要動態改變，放外部更佳
+  const heroParticlesOptions = {
+    fpsLimit: 60, // 限制 FPS，有助於性能
+    interactivity: {
+      events: {
+        onClick: {
+          // 可選：點擊時的效果
+          enable: true,
+          mode: "push", // 推出一些粒子
+        },
+      },
+      modes: {
+        repulse: {
+          distance: 60, // 散開的距離
+          duration: 0.4,
+        },
+      },
+    },
+    particles: {
+      color: {
+        value: "#ffffff", // 粒子顏色 (白色)
+      },
+      links: {
+        enable: false, // 粒子間的連接線，粉塵效果通常不需要
+      },
+      move: {
+        enable: true,
+        direction: "none", // 隨機方向飄動
+        speed: 0.3, // 飄動速度 (設定慢一點，營造漂浮感)
+        random: true, // 啟用隨機移動
+        straight: false, // 非直線移動，更自然
+        outModes: {
+          // 粒子移出畫布邊界時的行為
+          default: "out", // "out": 移出後消失 (然後新的會產生)
+        },
+      },
+      number: {
+        // 粒子數量
+        density: {
+          enable: true,
+          area: 1000, // 密度計算區域，值越大，在相同 value 下粒子越稀疏
+        },
+        value: 2000, // 基礎粒子數量，可調整
+      },
+      opacity: {
+        // 粒子透明度
+        value: { min: 0.1, max: 0.6 }, // 隨機透明度，增加層次感
+        animation: {
+          // 透明度動畫 (可選)
+          enable: true,
+          speed: 0.5,
+          minimumValue: 0.1,
+          sync: false,
+        },
+      },
+      shape: {
+        type: "circle", // 粒子形狀
+      },
+      size: {
+        // 粒子大小
+        value: { min: 0.5, max: 1.0 }, // 隨機大小，讓粒子更自然
+        animation: {
+          // 大小動畫 (可選)
+          enable: true,
+          speed: 2,
+          minimumValue: 0.3,
+          sync: false,
+        },
+      },
+    },
+    detectRetina: true, // 為高 DPI (Retina) 螢幕優化
+  };
   // --- 狀態管理和資料 ---
   const [locationData] = useState([
     "全部地區",
@@ -73,6 +148,15 @@ function Home() {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [loadingUpcoming, setLoadingUpcoming] = useState(true);
   const [errorUpcoming, setErrorUpcoming] = useState(null);
+
+  // 新增 useEffect 用於初始化粒子引擎
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadSlim(engine); // 如果您安裝的是 @tsparticles/slim
+    }).then(() => {
+      setParticlesInit(true); // 初始化完成後，設定 state
+    });
+  }, []); // 空依賴陣列，確保只在組件掛載時執行一次
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -195,8 +279,15 @@ function Home() {
   const renderHeroSection = () => {
     return (
       <section className="hero-section">
+        {particlesInit && ( // 只有在引擎初始化完成後才渲染 Particles 組件
+          <Particles
+            id="tsparticles-hero-background" // 給它一個唯一的 ID
+            options={heroParticlesOptions} // 傳入您的設定檔
+            className="hero-particles-canvas"
+          />
+        )}
         <div
-          className="container d-flex flex-column justify-content-center align-items-center"
+          className="container d-flex flex-column justify-content-center align-items-center hero-content-container"
           style={{ minHeight: "70vh" }}
         >
           <p className="hero-subtitle">即刻玩賞台灣藝文</p>
@@ -301,7 +392,6 @@ function Home() {
       <section className="why-choose-us-section py-5">
         <div className="container">
           <div className="row g-0">
-            {" "}
             {/* 外層 Row */}
             {/* 左欄：標題區塊 */}
             <div className="col-lg-4 col-12 why-choose-us-title-col-alt p-4 d-flex align-items-center text-start">
@@ -394,7 +484,7 @@ function Home() {
       <section className="carousel-section py-5">
         <Swiper
           modules={[Navigation, Pagination, EffectCoverflow, A11y]}
-          loop={true} // 只有一張時 loop 無意義，多於一張即可
+          loop={true}
           grabCursor={true}
           pagination={{ clickable: true, el: ".swiper-custom-pagination" }}
           navigation={{
@@ -432,7 +522,12 @@ function Home() {
             (
               slide // 使用 carouselSlides state
             ) => (
-              <SwiperSlide key={slide.id} className="carousel-slide">
+              <SwiperSlide
+                key={slide.id}
+                className="carousel-slide"
+                onClick={() => navigate(`/eventInfo/${slide.id}`)}
+                style={{ cursor: "pointer" }}
+              >
                 <img src={slide.img} alt={slide.title} className="carousel-slide-img" />
                 <div className="carousel-slide-content p-3">
                   <div className="d-flex justify-content-between align-items-center mb-3">
@@ -551,25 +646,33 @@ function Home() {
           >
             {recommendedEvents.map((event) => (
               <SwiperSlide key={event.id} className="recommended-slide">
-                <div className="event-card mt-5">
-                  {" "}
-                  {/* 注意 Section 4 的卡片有 mt-5 */}
-                  <div className="event-card-img-wrapper">
-                    <img src={event.img} alt={event.title} className="event-card-main-img" />
-                  </div>
-                  <div className="event-card-content">
-                    <div className="event-card-info-top d-flex justify-content-between align-items-center">
-                      <span className="event-date">{event.date}</span>
-                      <span className="event-location d-flex align-items-center">
-                        <i className="bi bi-geo-alt-fill me-1"></i>
-                        {event.location}
-                      </span>
+                <a
+                  href={`/eventInfo/${event.id}`} // 提供一個有效的 href，對 SEO 友好
+                  onClick={(e) => {
+                    e.preventDefault(); // 阻止預設跳轉
+                    navigate(`/eventInfo/${event.id}`); // 使用 React Router 導航
+                  }}
+                  style={{ textDecoration: "none", display: "block" }} // 移除底線並讓 <a> 表現得像區塊
+                >
+                  <div className="event-card mt-5">
+                    {/* 注意 Section 4 的卡片有 mt-5 */}
+                    <div className="event-card-img-wrapper">
+                      <img src={event.img} alt={event.title} className="event-card-main-img" />
                     </div>
-                    <h4 className="event-title mt-2 mb-2">{event.title}</h4>
-                    {/* 根據 API 是否有分類欄位以及您的決定來調整此處 */}
-                    {event.category && <span className="event-category-tag">{event.category}</span>}
+                    <div className="event-card-content">
+                      <div className="event-card-info-top d-flex justify-content-between align-items-center">
+                        <span className="event-date">{event.date}</span>
+                        <span className="event-location d-flex align-items-center">
+                          <i className="bi bi-geo-alt-fill me-1"></i>
+                          {event.location}
+                        </span>
+                      </div>
+                      <h4 className="event-title mt-2 mb-2">{event.title}</h4>
+                      {/* 根據 API 是否有分類欄位以及您的決定來調整此處 */}
+                      {event.category && <span className="event-category-tag">{event.category}</span>}
+                    </div>
                   </div>
-                </div>
+                </a>
               </SwiperSlide>
             ))}
           </Swiper>
@@ -669,22 +772,31 @@ function Home() {
           >
             {upcomingEvents.map((event) => (
               <SwiperSlide key={event.id} className="upcoming-slide">
-                <div className="event-card">
-                  <div className="event-card-img-wrapper">
-                    <img src={event.img} alt={event.title} className="event-card-main-img" />
-                  </div>
-                  <div className="event-card-content">
-                    <div className="event-card-info-top d-flex justify-content-between align-items-center">
-                      <span className="event-date">{event.date}</span>
-                      <span className="event-location d-flex align-items-center">
-                        <i className="bi bi-geo-alt-fill me-1"></i>
-                        {event.location}
-                      </span>
+                <a
+                  href={`/eventInfo/${event.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(`/eventInfo/${event.id}`);
+                  }}
+                  style={{ textDecoration: "none", display: "block" }}
+                >
+                  <div className="event-card">
+                    <div className="event-card-img-wrapper">
+                      <img src={event.img} alt={event.title} className="event-card-main-img" />
                     </div>
-                    <h4 className="event-title mt-2 mb-2">{event.title}</h4>
-                    <span className="event-category-tag">{event.category}</span>
+                    <div className="event-card-content">
+                      <div className="event-card-info-top d-flex justify-content-between align-items-center">
+                        <span className="event-date">{event.date}</span>
+                        <span className="event-location d-flex align-items-center">
+                          <i className="bi bi-geo-alt-fill me-1"></i>
+                          {event.location}
+                        </span>
+                      </div>
+                      <h4 className="event-title mt-2 mb-2">{event.title}</h4>
+                      <span className="event-category-tag">{event.category}</span>
+                    </div>
                   </div>
-                </div>
+                </a>
               </SwiperSlide>
             ))}
           </Swiper>
