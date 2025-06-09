@@ -391,9 +391,7 @@ const EventFormPage = () => {
         setCoverImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
-    } else {
-      setCoverImagePreview(null);
-    }
+    } 
   }, [eventCoverImageFile]);
   // 監控 venueMapImage 欄位的變化以更新預覽
   const venueMapImageFile = watch("venueMapImage");
@@ -405,9 +403,7 @@ const EventFormPage = () => {
         setVenueMapPreview(reader.result);
       };
       reader.readAsDataURL(file);
-    } else {
-      setVenueMapPreview(null);
-    }
+    } 
   }, [venueMapImageFile]);
   // 提交審核
   const onSubmit = async (data) => {

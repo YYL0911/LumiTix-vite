@@ -10,8 +10,30 @@
   padding-top: 15vh; // 使用 align-items 和 margin 控制垂直位置
   text-align: center;
   color: #fff;
+  position: relative; // **** 重要：為了讓內部的絕對定位元素 (粒子畫布、內容) 相對於它 ****
+  overflow: hidden;   // **** 重要：避免粒子或內容溢出 (可選，但通常建議) ****
 }
-
+// 新增：粒子畫布的樣式
+.hero-particles-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; // 粒子層在背景圖之上
+}
+// 新增或修改：Hero 內容容器的樣式
+.hero-content-container {
+  position: relative; // 確保它在粒子層之上
+  z-index: 2;         // 比粒子層的 z-index 高
+  min-height: 70vh;   // 保持您原本的最小高度
+  display: flex;      // 以下是您原本 .hero-section 的 flex 佈局樣式，移到這裡
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 15vh; // 您原本的 padding-top
+  width: 100%; // 確保容器寬度
+}
 // --- Hero Section 副標題 ("即刻玩賞台灣藝文") ---
 .hero-subtitle {
   font-size: 3rem; // 根據設計圖調整大小
@@ -34,11 +56,16 @@
     align-items: center; 
     justify-content: flex-end; 
   }
-
+  .hero-content-container {
+    min-height: 80vh; 
+    padding-top: 10rem;
+    justify-content: flex-end;
+  }
   .hero-subtitle {
     font-size: 2rem;
     font-weight: bold;   
     margin-bottom: 2rem;
+    margin-top: 1rem;
   }
 }
 
@@ -55,6 +82,7 @@
   align-items: center; // 垂直置中內容
   text-align: left; // 文字靠左
   padding: 1.5rem; // 桌面版 padding 
+  z-index: 2;
   h2 {
     font-size: 5rem; // 桌面版字體大小 (
     font-weight: bold; // 粗體
