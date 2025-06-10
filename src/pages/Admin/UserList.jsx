@@ -198,7 +198,7 @@ function UserManagementList() {
                                                     className="btn btn-sm btn-primary w-100 w-lg-auto"
                                                     onClick={(e) => {
                                                         e.preventDefault();
-                                                        handleNavigate(`/UserInfo/${user.id}`)
+                                                        handleNavigate(`/userList/${user.id}`);
                                                     }}
                                                 >
                                                     查看詳細資訊
