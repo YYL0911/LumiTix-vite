@@ -8,7 +8,8 @@ import Loading from "../conponents/Loading";
 function CreatOrder() {
     const { id: orderId } = useParams();
     const navigate = useNavigate();
-    
+    const { id } = useParams();
+
     const isFirstRender = useRef(true);
     const [apiLoading, setApiLoading] = useState(false);
     const { userToken } = useAuth();
@@ -26,6 +27,7 @@ function CreatOrder() {
         return `${year}-${month}-${day} ${hour}:${minute}`;
     }
 
+    // 取得單一訂單資料
     useEffect(() => {
         const fetchOrder = async () => {
             setApiLoading(true);
@@ -58,7 +60,7 @@ function CreatOrder() {
 
     // 載入
     if (apiLoading || !order) {
-        return <Loading/>
+        return <Loading />
     }
 
     return (
@@ -122,7 +124,7 @@ function CreatOrder() {
                             <div className="p-3 border-top border-2">
                                 <div className="d-flex flex-column flex-lg-row gap-4 col-6 mx-auto">
                                     <Link className="nav-link col btn p-2 bg-secondary text-white fw-boldr" to='/'>返回首頁</Link>
-                                    <Link className="nav-link col btn p-2 bg-danger text-white fw-boldr" to={`/user/tickets`}>查看票券</Link>
+                                    <Link className="nav-link col btn p-2 bg-danger text-white fw-boldr" to={`/ticketInfo/${id}`}>查看票券</Link>
                                 </div>
                             </div>
                         </div>

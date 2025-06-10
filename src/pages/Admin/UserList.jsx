@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from 'react'
-import axios from 'axios'
-import Breadcrumb from "../../conponents/Breadcrumb";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from '../../contexts/AuthContext';
+import axios from 'axios'
 
+import Breadcrumb from "../../conponents/Breadcrumb";
 import PaginationComponent from "../../conponents/Pagination";
 
 function UserManagementList() {
@@ -10,6 +11,7 @@ function UserManagementList() {
     const isFirstRender = useRef(true);
     const [apiLoading, setApiLoading] = useState(false);
     const [users, setUsers] = useState([])
+    const navigate = useNavigate();
 
     // 麵包屑
     const breadcrumb = [
@@ -31,7 +33,7 @@ function UserManagementList() {
         setTotalPages(Math.ceil(users.length / pageSize));
     }, [users, currentPage]);
 
-    // 取得一班會員列表
+    // 取得一般會員列表
     useEffect(() => {
         const getUsers = async () => {
             try {
@@ -112,6 +114,11 @@ function UserManagementList() {
         setTotalPages(Math.ceil(filteredUsers.length / pageSize));
     }, [users, searchTerm, currentPage]);
 
+    // 前往會員詳細頁
+    const handleNavigate = (path) => {
+        navigate(path);
+    };
+
     return (
         <>
             <div className="container py-3 px-md-5">
@@ -149,7 +156,7 @@ function UserManagementList() {
                 </div>
 
                 <div className="user-table-container d-flex flex-column" style={{ height: '680px' }}>
-                    
+
                     <div className="flex-grow-1 overflow-auto table-responsive-lg">
                         <table className="table">
                             <thead>
@@ -187,7 +194,13 @@ function UserManagementList() {
                                                 </button>
                                             </td>
                                             <td className='text-center '>
-                                                <button className="btn btn-sm btn-primary w-100">
+                                                <button
+                                                    className="btn btn-sm btn-primary w-100 w-lg-auto"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        handleNavigate(`/UserInfo/${user.id}`)
+                                                    }}
+                                                >
                                                     查看詳細資訊
                                                 </button>
                                             </td>
