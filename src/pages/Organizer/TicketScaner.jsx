@@ -1,18 +1,26 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from 'react';
 import { Html5QrcodeScanner } from "html5-qrcode"; // 掃描套件
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 // Context
 import { useAuth } from '../../contexts/AuthContext';
 
 // 元件
 import Loading from "../../conponents/Loading";
-import ButtonTipModal from "../../conponents/TipModal";
-
 
 // 判斷是否是手機
 function isMobileDevice() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
+
+const showSwal = (icon, title, info) => {
+    withReactContent(Swal).fire({
+      icon: icon,
+      title: title,
+      text: info,
+    })
 }
 
 function TicketScaner() {
@@ -20,7 +28,6 @@ function TicketScaner() {
   const navigate = useNavigate(); 
   const [apiLoading, setApiLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const modalRef = useRef(); // 彈窗ref
 
   const [eventID, setEventID] = useState("");
   const eventIDRef = useRef("");
@@ -38,7 +45,7 @@ function TicketScaner() {
     if (isFirstRender.current) {
       isFirstRender.current = false; // 更新為 false，代表已執行過
     
-      // console.log("✅ useEffect 只執行一次");
+      // console.log(" useEffect 只執行一次");
       setApiLoading(true)
       fetch("https://n7-backend.onrender.com/api/v1/organizer/events/by-status?status=holding",{
         method: "GET",
@@ -56,6 +63,10 @@ function TicketScaner() {
           }
           else{
             setOptions(result.data)
+            if(result.data.length > 0){
+              setEventID(result.data[0].id)
+              eventIDRef.current = result.data[0].id; // 同步更新 ref
+            } 
             const eventIDStorage = localStorage.getItem("scanEventID");
             if(eventIDStorage){
               setEventID(eventIDStorage)
@@ -63,10 +74,6 @@ function TicketScaner() {
               if (!result.data.some((item) => item.id == eventIDStorage) ){
                 setEventID("")
                 eventIDRef.current = ""; // 同步更新 ref
-                if(result.data.length > 0){
-                  setEventID(result.data[0].id)
-                  eventIDRef.current = result.data[0].id; // 同步更新 ref
-                } 
               } 
               else{
                 setEventID(eventIDStorage)
@@ -92,9 +99,7 @@ function TicketScaner() {
 
   const handleScan = (data) => {
     let ticket403 = false
-
     //由DATA抓到QRCORD資訊
-    // 你可以改成呼叫後端驗證會員入場
     fetch(`https://n7-backend.onrender.com/api/v1/organizer/events/${eventIDRef.current}/verify/?token=${data}`, {
       method: "PATCH",
       headers: {
@@ -129,7 +134,7 @@ function TicketScaner() {
       const currentEventID = eventIDRef.current;
       
       if(currentEventID == ""){
-        modalRef.current.open();
+        showSwal("error", "驗票失敗", "未選擇要驗票活動")
       }
       else{
         scanner.clear();
@@ -173,12 +178,6 @@ function TicketScaner() {
       <div id = "reader"></div>
 
       { !loading && apiLoading && (<Loading></Loading>)}
-
-      <ButtonTipModal  ref={modalRef}
-          title = "驗票提示" 
-          info = "未選擇驗票活動" 
-      >
-      </ButtonTipModal>
 
     </div>
   );
