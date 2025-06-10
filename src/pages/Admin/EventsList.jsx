@@ -32,8 +32,8 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
 
             <a className="text-decoration-none" href="#" onClick={(e) => {
               e.preventDefault();
-              // if(product.sale_status != "待審核") handleNavigate(`/evevtInfo/${product.id}`)
-              // else handleNavigate(`/evevtInfo/${product.id}`)
+              if(product.sale_status != "待審核") handleNavigate(`/eventRevenue/${product.id}`); 
+              else handleNavigate(`/eventReview/${product.id}`); 
             }}>
 
               <div  className="bg-white my-3 d-flex align-items-center border border-2 border-black p-3">

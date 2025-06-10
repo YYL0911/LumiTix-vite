@@ -232,88 +232,110 @@ const EventFormPage = () => {
   const [zones, setZones] = useState([]); // 初始為空陣列，等待 API 或使用者新增
   const [activeDragId, setActiveDragId] = useState(null); // 用於 DragOverlay
 
-  // 縣市列表用狀態
   useEffect(() => {
-    if (!isEditMode || !userToken) {
+    // 狀況一：進入「新增模式」
+    // 如果 isEditMode 是 false，代表現在是 /new 的路徑
+    if (!isEditMode) {
+      console.log("偵測到進入「新增模式」，正在清空表單...");
+      // 1. 重設 react-hook-form 的所有欄位
+      reset({
+        eventName: "",
+        eventVenue: "",
+        eventCity: "",
+        eventStreetAddress: "",
+        performanceStartDate: null,
+        performanceStartTime: null,
+        performanceEndDate: null,
+        performanceEndTime: null,
+        ticketSalesStartDate: null,
+        ticketSalesStartTime: null,
+        ticketSalesEndDate: null,
+        ticketSalesEndTime: null,
+        eventType: "",
+        eventCoverImage: null,
+        venueMapImage: null,
+      });
+      // 2. 清空我們手動管理的 state
+      setZones([]);
+      setCoverImagePreview(null);
+      setVenueMapPreview(null);
+      // 3. 清空完畢，結束這個 effect
       return;
     }
-    const fetchEventData = async () => {
-      setApiLoading(true);
-      try {
-        const url = `https://n7-backend.onrender.com/api/v1/organizer/events/${eventId}`;
-        const response = await axios.get(url, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userToken}`,
-          },
-        });
-        const eventData = response.data.data;
-        const { city, streetAddress } = splitAddress(eventData.address, locationData);
-        // --- 根據類型名稱(eventData.type)，反查出對應的 type ID ---
-        const currentType = eventTypesOri.find((t) => t.name === eventData.type);
-        const currentTypeId = currentType ? currentType.id : "";
-        // --- 最終修正：確保欄位完全對應 ---
-        reset({
-          eventName: eventData.title, // 對應 title
-          eventVenue: eventData.location, // 對應 location
-          eventCity: city,
-          eventStreetAddress: streetAddress,
-          performers: eventData.performance_group, // 對應 performance_group
-          eventDescription: eventData.description, // 對應 description
-          eventType: currentTypeId, // 將查到的 ID 設為表單預設值
-          performanceStartDate: new Date(eventData.start_at.slice(0, -1)),
-          performanceStartTime: new Date(eventData.start_at.slice(0, -1)),
-          performanceEndDate: new Date(eventData.end_at.slice(0, -1)),
-          performanceEndTime: new Date(eventData.end_at.slice(0, -1)),
-          ticketSalesStartDate: new Date(eventData.sale_start_at.slice(0, -1)),
-          ticketSalesStartTime: new Date(eventData.sale_start_at.slice(0, -1)),
-          ticketSalesEndDate: new Date(eventData.sale_end_at.slice(0, -1)),
-          ticketSalesEndTime: new Date(eventData.sale_end_at.slice(0, -1)),
-        });
 
-        setCoverImagePreview(eventData.cover_image_url);
-        setVenueMapPreview(eventData.section_image_url);
+    // 狀況二：進入「編輯模式」
+    // 如果 isEditMode 是 true，且其他依賴項已準備好，就去抓取資料
+    if (userToken && eventTypesOri && eventTypesOri.length > 0) {
+      const fetchEventData = async () => {
+        setApiLoading(true);
+        try {
+          const url = `https://n7-backend.onrender.com/api/v1/organizer/events/${eventId}`;
+          const response = await axios.get(url, { headers: { Authorization: `Bearer ${userToken}` } });
+          const eventData = response.data.data;
+          if (!eventData) {
+            throw new Error("API 回應中缺少 data 物件");
+          }
+          const { city, streetAddress } = splitAddress(eventData.address, locationData);
+          const currentType = eventTypesOri.find((t) => t.name === eventData.type);
+          const currentTypeId = currentType ? currentType.id : "";
+          reset({
+            eventName: eventData.title,
+            eventVenue: eventData.location,
+            eventCity: city,
+            eventStreetAddress: streetAddress,
+            performers: eventData.performance_group,
+            eventDescription: eventData.description,
+            eventType: currentTypeId,
+            performanceStartDate: new Date(eventData.start_at.slice(0, -1)),
+            performanceStartTime: new Date(eventData.start_at.slice(0, -1)),
+            performanceEndDate: new Date(eventData.end_at.slice(0, -1)),
+            performanceEndTime: new Date(eventData.end_at.slice(0, -1)),
+            ticketSalesStartDate: new Date(eventData.sale_start_at.slice(0, -1)),
+            ticketSalesStartTime: new Date(eventData.sale_start_at.slice(0, -1)),
+            ticketSalesEndDate: new Date(eventData.sale_end_at.slice(0, -1)),
+            ticketSalesEndTime: new Date(eventData.sale_end_at.slice(0, -1)),
+          });
+          setCoverImagePreview(eventData.cover_image_url);
+          setVenueMapPreview(eventData.section_image_url);
 
-        const formattedZones = eventData.sections.map((section, index) => ({
-          id: section.id || `api-zone-${index}`,
-          name: section.section_name, // 對應 section_name
-          price: section.price.toString(),
-          tickets: section.ticket_total.toString(), // 對應 ticket_total
-        }));
-        setZones(formattedZones);
-      } catch (error) {
-        // --- 建議的完整錯誤處理邏輯 ---
-        console.error("載入活動資料失敗!", error.response || error);
-        // 從 error 物件中，提取後端回傳的狀態碼和錯誤訊息
-        const statusCode = error.response?.status;
-        const errorMessage = error.response?.data?.message || "發生未知錯誤，請稍後再試。";
-        // 狀況一：401 未授權 (Token 失效或未登入)
-        if (statusCode === 401) {
-          alert("您尚未登入或登入已逾時，請重新登入。");
-          navigate("/login");
+          const formattedZones = eventData.sections.map((section, index) => ({
+            id: section.id || `api-zone-${index}`,
+            name: section.section_name, // 對應 section_name
+            price: section.price.toString(),
+            tickets: section.ticket_total.toString(), // 對應 ticket_total
+          }));
+          setZones(formattedZones);
+        } catch (error) {
+          // --- 建議的完整錯誤處理邏輯 ---
+          console.error("載入活動資料失敗!", error.response || error);
+          // 從 error 物件中，提取後端回傳的狀態碼和錯誤訊息
+          const statusCode = error.response?.status;
+          const errorMessage = error.response?.data?.message || "發生未知錯誤，請稍後再試。";
+          // 狀況一：401 未授權 (Token 失效或未登入)
+          if (statusCode === 401) {
+            alert("您尚未登入或登入已逾時，請重新登入。");
+            navigate("/login");
+          }
+          // 狀況二：403 禁止 (使用者沒有權限編輯此活動)
+          else if (statusCode === 403) {
+            alert("您沒有權限編輯此活動。");
+            navigate("/events");
+          }
+          // 狀況三：404 找不到 (使用者想編輯一個不存在或已被刪除的活動)
+          else if (statusCode === 404) {
+            alert("找不到您要編輯的活動，它可能已被刪除。");
+            navigate("/events");
+          }
+          // 狀況四：其他所有錯誤 (例如 500 伺服器內部錯誤)
+          else {
+            alert(`載入資料時發生錯誤：\n${errorMessage}`);
+            navigate("/events");
+          }
+        } finally {
+          setApiLoading(false);
         }
-        // 狀況二：403 禁止 (使用者沒有權限編輯此活動)
-        else if (statusCode === 403) {
-          alert("您沒有權限編輯此活動。");
-          navigate("/events");
-        }
-        // 狀況三：404 找不到 (使用者想編輯一個不存在或已被刪除的活動)
-        else if (statusCode === 404) {
-          alert("找不到您要編輯的活動，它可能已被刪除。");
-          navigate("/events");
-        }
-        // 狀況四：其他所有錯誤 (例如 500 伺服器內部錯誤)
-        else {
-          alert(`載入資料時發生錯誤：\n${errorMessage}`);
-          navigate("/events");
-        }
-      } finally {
-        setApiLoading(false);
-      }
-    };
-    if (eventTypesOri.length > 0) {
-      // 確保 eventTypesOri 載入後才執行
-      fetchEventData();
+      };
+    fetchEventData();
     }
   }, [isEditMode, eventId, userToken, navigate, reset, locationData, eventTypesOri]);
 
@@ -391,7 +413,7 @@ const EventFormPage = () => {
         setCoverImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
-    } 
+    }
   }, [eventCoverImageFile]);
   // 監控 venueMapImage 欄位的變化以更新預覽
   const venueMapImageFile = watch("venueMapImage");
@@ -403,7 +425,7 @@ const EventFormPage = () => {
         setVenueMapPreview(reader.result);
       };
       reader.readAsDataURL(file);
-    } 
+    }
   }, [venueMapImageFile]);
   // 提交審核
   const onSubmit = async (data) => {

@@ -27,8 +27,9 @@ import PaymentResult from './pages/PaymentResult';
 import Callback from './pages/Callback';
 
 import EventsList from './pages/Admin/EventsList';
+import EventReviewPage from "./pages/Admin/EventReviewPage";
 import UserList from './pages/Admin/UserList';
-// import UserInfo from './pages/Admin/UserInfo';
+import UserInfo from './pages/Admin/UserInfo';
 import EventRevenue from './pages/Admin/EventRevenue';
 
 const NotFound = () => <h1>404 - 頁面不存在</h1>;
@@ -72,7 +73,9 @@ function App() {
           {/* 只有平台方可以看的頁面 */}
           <Route element={<PrivateRoute roles={["Admin"]} />}>
             <Route path="/userList" element={<UserList />} />
+            <Route path="/userList/:userId" element={<UserInfo />} />
             <Route path="/eventsList" element={<EventsList></EventsList>}></Route>
+            <Route path="/eventReview/:eventId" element={<EventReviewPage />} />
             <Route path="/eventRevenue/:id" element={<EventRevenue></EventRevenue>}></Route>
           </Route>
 
