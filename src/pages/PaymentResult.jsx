@@ -100,20 +100,13 @@ function CreatOrder() {
                                     <dt className="col-sm-2">座位</dt>
                                     <dd className="col-sm-9 d-flex gap-2">
                                         {order?.tickets?.map((ticket, index) => (
-                                            <p key={index}>{ticket.seat_no}</p>
-                                        ))}
-                                    </dd>
-
-                                    <dt className="col-sm-2">票種</dt>
-                                    <dd className="col-sm-9">
-                                        {order?.tickets?.map((ticket, index) => (
-                                            <p key={index}>{ticket.type}</p>
+                                            <p key={index}>{ticket.seat_no}({ticket.type})</p>
                                         ))}
                                     </dd>
 
                                     <dt className="col-sm-2">總計</dt>
                                     <dd className="col-sm-9">
-                                        NT$ {order?.tickets?.reduce((sum, ticket) => sum + ticket.price, 0)}
+                                        NT$ {order?.tickets?.reduce((sum, ticket) => sum + ticket.price, 0).toLocaleString()}
                                     </dd>
 
                                     <dt className="col-sm-2">付款狀態</dt>

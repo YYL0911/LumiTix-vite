@@ -44,6 +44,7 @@ function Payments() {
         section: sectionName,
         price_default: price,
     });
+
     const [quantity, setQuantity] = useState(1);
 
     // 總金額
@@ -68,7 +69,7 @@ function Payments() {
         if (isFirstRender.current) {
             isFirstRender.current = false;
             fetchEvent();
-            console.log(selectedArea)
+            // console.log(selectedArea)
         }
     }, []);
 
@@ -93,15 +94,20 @@ function Payments() {
     // 回傳訂單
     const createOrder = async () => {
         try {
+            const tickets = Array.from({ length: quantity }).map(() => ({
+                section_id: selectedArea.id,
+                quantity: 1,
+            }));
+
+            // console.log("送出訂單資料", {
+            //     event_id: id,
+            //     tickets,
+            // });
+
             const res = await axios.post('https://n7-backend.onrender.com/api/v1/orders/create',
                 {
                     event_id: id,
-                    tickets: [
-                        {
-                            section_id: selectedArea.id,
-                            quantity: quantity,
-                        },
-                    ],
+                    tickets,
                 },
                 {
                     headers: {
@@ -119,20 +125,10 @@ function Payments() {
                 alert(res.data.message);
             }
         } catch (error) {
-            console.error('建立訂單失敗：', error);
+            // console.error('建立訂單失敗：', error);
             alert('建立訂單失敗，請稍後再試');
         }
     };
-
-    // console.log("送出訂單資料", {
-    //     event_id: id,
-    //     tickets: [
-    //         {
-    //             section_id: selectedArea.id,
-    //             quantity: quantity,
-    //         },
-    //     ],
-    // });
 
     // 前往藍星
     const sendToNewebPay = ({ MerchantID, TradeInfo, TradeSha, Version }) => {
@@ -225,7 +221,7 @@ function Payments() {
                                     <div className="d-flex justify-content-between align-items-center gap-2">
                                         <div className="d-flex gap-2 align-items-center">
                                             <p>{selectedArea.section} 區</p>
-                                            <p className="mb-0">NT$ {selectedArea.price_default}</p>
+                                            <p className="mb-0">NT$ {selectedArea.price_default.toLocaleString()}</p>
                                         </div>
                                         <select
                                             className="form-select"
@@ -233,7 +229,10 @@ function Payments() {
                                             value={quantity}
                                             onChange={(e) => setQuantity(Number(e.target.value))}
                                         >
-                                            {[1, 2, 3, 4].map((num) => (
+                                            {Array.from(
+                                                { length: Math.min(4, event.Section?.find(s => s.id === selectedArea.id)?.remainingSeats || 0) },
+                                                (_, i) => i + 1
+                                            ).map((num) => (
                                                 <option key={num} value={num}>
                                                     {num}
                                                 </option>
@@ -242,7 +241,7 @@ function Payments() {
                                     </div>
                                     <div className="d-flex justify-content-end gap-2 p-3">
                                         <h5>總計</h5>
-                                        <p>NT$ {total}</p>
+                                        <p>NT$ {total.toLocaleString()}</p>
                                     </div>
                                 </div>
                             </div>
@@ -272,7 +271,7 @@ function Payments() {
                         </div>
                         <div className="d-flex justify-content-end gap-2 p-3 border-top border-2">
                             <h5>總計</h5>
-                            <p>NT$ {total}</p>
+                            <p>NT$ {total.toLocaleString()}</p>
                         </div>
                     </div>
 

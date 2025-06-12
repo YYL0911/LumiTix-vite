@@ -4,12 +4,6 @@ a {
     // display: block;
 }
 
-// img {
-//     max-width: 100%;
-//     display: block;
-//     height: auto;
-// }
-
 h1,
 h2,
 h3,
@@ -18,4 +12,21 @@ h5,
 h6,
 p {
     margin-bottom: 0;
+}
+
+.img-contain {
+    object-fit: contain;
+    height: 100%;
+    left: 0;
+    top: 0;
+    width: 100%;
+}
+
+.fs-7 {
+    font-size: 14px;
+}
+
+.coverImg {
+  mix-blend-mode: multiply;
+  background-color: #121212; /* 作為混合底色 */
 }

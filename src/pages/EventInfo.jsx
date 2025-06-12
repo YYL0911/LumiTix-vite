@@ -150,6 +150,9 @@ function EventInfo() {
       if (now < start) {
         return { newStatus: "countdown", time: formatTime(start - now) };
       } else if (now >= start && now <= end) {
+        if (event.Section?.remainingSeats === 0) {
+          return { newStatus: "ended" }
+        }
         return { newStatus: "active", time: formatTime(end - now) };
       } else {
         return { newStatus: "ended", time: null };
@@ -300,35 +303,43 @@ function EventInfo() {
               onStatusChange={setSaleStatus}
             />
 
-            {event.Section?.map((section, index) => (
-              <div key={index}>
-                <div className="d-flex align-items-center justify-content-between my-lg-4 my-3">
-                  <div className="d-flex gap-3">
-                    <p className="text-Neutral-700" style={{ minWidth: '60px' }}>
-                      {section.section} 區
-                    </p>
-                    <p className="fw-bold">
-                      NT$ {section.price_default.toLocaleString()}
-                    </p>
+            {event.Section?.map((section, index) => {
+              const isSoldOut = section.remainingSeats === 0;
+              let buttonText = "";
+              if (saleStatus === "countdown") buttonText = "尚未開賣";
+              else if (saleStatus === "active" && isSoldOut) buttonText = "票券售完";
+              else if (saleStatus === "active") buttonText = "購買票券";
+              else buttonText = "售票結束";
+
+              return (
+                <div key={index}>
+                  <div className="d-flex align-items-center justify-content-between my-lg-4 my-3">
+                    <div className="d-flex gap-3">
+                      <p className="text-Neutral-700" style={{ minWidth: '60px' }}>
+                        {section.section} 區
+                      </p>
+                      <p className="fw-bold">
+                        NT$ {section.price_default.toLocaleString()}
+                      </p>
+                    </div>
+
+                    <button
+                      className={`border-0 py-2 px-3 ${saleStatus === "active" && !isSoldOut ? "btn-sale" : "btn-unsale"
+                        }`}
+                      disabled={saleStatus !== "active" || isSoldOut}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavigate(section);
+                      }}
+                    >
+                      <p className="fw-bold">{buttonText}</p>
+                    </button>
                   </div>
-                  <button
-                    className={`border-0 py-2 px-3 ${saleStatus === "active" ? "btn-sale" : "btn-unsale"}`}
-                    disabled={saleStatus !== "active"}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleNavigate(section);
-                    }}
-                  >
-                    <p className="fw-bold">
-                      {saleStatus === "countdown" && "尚未開賣"}
-                      {saleStatus === "active" && "購買票券"}
-                      {saleStatus === "ended" && "票券售完"}
-                    </p>
-                  </button>
+                  <div className="border-2 border-top border-Neutral-700"></div>
                 </div>
-                <div className="border-2 border-top border-Neutral-700"></div>
-              </div>
-            ))}
+              );
+            })}
+
           </div>
         </div>
       </div>
@@ -344,7 +355,7 @@ function EventInfo() {
 
           {/* 活動封面 */}
           <div className="border border-2 border-black p-lg-7 p-2 mb-4">
-            <img className="p-lg-0 p-1 w-100" src={event.cover_image_url} alt={event.title || "活動封面"} />
+            <img className="coverImg img-contain p-lg-0 p-1" src={event.cover_image_url} alt={event.title || "活動封面"} style={{ maxWidth: '1212px', maxHeight: '660px' }} />
           </div>
 
           {/* 活動標題 */}
@@ -365,7 +376,7 @@ function EventInfo() {
       </div>
 
       {/* navbar sticky */}
-      <ul className="nav eventInfo-nav border-bottom border-2 border-black p-2 sticky-navbar" style={{ display: showStickyNavbar ? "block" : "none" }}>
+      <ul className="nav eventInfo-nav border-bottom border-2 border-black p-2 sticky-navbar" style={{ display: showStickyNavbar ? "block" : "none"}}>
         <div className="container">
           <div className="m-x-1">
             <div className="d-flex gap-2">

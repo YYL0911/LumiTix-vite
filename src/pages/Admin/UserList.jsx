@@ -16,7 +16,7 @@ function UserManagementList() {
     // 麵包屑
     const breadcrumb = [
         { name: '首頁', path: "/" },
-        { name: '一般會員列表', path: "/userList" },
+        { name: '一般會員管理', path: "/userList" },
     ];
 
     // 列表分頁
@@ -127,32 +127,50 @@ function UserManagementList() {
 
 
                 <div className='d-flex flex-column flex-lg-row gap-2 justify-content-between mb-4'>
-                    <h2 className="text-lg-start text-center">一般會員列表</h2>
+                    <h2 className="text-lg-start text-center">一般會員管理</h2>
 
-                    <div className="d-flex m-lg-0 m-auto" style={{ width: '350px' }}>
+                    <div className="d-flex gap-1 m-lg-0 m-auto" style={{ width: '350px' }}>
                         <input
                             type="text"
-                            className="form-control rounded-end-0"
+                            className="form-control"
                             placeholder="搜尋會員（名稱 / 信箱）"
                             aria-describedby="searchUserBtn"
+                            size={{ maxWidth: "200px" }}
                             value={tempSearchTerm}
                             onChange={(e) => setTempSearchTerm(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
                         />
                         <button
-                            className="btn btn-secondary rounded-0 rounded-end"
-                            style={{ width: '120px' }}
+                            className="btn btn-secondary"
                             type="button"
                             id="searchUserBtn"
+                            style={{ width: '100px' }}
                             onClick={handleSearch}
                         >
-                            搜尋會員
+                            搜尋
                         </button>
+                        {searchTerm && (
+                            <button
+                                className='btn btn-outline-secondary'
+                                type="button"
+                                style={{ width: '180px' }}
+                                onClick={() => {
+                                    setTempSearchTerm("");
+                                    setSearchTerm("");
+                                    setCurrentPage(1);
+                                }}
+                            >
+                                取消搜尋
+                            </button>
+                        )}
                     </div>
                 </div>
 
-                <div className='text-lg-end text-start'>
-                    <span className='fs-7'>會員總數 : {users.length}</span>
+                <div className='text-lg-end text-start d-flex flex-column gap-1 mb-2'>
+                    <span className='text-start fs-7'>一般會員總數 : {users.length}</span>
+                    {searchTerm && (
+                        <span className='text-start fs-7 text-danger'>收尋結果數量 : {pagedUsers.length}</span>
+                    )}
                 </div>
 
                 <div className="user-table-container d-flex flex-column" style={{ height: '680px' }}>
