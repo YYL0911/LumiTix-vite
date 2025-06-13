@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef  } from 'react';
 
 // Context
@@ -13,8 +13,10 @@ import { BsPencilSquare } from "react-icons/bs";
 
 
 const EventDetail = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const { id: evendId } = useParams();
+  const { activeState } = location.state || "";  // 要加 ||  防止錯誤
 
   const { userToken, loading,  } = useAuth();
 
@@ -154,8 +156,8 @@ const EventDetail = () => {
         </div>
       </div>
 
-    
-      <div className="d-flex justify-content-between my-5  px-sm-5" >
+      {["checking", "holding"].includes(activeState) && (
+        <div className="d-flex justify-content-between my-5  px-sm-5" >
           <div className="col-6 col-sm-4 pe-2 mx-auto">
             <button
               type="button"
@@ -174,8 +176,9 @@ const EventDetail = () => {
                 驗票 <BsQrCodeScan size={20}  className={`ms-2`}/>
               </button>
           </div>
-      </div>
-
+        </div>
+      )
+      }
       
 
       {(!loading && apiLoading ) && (<Loading></Loading>)}

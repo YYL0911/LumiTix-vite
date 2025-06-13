@@ -234,7 +234,7 @@ function Events() {
                   <button
                     type="button"
                     className="btn btn-outline-secondary mx-1"
-                    onClick={() => handleNavigate(`/eventDetail/${product.id}`)}
+                    onClick={() => handleNavigate(`/eventDetail/${product.id}`, { state: activeState })}
                   >
                     詳細內容
                   </button>
