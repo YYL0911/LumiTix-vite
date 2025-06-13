@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from '../../contexts/AuthContext';
+import Swal from 'sweetalert2';
 import axios from 'axios'
 
 import Breadcrumb from "../../conponents/Breadcrumb";
@@ -63,7 +64,18 @@ function UserManagementList() {
     }, []);
 
     // 切換會員狀態
-    const changeUserState = async (id) => {
+    const changeUserState = async (id, name, isBlocked) => {
+        const action = isBlocked ? '取消封鎖' : '封鎖';
+        const confirmResult = await Swal.fire({
+            title: `確定要${action}${name}嗎？`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: `是的，${action}`,
+            cancelButtonText: '取消',
+        });
+
+        if (!confirmResult.isConfirmed) return;
+
         try {
             const res = await axios.patch(
                 `https://n7-backend.onrender.com/api/v1/admin/users/${id}/toggle-block`,
@@ -77,17 +89,25 @@ function UserManagementList() {
                 }
             );
 
-            console.log('後端回應：', res.data);
-
             const updatedUsers = users.map(user =>
                 user.id === id ? { ...user, isBlocked: !user.isBlocked } : user
             );
-
             setUsers(updatedUsers);
             setPagedUsers(updatedUsers.slice((currentPage - 1) * 10, currentPage * 10));
 
+            Swal.fire({
+                icon: 'success',
+                title: `${action}成功`,
+                timer: 1500,
+                showConfirmButton: false,
+            });
         } catch (err) {
             console.error('切換使用者狀態失敗', err.response?.data || err.message);
+            Swal.fire({
+                icon: 'error',
+                title: '操作失敗',
+                text: err.response?.data?.message || '請稍後再試',
+            });
         }
     };
 
@@ -125,10 +145,10 @@ function UserManagementList() {
 
                 <Breadcrumb breadcrumbs={breadcrumb} />
 
-
                 <div className='d-flex flex-column flex-lg-row gap-2 justify-content-between mb-4'>
                     <h2 className="text-lg-start text-center">一般會員管理</h2>
 
+                    {/* 收尋藍 */}
                     <div className="d-flex gap-1 m-lg-0 m-auto" style={{ width: '350px' }}>
                         <input
                             type="text"
@@ -164,6 +184,7 @@ function UserManagementList() {
                             </button>
                         )}
                     </div>
+
                 </div>
 
                 <div className='text-lg-end text-start d-flex flex-column gap-1 mb-2'>
@@ -173,9 +194,9 @@ function UserManagementList() {
                     )}
                 </div>
 
-                <div className="user-table-container d-flex flex-column" style={{ height: '680px' }}>
+                <div className="d-flex flex-column" style={{ height: '680px' }}>
 
-                    <div className="flex-grow-1 overflow-auto table-responsive-lg">
+                    <div className="userListTable flex-grow-1 overflow-auto">
                         <table className="table">
                             <thead>
                                 <tr className='text-start'>
@@ -195,7 +216,7 @@ function UserManagementList() {
                                     </tr>
                                 ) : (
                                     pagedUsers.map((user) => (
-                                        <tr key={user.id}>
+                                        <tr key={user.id} className='align-middle'>
                                             <td>{user.id?.slice(0, 8)}</td>
                                             <td>{user.name}</td>
                                             <td>{user.email}</td>
@@ -206,7 +227,7 @@ function UserManagementList() {
                                             <td className='text-center'>
                                                 <button
                                                     className={`btn btn-sm ${user.isBlocked ? 'btn-success' : 'btn-danger'}`}
-                                                    onClick={() => changeUserState(user.id)}
+                                                    onClick={() => changeUserState(user.id, user.name, user.isBlocked)}
                                                 >
                                                     {user.isBlocked ? '取消封鎖' : '封鎖'}
                                                 </button>
@@ -229,7 +250,7 @@ function UserManagementList() {
                         </table>
                     </div>
 
-                    <div className="mt-3 text-center">
+                    <div className="text-center">
                         <PaginationComponent
                             totalPages={totalPages}
                             currentPage={currentPage}
