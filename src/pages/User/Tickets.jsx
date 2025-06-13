@@ -23,8 +23,12 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
   let month = ""
   let changeMonth = false
 
+  if( filterProducts.length == 0){
+    return (<h3 className='mb-3 text-secondary'> 沒有符合票券</h3>)
+  }
+
   return (
-    <>  
+    <> 
       {filterProducts.map((product) =>{
         if(month != product.start_at.substring(0,7)){
           month = product.start_at.substring(0,7)
@@ -51,53 +55,43 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
                   <img src={ product.cover_image_url} className="img-fluid object-fit-cover h-100 " alt="..."/>
                 </div>
                 <div className="flex-grow-1 ms-3">
-                  <div className="d-flex flex-column-reverse flex-sm-row justify-content-between 
-                  align-items-sm-center align-items-start">
-
+                  <div className="d-flex flex-column-reverse flex-sm-row justify-content-between align-items-sm-center align-items-start">
                     <div className=" my-2 text-muted">
-                      {/* <p className=" m-0" >{product.start_at}</p> */}
                       <p className=" m-0" >{product.start_at.substring(0,10)} {product.start_at.substring(11,16)}</p>
-                      
                       <h4 className="fw-bold text-start my-3 text-black">{product.title}</h4>
-
                       <div className="d-flex align-items-center">
                         <img src={locationIcon} alt="icon" />
                         <p className=" m-0 ms-1 align-self-end" >{product.location}</p>
                       </div>
-                      
                     </div>
                     
                     <div className=" my-2 flex-shrink-0 text-black">
                       {product.ticket_status == 'used'?
-                      <p className=" border-bottom border-top  border-secondary border-3 p-1 m-0" >
-                        已使用
-                      </p>
+                        <p className=" border-bottom border-top  border-secondary border-3 p-1 m-0" >
+                          已使用
+                        </p>
                       :
-                      <p className=" border-bottom border-top border-danger border-3 p-1 m-0 fw-bold" >
-                        未使用
-                      </p>}
+                        <p className=" border-bottom border-top border-danger border-3 p-1 m-0 fw-bold" >
+                          尚有未使用票券
+                        </p>}
                     </div>
                     
                   </div>
                 </div>
               </div> 
-              
             </a>
-            </div>
-          )
-        } 
-      )
-    }
-  </>
-        
-)
+          </div>
+        )
+      })}
+    </>
+  )
 })
 
 
 const tabs = [
   { key: null, label: '全部' },
   { key: "used", label: '已使用' },
-  { key: "unused", label: '未使用' },
+  { key: "unused", label: '尚有未使用票券' },
 ];
 
 function Tickets() {
@@ -105,6 +99,7 @@ function Tickets() {
   const navigate = useNavigate();
   const [activeState, setActiveState] = useState(null);
   const [allData, setAllData] = useState(null); 
+  const [orignDataLen, setOrignDataLen] = useState(0); 
 
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
   const [userBlock, setUserBlock] = useState(0);
@@ -131,6 +126,7 @@ function Tickets() {
             }
             else{
               setAllData(result.data)
+              setOrignDataLen(result.data.length)
               setUserBlock(1)
             }
           })
@@ -195,7 +191,7 @@ function Tickets() {
 
         {userBlock == -1 && (<h3 className='mb-3 text-secondary text-center '>帳號已被封鎖</h3>)}
 
-        {filterProducts.length == 0 ? 
+        {orignDataLen == 0 ? 
         
           <div className={`${userBlock == 1 ? "d-block": "d-none"} `}>
             <h3 className='my-3 text-secondary text-center '>沒有票卷</h3>
@@ -243,13 +239,8 @@ function Tickets() {
               filterProducts={filterProducts} 
               handleNavigate={handleNavigate}>
             </DataTable>
-
           </div>
-        
         }
-
-
-
       </div>
 
       {(!loading && apiLoading) && (<Loading></Loading>)}

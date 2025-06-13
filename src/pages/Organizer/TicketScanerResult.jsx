@@ -14,7 +14,6 @@ function TicketScanerResult() {
   const location = useLocation();
   const navigate = useNavigate();
   const { result } = location.state || {};  // 要加 || {} 防止錯誤
-
   return (
     <div className='container py-3 d-flex flex-column '>
 
@@ -32,9 +31,9 @@ function TicketScanerResult() {
             訂單編號
             <p className="border-bottom border-2 text-black">{result.data.ticket_no}</p>
             活動名稱
-            <p className="border-bottom border-2 text-black">{result.data.event.tilte}</p>
+            <p className="border-bottom border-2 text-black">{result.data.event.title}</p>
             活動時間
-            <p className="border-bottom border-2 text-black">{result.data.event.start_at}</p>
+            <p className="border-bottom border-2 text-black">{result.data.event.start_at.substring(0,10)}</p>
             活動地點
             <p className="border-bottom border-2 text-black">{result.data.event.location}</p>
             <br />參加者資訊<br />

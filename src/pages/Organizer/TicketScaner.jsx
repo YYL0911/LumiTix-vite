@@ -111,7 +111,7 @@ function TicketScaner() {
       return res.json()
     } )
     .then((res) => {
-      if (res.status) navigate('/ticketScanerResult', { state: { result: res.data} });
+      if (res.status) navigate('/ticketScanerResult', { state: { result: res} });
       else if(res.message == "尚未登入" )navigate("/login");
       else if(ticket403 ) navigate('/');
       else navigate('/ticketScanerResult', { state: { result: res} });
