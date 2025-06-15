@@ -16,7 +16,7 @@ const EventDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { id: evendId } = useParams();
-  const { activeState } = location.state || "";  // 要加 ||  防止錯誤
+  const { activeState } = location.state || {};  // 要加 || {} 防止錯誤
 
   const { userToken, loading,  } = useAuth();
 
@@ -33,8 +33,8 @@ const EventDetail = () => {
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
   //取得使用者資料
   useEffect(() => {
-
     if (isFirstRender.current) {
+      
       isFirstRender.current = false; // 更新為 false，代表已執行過
       setApiLoading(true)
       fetch(`https://n7-backend.onrender.com/api/v1/organizer/events/${evendId}`,{
