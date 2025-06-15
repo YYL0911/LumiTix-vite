@@ -1,6 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
+import Swal from 'sweetalert2';
+import dayjs from "dayjs";
+import utc from 'dayjs/plugin/utc';
 import axios from 'axios'
 
 // 元件
@@ -10,11 +13,12 @@ import InfoSection from "../conponents/InfoSection";
 function EventInfo() {
   const { id } = useParams();
   const navigate = useNavigate();
+  dayjs.extend(utc);
 
   const { userToken, userRole } = useAuth();
 
-  const isFirstRender = useRef(true); // 記錄是否是第一次渲染
-  const [apiLoading, setApiLoading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
+  const isFirstRender = useRef(true);
+  const [apiLoading, setApiLoading] = useState(false);
   const [event, setEvent] = useState({})
 
   // 麵包屑
@@ -34,14 +38,21 @@ function EventInfo() {
 
   // 前往購票
   const handleNavigate = (section) => {
-    if (!userToken) {
-      alert("請先登入，再購買票券");
-      navigate('/login')
-    } else if (userRole != 'General') {
-      alert("請先登入一般會員，再購買票券");
-      navigate('/login')
+    const LoginAlert = (message) => {
+      Swal.fire({
+        icon: 'warning',
+        title: message,
+        confirmButtonText: `確認`,
+      }).then(() => {
+        navigate('/login')
+      });
     }
-    else {
+
+    if (!userToken) {
+      LoginAlert('請先登入，再購買票券')
+    } else if (userRole != 'General') {
+      LoginAlert('請先登入一般會員，再購買票券')
+    } else {
       navigate(`/eventInfo/${id}/payments`, {
         state: {
           sectionId: section.id,
@@ -196,29 +207,16 @@ function EventInfo() {
 
   // 轉換UTC時間(演出日期)
   function showTimeStartToEnd(start, end) {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-
-    const year = startDate.getUTCFullYear();
-    const month = String(startDate.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(startDate.getUTCDate()).padStart(2, '0');
-    const startHour = String(startDate.getUTCHours()).padStart(2, '0');
-    const startMinute = String(startDate.getUTCMinutes()).padStart(2, '0');
-    const endHour = String(endDate.getUTCHours()).padStart(2, '0');
-    const endMinute = String(endDate.getUTCMinutes()).padStart(2, '0');
-
-    return `${year}-${month}-${day} ${startHour}:${startMinute} ～ ${endHour}:${endMinute}`;
+    const startTime = dayjs.utc(start).format("YYYY-MM-DD HH:mm");
+    const endTime = dayjs.utc(end).format("HH:mm");
+    return `${startTime} ～ ${endTime}`;
   }
 
   // 轉換UTC時間(售票時間)
-  function showTime(utcString) {
-    const date = new Date(utcString);
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const hour = String(date.getUTCHours()).padStart(2, '0');
-    const minute = String(date.getUTCMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day} ${hour}:${minute}`;
+  function showSaleTime(startSale, endSale) {
+    const startTime = dayjs.utc(startSale).format("YYYY-MM-DD HH:mm");
+    const endTime = dayjs.utc(endSale).format("YYYY-MM-DD HH:mm");
+    return `${startTime} ～ ${endTime}`;
   }
 
   // 活動詳情區域
@@ -251,9 +249,7 @@ function EventInfo() {
           <div className="d-flex justify-content-between">
             <p className="text-Neutral-700">售票時間</p>
             <div className="d-flex flex-column flex-sm-row gap-1">
-              <p className="fw-bold">{showTime(event.sale_start_at)}</p>
-              <p className="fw-bold text-center">～</p>
-              <p className="fw-bold">{showTime(event.sale_end_at)}</p>
+              <p className="fw-bold">{showSaleTime(event.sale_start_at, event.sale_end_at)}</p>
             </div>
           </div>
         </div>
@@ -376,7 +372,7 @@ function EventInfo() {
       </div>
 
       {/* navbar sticky */}
-      <ul className="nav eventInfo-nav border-bottom border-2 border-black p-2 sticky-navbar" style={{ display: showStickyNavbar ? "block" : "none"}}>
+      <ul className="nav eventInfo-nav border-bottom border-2 border-black p-2 sticky-navbar" style={{ display: showStickyNavbar ? "block" : "none" }}>
         <div className="container">
           <div className="m-x-1">
             <div className="d-flex gap-2">

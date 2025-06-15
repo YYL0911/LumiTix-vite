@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
+import Swal from 'sweetalert2';
 import axios from 'axios'
 
 // 元件
@@ -17,7 +18,7 @@ function Payments() {
     const [loading, setLoading] = useState(true);
 
     const isFirstRender = useRef(true); // 記錄是否是第一次渲染
-    const { userToken } = useAuth();
+    const { userToken, userRole } = useAuth();
     const [event, setEvent] = useState({})
 
     const [paymentMethod, setPaymentMethod] = useState("");
@@ -34,8 +35,13 @@ function Payments() {
     // 防止直接貼上網址進入頁面
     useEffect(() => {
         if (!sectionId || !sectionName || !price) {
-            alert("尚未選擇票券區域，請重新選擇");
-            navigate(`/eventInfo/${id}`);
+            Swal.fire({
+                icon: 'warning',
+                title: "尚未選擇票券區域，請重新選擇",
+                confirmButtonText: `確認`,
+            }).then(() => {
+                navigate(`/eventInfo/${id}`);
+            });
         }
     }, []);
 
@@ -122,11 +128,19 @@ function Payments() {
                 const { MerchantID, TradeInfo, TradeSha, Version } = res.data.data;
                 sendToNewebPay({ MerchantID, TradeInfo, TradeSha, Version });
             } else {
-                alert(res.data.message);
+                Swal.fire({
+                    icon: "error",
+                    title: '錯誤',
+                    text: "無法建立訂單，請稍後再試",
+                });
             }
         } catch (error) {
             // console.error('建立訂單失敗：', error);
-            alert('建立訂單失敗，請稍後再試');
+            Swal.fire({
+                icon: "error",
+                title: '錯誤',
+                text: "建立訂單失敗，請稍後再試",
+            });
         }
     };
 
@@ -298,7 +312,10 @@ function Payments() {
                         className="col btn btn-danger text-white fw-bold"
                         onClick={() => {
                             if (!paymentMethod) {
-                                alert("請選擇付款方式！");
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: '請選擇付款方式！',
+                                });
                                 return;
                             }
 
@@ -309,7 +326,10 @@ function Payments() {
                                 // });
                                 createOrder();
                             } else {
-                                alert("目前只支援信用卡付款");
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: '目前只支援信用卡付款',
+                                });
                             }
                         }}
                     >
