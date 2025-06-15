@@ -1,6 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
+import Swal from 'sweetalert2';
+import dayjs from "dayjs";
+import utc from 'dayjs/plugin/utc';
 import axios from 'axios';
 
 import Loading from "../conponents/Loading";
@@ -15,16 +18,11 @@ function CreatOrder() {
     const { userToken } = useAuth();
 
     const [order, setOrder] = useState(null);
+    dayjs.extend(utc);
 
     // 轉換UTC時間
-    function showTime(utcString) {
-        const date = new Date(utcString);
-        const year = date.getUTCFullYear();
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(date.getUTCDate()).padStart(2, '0');
-        const hour = String(date.getUTCHours()).padStart(2, '0');
-        const minute = String(date.getUTCMinutes()).padStart(2, '0');
-        return `${year}-${month}-${day} ${hour}:${minute}`;
+    function showTime(utcTime) {
+        return dayjs.utc(utcTime).format("YYYY-MM-DD HH:mm");
     }
 
     // 取得單一訂單資料
@@ -42,13 +40,18 @@ function CreatOrder() {
                 setApiLoading(false);
                 if (res.data.status) {
                     setOrder(res.data.data || {});
-                    console.log('API 回傳資料:', res.data.data);
+                    // console.log('API 回傳資料:', res.data.data);
                 }
             } catch (err) {
                 setApiLoading(false);
                 // console.error('取得訂單失敗', err);
-                alert('無法取得訂單資訊');
-                navigate('/tickets')
+                Swal.fire({
+                    icon: 'error',
+                    title: '錯誤',
+                    text: '無法取得訂單資訊，請確認是否購買成功',
+                }).then(() => {
+                    navigate('/tickets');
+                })
             }
         };
 
@@ -56,7 +59,7 @@ function CreatOrder() {
             isFirstRender.current = false;
             fetchOrder();
         }
-    }, []);
+    }, [orderId, userToken]);
 
     // 載入
     if (apiLoading || !order) {
