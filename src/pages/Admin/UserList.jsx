@@ -67,11 +67,13 @@ function UserManagementList() {
     const changeUserState = async (id, name, isBlocked) => {
         const action = isBlocked ? '取消封鎖' : '封鎖';
         const confirmResult = await Swal.fire({
-            title: `確定要${action}${name}嗎？`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: `是的，${action}`,
-            cancelButtonText: '取消',
+          title: `確定要${action}${name}嗎？`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#6c757d",
+          confirmButtonText: `是的，${action}`,
+          cancelButtonText: "取消",
         });
 
         if (!confirmResult.isConfirmed) return;

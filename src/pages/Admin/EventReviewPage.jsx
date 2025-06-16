@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import axios from "axios";
-
+import Swal from "sweetalert2";
+// 元件
 import Breadcrumb from "../../conponents/Breadcrumb";
 import Loading from "../../conponents/Loading";
-
-
-
 // 定義此頁面的麵包屑靜態結構
 const breadcrumb = [{ name: "首頁", path: "/" }, { name: "活動管理", path: "/eventsList" }, { name: "活動審核" }];
 
@@ -90,12 +88,25 @@ const EventReviewPage = () => {
   // --- 審核操作邏輯 ---
   const handleReviewAction = async (isApproved) => {
     const actionText = isApproved ? "核准" : "拒絕";
+    const confirmButtonColor = isApproved ? "#28a745" : "#dc3545"; // 核准用綠色，拒絕用紅色
 
-    if (window.confirm(`確定要 ${actionText} 活動「${eventData?.title}」嗎？`)) {
+    const result = await Swal.fire({
+      title: `確定要 ${actionText} 活動嗎？`,
+      text: `活動名稱：${eventData?.title}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: confirmButtonColor,
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: `是的，${actionText}`,
+      cancelButtonText: "取消",
+    });
+
+    // 如果使用者點擊了「確認」按鈕
+    if (result.isConfirmed) {
       setApiLoading(true);
       try {
         const url = `https://n7-backend.onrender.com/api/v1/admin/events/${eventId}`;
-        const body = { isApproved: isApproved }; // 根據傳入的參數決定 body 內容
+        const body = { isApproved: isApproved };
 
         await axios.patch(url, body, {
           headers: {
@@ -104,12 +115,23 @@ const EventReviewPage = () => {
           },
         });
 
-        alert(`活動已成功 ${actionText}！`);
+        // 用 Swal.fire 取代成功的 alert
+        await Swal.fire({
+          title: "操作成功！",
+          text: `活動已成功 ${actionText}。`,
+          icon: "success",
+          timer: 1500, // 1.5秒後自動關閉
+          showConfirmButton: false,
+        });
+
+        // 在 SweetAlert 成功提示框關閉後，才跳轉頁面
         navigate("/eventsList");
       } catch (error) {
         const errorMessage = error.response?.data?.message || "發生未知錯誤，請稍後再試。";
         console.error(`活動${actionText}失敗`, error.response || error);
-        alert(`操作失敗：${errorMessage}`);
+
+        // 用 Swal.fire 取代失敗的 alert
+        Swal.fire("操作失敗！", errorMessage, "error");
       } finally {
         setApiLoading(false);
       }
@@ -135,84 +157,90 @@ const EventReviewPage = () => {
       <div className="mt-3">
         {/* --- 3. JSX 中改為讀取 eventData state，並使用可選串聯 (?.) 避免錯誤 --- */}
         <div className="fs-5 border-bottom border-1 border-secondary">
-          <div className="d-flex mb-3">
-            <div className="fw-semibold text-nowrap" style={{ flexBasis: "120px" }}>
+          <div className="d-flex flex-column flex-md-row mb-3">
+            <div className="text-nowrap text-muted me-md-3 mb-2 mb-md-0" style={{ width: "120px" }}>
               主辦方：
             </div>
-            <div className="flex-grow-1">{eventData.organizer}</div>
+            <div className="fw-bold flex-grow-1">{eventData.organizer}</div>
           </div>
-          <div className="d-flex mb-3">
-            <div className="fw-semibold text-nowrap" style={{ flexBasis: "120px" }}>
-              活動封面照：
-            </div>
+          <div className="d-flex flex-column flex-md-row mb-3">
+            <div className="text-nowrap text-muted me-md-3 mb-2 mb-md-0">活動封面照：</div>
             <div className="border border-2 border-secondary p-3 mb-4">
-              <img
-                src={eventData.cover_image_url}
-                alt={eventData.title}
-                className="img-fluid"
-              />
+              <img src={eventData.cover_image_url} alt={eventData.title} className="img-fluid" />
             </div>
           </div>
-          <div className="d-flex mb-3">
-            <div className="fw-semibold text-nowrap" style={{ flexBasis: "120px" }}>
+          <div className="d-flex flex-column flex-md-row mb-3">
+            <div className="text-nowrap text-muted me-md-3 mb-2 mb-md-0" style={{ width: "120px" }}>
               活動名稱：
             </div>
-            <div className="flex-grow-1">{eventData.title}</div>
+            <div className="fw-bold flex-grow-1">{eventData.title}</div>
           </div>
-          <div className="d-flex mb-3">
-            <div className="fw-semibold text-nowrap" style={{ flexBasis: "120px" }}>
+          <div className="d-flex flex-column flex-md-row mb-3">
+            <div className="text-nowrap text-muted me-md-3 mb-2 mb-md-0" style={{ width: "120px" }}>
               活動地點：
             </div>
-            <div className="flex-grow-1">{eventData.location}</div>
+            <div className="fw-bold flex-grow-1">{eventData.location}</div>
           </div>
-          <div className="d-flex mb-3">
-            <div className="fw-semibold text-nowrap" style={{ flexBasis: "120px" }}>
+          <div className="d-flex flex-column flex-md-row mb-3">
+            <div className="text-nowrap text-muted me-md-3 mb-2 mb-md-0" style={{ width: "120px" }}>
               地址：
             </div>
-            <div className="flex-grow-1">{eventData.address}</div>
+            <div className="fw-bold flex-grow-1">{eventData.address}</div>
           </div>
-          <div className="d-flex mb-3">
-            <div className="fw-semibold text-nowrap" style={{ flexBasis: "120px" }}>
+          <div className="d-flex flex-column flex-md-row mb-3">
+            <div className=" text-nowrap text-muted me-md-3 mb-2 mb-md-0" style={{ width: "120px" }}>
               演出時間：
             </div>
-            <div className="flex-grow-1">{`${formatDateTime(eventData.start_at)} ~ ${formatDateTime(
-              eventData.end_at
-            )}`}</div>
+            <div className="fw-bold flex-grow-1">
+              {formatDateTime(eventData.start_at)}
+              <span className="d-md-none">
+                <br />
+              </span>
+              <span className="d-none d-md-inline"> ~ </span>
+              {formatDateTime(eventData.end_at)}
+            </div>
           </div>
-          <div className="d-flex mb-3">
-            <div className="fw-semibold text-nowrap" style={{ flexBasis: "120px" }}>
+          <div className="d-flex flex-column flex-md-row mb-3">
+            <div className="text-nowrap text-muted me-md-3 mb-2 mb-md-0" style={{ width: "120px" }}>
               表演人員：
             </div>
-            <div className="flex-grow-1">{eventData.performance_group}</div>
+            <div className="fw-bold flex-grow-1">{eventData.performance_group}</div>
           </div>
-          <div className="d-flex mb-3">
-            <div className="fw-semibold text-nowrap" style={{ flexBasis: "120px" }}>
+          <div className="d-flex flex-column flex-md-row mb-3">
+            <div className="text-nowrap text-muted me-md-3 mb-2 mb-md-0" style={{ width: "120px" }}>
               售票時間：
             </div>
-            <div className="flex-grow-1">{`${formatDateTime(eventData.sale_start_at)} ~ ${formatDateTime(
-              eventData.sale_end_at
-            )}`}</div>
+            <div className="fw-bold flex-grow-1">
+              {formatDateTime(eventData.sale_start_at)}
+              <span className="d-md-none">
+                <br />
+              </span>
+              <span className="d-none d-md-inline"> ~ </span>
+              {formatDateTime(eventData.sale_end_at)}
+            </div>
           </div>
-          <div className="d-flex mb-3">
-            <div className="fw-semibold text-nowrap" style={{ flexBasis: "120px" }}>
+          <div className="d-flex flex-column flex-md-row mb-3">
+            <div className="text-nowrap text-muted me-md-3 mb-2 mb-md-0" style={{ width: "120px" }}>
               類型：
             </div>
-            <div className="flex-grow-1">{eventData.type}</div>
+            <div className="fw-bold flex-grow-1">{eventData.type}</div>
           </div>
-          <div className="d-flex mb-3">
-            <div className="pe-2 fw-semibold text-nowrap" style={{ flexBasis: "120px" }}>
+          <div className="d-flex flex-column flex-md-row mb-3">
+            <div className="pe-2 text-nowrap text-muted me-md-3 mb-2 mb-md-0" style={{ width: "120px" }}>
               活動介紹：
             </div>
-            <div style={{ whiteSpace: "pre-wrap" }}>{eventData.description}</div>
+            <div className="fw-bold" style={{ whiteSpace: "pre-wrap" }}>
+              {eventData.description}
+            </div>
           </div>
 
           <div className="my-4">
-            <p className="fs-5 fw-semibold">分區設定：</p>
+            <p className="fs-5 text-muted mb-4">分區設定：</p>
             <div className="row g-4 justify-content-between align-items-start">
-              <div className="col-12 col-md-7">
+              <div className="col-12 col-lg-7">
                 <img src={eventData.section_image_url} alt="場地圖" className="img-fluid border" />
               </div>
-              <div className="col-12 col-md-5">
+              <div className="col-12 col-lg-5">
                 <div className="table-responsive">
                   <table className="table text-center align-middle table-bordered">
                     <thead className="table-light">
