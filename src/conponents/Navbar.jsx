@@ -100,7 +100,7 @@ export default function Navbar() {
                   <span className="d-none d-md-inline">{userName}</span>
                 </a>
                 <ul className="dropdown-menu dropdown-menu-end">
-                  <li className="nav-item ps-3 dropdown-item d-md-none d-inline">
+                  <li className="nav-item ps-3 dropdown-item d-md-none">
                     <span className="nav-link text-black fw-bold">{userName}</span>
                   </li>
                   <li className="nav-item ps-3 dropdown-item">
