@@ -5,6 +5,7 @@ import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { useAuth } from "../../contexts/AuthContext";
 // 元件
 import axios from "axios";
+import Swal from "sweetalert2";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../../assets/scss/pages/EventFormPage.scss";
@@ -313,23 +314,19 @@ const EventFormPage = () => {
           const errorMessage = error.response?.data?.message || "發生未知錯誤，請稍後再試。";
           // 狀況一：401 未授權 (Token 失效或未登入)
           if (statusCode === 401) {
-            alert("您尚未登入或登入已逾時，請重新登入。");
-            navigate("/login");
+            Swal.fire("驗證失敗", "您尚未登入或登入已逾時，請重新登入。", "error").then(() => navigate("/login"));
           }
           // 狀況二：403 禁止 (使用者沒有權限編輯此活動)
           else if (statusCode === 403) {
-            alert("您沒有權限編輯此活動。");
-            navigate("/events");
+            Swal.fire("權限不足", "您沒有權限編輯此活動。", "error").then(() => navigate("/events"));
           }
           // 狀況三：404 找不到 (使用者想編輯一個不存在或已被刪除的活動)
           else if (statusCode === 404) {
-            alert("找不到您要編輯的活動，它可能已被刪除。");
-            navigate("/events");
+            Swal.fire("找不到資料", "找不到您要編輯的活動，它可能已被刪除。", "error").then(() => navigate("/events"));
           }
           // 狀況四：其他所有錯誤 (例如 500 伺服器內部錯誤)
           else {
-            alert(`載入資料時發生錯誤：\n${errorMessage}`);
-            navigate("/events");
+            Swal.fire("載入失敗", `發生錯誤：\n${errorMessage}`, "error").then(() => navigate("/events"));
           }
         } finally {
           setApiLoading(false);
@@ -501,21 +498,28 @@ const EventFormPage = () => {
         const url = "https://n7-backend.onrender.com/api/v1/organizer/propose-event";
         response = await axios.post(url, apiData, { headers });
       }
-
+      // --- 修改 onSubmit 的成功/失敗提示 ---
       if (response.data.status) {
-        alert(isEditMode ? "活動更新成功！" : "活動新增成功！");
+        await Swal.fire({
+          title: "操作成功！",
+          text: isEditMode ? "活動更新成功！" : "活動新增成功！",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        });
         navigate("/events");
       } else {
-        alert(`操作失敗：${response.data.message || "回傳狀態錯誤"}`);
+        throw new Error(response.data.message || "回傳狀態錯誤");
       }
     } catch (error) {
-      const errorMsg = error.response?.data?.message || "發生未知錯誤，請稍後再試";
+      const errorMessage = error.response?.data?.message || "發生未知錯誤，請稍後再試";
       console.error("Submit failed:", error.response || error);
-      alert(`操作失敗：${errorMsg}`);
+      Swal.fire("操作失敗！", errorMessage, "error");
     } finally {
       setApiLoading(false);
     }
   };
+
 
   if (apiLoading) {
     return <Loading />;
