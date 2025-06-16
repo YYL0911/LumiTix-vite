@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import axios from "axios";
-
+import Swal from "sweetalert2";
+// 元件
 import Breadcrumb from "../../conponents/Breadcrumb";
 import Loading from "../../conponents/Loading";
+import PaginationComponent from "../../conponents/Pagination";
 
 // 定義此頁面的麵包屑靜態結構
 const breadcrumb = [{ name: "首頁", path: "/" }, { name: "一般會員列表", path: "/userList" }, { name: "會員詳情" }];
@@ -17,6 +19,34 @@ const UserInfo = () => {
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [apiLoading, setApiLoading] = useState(true);
+
+  // --- 新增分頁相關的 State ---
+  const [pagedOrders, setPagedOrders] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10; // 可以自行調整每頁顯示幾筆訂單
+
+  // --- 新增處理分頁邏輯的 useEffect ---
+  useEffect(() => {
+    if (orders && orders.length > 0) {
+      const total = Math.ceil(orders.length / ordersPerPage);
+      setTotalPages(total > 0 ? total : 1);
+
+      const startIndex = (currentPage - 1) * ordersPerPage;
+      const endIndex = startIndex + ordersPerPage;
+      setPagedOrders(orders.slice(startIndex, endIndex));
+
+      // 如果因資料變動導致當前頁不存在，則跳回第一頁
+      if (currentPage > total && total > 0) {
+        setCurrentPage(1);
+      }
+    } else {
+      // 如果沒有訂單，重設分頁
+      setPagedOrders([]);
+      setTotalPages(1);
+      setCurrentPage(1);
+    }
+  }, [orders, currentPage, ordersPerPage]);
 
   // 讀取會員資料
   useEffect(() => {
@@ -53,35 +83,39 @@ const UserInfo = () => {
     // 根據目前狀態，決定提示訊息的動詞
     const actionText = user.isBlocked ? "取消封鎖" : "封鎖";
 
-    if (window.confirm(`確定要 ${actionText} 使用者 ${user.name} 嗎？`)) {
-      setApiLoading(true); // 開始執行操作，顯示 Loading
+    const result = await Swal.fire({
+      title: `確定要 ${actionText} 使用者 ${user.name} 嗎？`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: `是的，${actionText}`,
+      cancelButtonText: "取消",
+    });
+
+    if (result.isConfirmed) {
+      setApiLoading(true);
       try {
         const url = `https://n7-backend.onrender.com/api/v1/admin/users/${userId}/toggle-block`;
-        const response = await axios.patch(
-          url,
-          {},
-          {
-            // 發送 PATCH 請求，body 為空物件
-            headers: { Authorization: `Bearer ${userToken}` },
-          }
-        );
+        const response = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${userToken}` } });
 
         if (response.data.status) {
-          alert(`已成功 ${actionText}！`);
-          // 直接用後端回傳的最新狀態來更新畫面，最準確
-          setUser((prevUser) => ({
-            ...prevUser,
-            isBlocked: response.data.data.isBlocked,
-          }));
+          Swal.fire({
+            title: "操作成功！",
+            text: `已成功 ${actionText} 使用者。`,
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+          setUser((prevUser) => ({ ...prevUser, isBlocked: response.data.data.isBlocked }));
         } else {
           throw new Error(response.data.message || "操作失敗");
         }
       } catch (error) {
         const errorMessage = error.response?.data?.message || "發生未知錯誤，請稍後再試。";
-        console.error("切換使用者狀態失敗", error);
-        alert(`操作失敗：${errorMessage}`);
+        Swal.fire("操作失敗！", errorMessage, "error");
       } finally {
-        setApiLoading(false); // 結束操作，隱藏 Loading
+        setApiLoading(false);
       }
     }
   };
@@ -138,12 +172,11 @@ const UserInfo = () => {
             </tr>
           </thead>
           <tbody className="text-center">
-            {orders.length > 0 ? (
-              orders.map((order) => (
+            {pagedOrders.length > 0 ? (
+              pagedOrders.map((order) => (
                 <tr key={order.order_id}>
                   <td className="text-start">{order.event_title}</td>
                   <td>{order.ticket_puchased}</td>
-                  {/* --- 最終修正 --- */}
                   <td className="text-end">{(order.total_price ?? 0).toLocaleString()}</td>
                   <td className="text-end">{order.ticket_used}</td>
                 </tr>
@@ -158,6 +191,17 @@ const UserInfo = () => {
           </tbody>
         </table>
       </div>
+
+      {/* --- 在表格下方加入分頁元件 --- */}
+      {totalPages > 1 && (
+        <div className="d-flex justify-content-center mt-4">
+          <PaginationComponent
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
+        </div>
+      )}
 
       <div className="mt-5 d-flex justify-content-center gap-3">
         <button className="btn btn-primary px-4" onClick={() => navigate("/userList")}>
