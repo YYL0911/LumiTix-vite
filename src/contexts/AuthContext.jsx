@@ -1,6 +1,7 @@
 // contexts/AuthContext.jsx
 import { createContext, useEffect, useContext, useState, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 import Loading from '../conponents/Loading';
 
@@ -81,7 +82,12 @@ export const AuthProvider = ({ children }) => {
           localStorage.clear();
           if(result.message == "使用者已被封鎖"){
             logout();
-            alert("此帳號已被封鎖");
+            Swal.fire({
+              title: "帳號已被封鎖",
+              text: "您的帳號因違反使用條款已被停權，如有疑問請聯繫客服。",
+              icon: "error",
+              confirmButtonText: "了解",
+            });
           }
           navigate("/")
         }

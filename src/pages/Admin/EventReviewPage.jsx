@@ -45,23 +45,19 @@ const EventReviewPage = () => {
 
         // 狀況一：401 未授權 (Token 失效或未登入)
         if (statusCode === 401) {
-          alert("您尚未登入或登入已逾時，請重新登入。");
-          navigate("/login");
+          Swal.fire("驗證失敗", "您尚未登入或登入已逾時，請重新登入。", "error").then(() => navigate("/login"));
         }
         // 狀況二：403 禁止 (使用者沒有權限)
         else if (statusCode === 403) {
-          alert("您沒有權限查看此活動詳情。");
-          navigate("/eventsList");
+          Swal.fire("權限不足", "您沒有權限查看此活動詳情。", "error").then(() => navigate("/eventsList"));
         }
         // 狀況三：404 找不到 (活動不存在或已被刪除)
         else if (statusCode === 404) {
-          alert("找不到此活動，它可能已被刪除。");
-          navigate("/eventsList");
+          Swal.fire("找不到資料", "找不到此活動，它可能已被刪除。", "error").then(() => navigate("/eventsList"));
         }
         // 狀況四：其他所有錯誤 (例如 400, 500)
         else {
-          alert(`載入資料時發生錯誤：\n${errorMessage}`);
-          navigate("/eventsList");
+          Swal.fire("載入失敗", `發生錯誤：\n${errorMessage}`, "error").then(() => navigate("/eventsList"));
         }
       } finally {
         setApiLoading(false);
