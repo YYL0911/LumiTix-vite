@@ -540,6 +540,9 @@ const EventFormPage = () => {
                   <label className="text-muted form-label">
                     活動封面照 <span className="text-danger">*</span>
                   </label>
+                  <small className="text-muted d-block mb-2">
+                    請上傳橫向圖片（JPG 或 PNG 格式），檔案大小需低於 5MB。
+                  </small>
                   {/* 使用 Controller 包裹自訂的上傳區塊 */}
                   <Controller
                     name="eventCoverImage"
@@ -907,6 +910,9 @@ const EventFormPage = () => {
                   <label className="text-muted form-label">
                     場地圖 <span className="text-danger">*</span>
                   </label>
+                  <small className="text-muted d-block mb-2">
+                    請上傳圖片（JPG 或 PNG 格式），檔案大小需低於 5MB。
+                  </small>
                   <Controller
                     name="venueMapImage"
                     control={control}

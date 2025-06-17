@@ -68,8 +68,13 @@ const UserInfo = () => {
         }
       } catch (error) {
         console.error("獲取會員資料失敗", error);
-        alert("獲取會員資料失敗，將返回列表頁。");
-        navigate("/userList");
+        Swal.fire({
+          icon: "error",
+          title: "載入失敗",
+          text: error.response?.data?.message || "無法取得使用者資料，請稍後再試。",
+        }).then(() => {
+          navigate("/userList");
+        });
       } finally {
         setApiLoading(false);
       }
