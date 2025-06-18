@@ -1,6 +1,6 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef  } from 'react';
-
+import Swal from "sweetalert2";
 // Context
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -10,6 +10,23 @@ import Loading from '../../conponents/Loading';
 
 import { BsQrCodeScan } from "react-icons/bs";
 import { BsPencilSquare } from "react-icons/bs";
+
+const eventStatus = [
+  { key: "checking", label: '正在審核', class: "bg-danger" },
+  { key: "holding", label: '正在舉辦', class: "bg-success" },
+  { key: "finished", label: '已經結束', class: "bg-secondary" },
+  { key: "rejected", label: '被拒絕', class: "bg-dark" },
+];
+
+const showSwal = (icon, title, info) => {
+    Swal.fire({
+      icon: icon,
+      title: title,
+      text: info
+    })
+}
+
+
 
 
 const EventDetail = () => {
@@ -22,6 +39,8 @@ const EventDetail = () => {
 
   const [apiLoading, setApiLoading] = useState(false);
   const [eventInfo, setEventInfo] = useState({});
+  const [eventStatusIdx, setEventStatusIdx] = useState(0);
+  const [hasSale, setHasSale] = useState(false);
 
   //麵包屑
   const breadcrumb = [
@@ -34,6 +53,7 @@ const EventDetail = () => {
   //取得使用者資料
   useEffect(() => {
     if (isFirstRender.current) {
+      setEventStatusIdx(eventStatus.findIndex(item => item.key === activeState))
       
       isFirstRender.current = false; // 更新為 false，代表已執行過
       setApiLoading(true)
@@ -48,12 +68,14 @@ const EventDetail = () => {
         setApiLoading(false)
         if(!result.status){
           if(result.message == "尚未登入") navigate("/login");
-          else{
-            
-          }
         }
         else{
           setEventInfo(result.data)
+          if(activeState == "holding"){
+            setHasSale(result.data.sections.some(item => item.ticket_purchaced > 0))
+          }
+          
+          
         }
       })
       .catch(err => {
@@ -85,6 +107,14 @@ const EventDetail = () => {
         
         <div className="fs-5">
           <div className="d-flex my-3">
+            <div className="fw-semibold text-nowrap">活動狀態：</div>
+            <div className=" flex-grow-1 ms-2">
+              <span className={`badge ${eventStatus[eventStatusIdx].class}`}>
+                {eventStatus[eventStatusIdx].label}
+              </span>
+            </div>
+          </div>
+          <div className="d-flex my-3">
             <div className="fw-semibold text-nowrap">活動名稱：</div>
             <div className=" flex-grow-1 ms-2">{eventInfo.title}</div>
           </div>
@@ -97,9 +127,20 @@ const EventDetail = () => {
             <div className=" flex-grow-1 ms-2">{eventInfo.address}</div>
           </div>
           <div className="d-flex mb-3">
-            <div className="fw-semibold text-nowrap">演出時間：</div>
+            <div className="fw-semibold text-nowrap">演出開始：</div>
             <div className=" flex-grow-1 ms-2">{eventInfo.start_at?.substring(0,10)} {eventInfo.start_at?.substring(11,16)}</div>
-            
+          </div>
+          <div className="d-flex mb-3">
+            <div className="fw-semibold text-nowrap">演出結束：</div>
+            <div className=" flex-grow-1 ms-2">{eventInfo.end_at?.substring(0,10)} {eventInfo.end_at?.substring(11,16)}</div>
+          </div>
+          <div className="d-flex mb-3">
+            <div className="fw-semibold text-nowrap">售票開始：</div>
+            <div className=" flex-grow-1 ms-2">{eventInfo.sale_start_at?.substring(0,10)} {eventInfo.sale_start_at?.substring(11,16)}</div>
+          </div>
+          <div className="d-flex mb-3">
+            <div className="fw-semibold text-nowrap">售票結束：</div>
+            <div className=" flex-grow-1 ms-2">{eventInfo.sale_end_at?.substring(0,10)} {eventInfo.sale_start_at?.substring(11,16)}</div>
           </div>
           <div className="d-flex mb-3">
             <div className="fw-semibold text-nowrap">表演人員：</div>
@@ -136,7 +177,14 @@ const EventDetail = () => {
                       </thead>
                       <tbody className="table-group-divider">
                 
-                        {eventInfo.sections?.map((product) => (
+                        {[...(eventInfo?.sections ?? [])]
+                          .sort((a, b) =>
+                            a.section_name.localeCompare(b.section_name, {
+                              numeric: true,
+                              sensitivity: 'base'
+                            })
+                          )
+                          .map((product) => (
                           <tr key={product.section_name}>
                             <td className="text-wrap text-break">{product.section_name}</td>
                             <td >{product.price}</td>
@@ -156,13 +204,16 @@ const EventDetail = () => {
         </div>
       </div>
 
-      {["checking", "holding"].includes(activeState) && (
+      {eventStatusIdx < 2 && (
         <div className="d-flex justify-content-between my-5  px-sm-5" >
           <div className="col-6 col-sm-4 pe-2 mx-auto">
             <button
-              type="button"
-              className="btn btn-dark w-100 d-flex align-items-center justify-content-center"
-              onClick={() => navigate(`/organizer/event/edit/${evendId}`)}
+              type="button" 
+              className={`btn btn-dark w-100 d-flex align-items-center justify-content-center`}
+              onClick={() =>{
+                if(hasSale) showSwal("warning", "不可編輯已有售票之活動", "")
+                else navigate(`/organizer/event/edit/${evendId}`)
+              }}
             >
               編輯資訊 <BsPencilSquare size={20}  className={`ms-2`}/>
             </button>
