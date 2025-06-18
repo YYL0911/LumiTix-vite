@@ -28,7 +28,6 @@ const showSwal = (icon, title, info) => {
 }
 
 
-
 function Events() {
   const { userToken, loading } = useAuth(); // [變更使用者名稱, token]
   const [apiLoading, setApiLoading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
@@ -220,18 +219,13 @@ function Events() {
                     <br />
                     {product.start_at.substring(11, 16)}~{product.end_at.substring(11, 16)}
                   </td>
-                  <td>
-                    {product.ticket_purchaced}/{product.ticket_total}
-                  </td>
+                  <td>{product.ticket_purchaced}/{product.ticket_total}</td>
                   <td>
                     <button
                       type="button"
                       className={`btn btn-dark mx-1  
-                        ${["checking", "holding"].includes(activeState) ? "" : "d-none"}`}
-                      onClick={() =>{
-                        if(product.ticket_purchaced > 0) showSwal("warning", "不可編輯已有售票之活動", "")
-                        else handleNavigate(`/organizer/event/edit/${product.id}`)
-                      } }
+                        ${["checking"].includes(activeState) ? "" : "d-none"}`}
+                      onClick={() =>handleNavigate(`/organizer/event/edit/${product.id}`)}
                     >
                       編輯資訊
                     </button>

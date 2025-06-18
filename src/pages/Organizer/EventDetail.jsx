@@ -1,6 +1,6 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef  } from 'react';
-import Swal from "sweetalert2";
+
 // Context
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -18,16 +18,6 @@ const eventStatus = [
   { key: "rejected", label: '被拒絕', class: "bg-dark" },
 ];
 
-const showSwal = (icon, title, info) => {
-    Swal.fire({
-      icon: icon,
-      title: title,
-      text: info
-    })
-}
-
-
-
 
 const EventDetail = () => {
   const location = useLocation();
@@ -40,7 +30,6 @@ const EventDetail = () => {
   const [apiLoading, setApiLoading] = useState(false);
   const [eventInfo, setEventInfo] = useState({});
   const [eventStatusIdx, setEventStatusIdx] = useState(0);
-  const [hasSale, setHasSale] = useState(false);
 
   //麵包屑
   const breadcrumb = [
@@ -71,11 +60,6 @@ const EventDetail = () => {
         }
         else{
           setEventInfo(result.data)
-          if(activeState == "holding"){
-            setHasSale(result.data.sections.some(item => item.ticket_purchaced > 0))
-          }
-          
-          
         }
       })
       .catch(err => {
@@ -157,10 +141,7 @@ const EventDetail = () => {
 
           <div className='mb-3'> 
             <p className="fs-5 fw-semibold">分區設定：</p>
-
-
               <div className="row  justify-content-between  align-items-start">
-
                 <div className=" col-12 col-md-7">
                   <img src={eventInfo.section_image_url} alt={eventInfo.title} className="img-fluid " />
                 </div>
@@ -176,15 +157,7 @@ const EventDetail = () => {
                         </tr>
                       </thead>
                       <tbody className="table-group-divider">
-                
-                        {[...(eventInfo?.sections ?? [])]
-                          .sort((a, b) =>
-                            a.section_name.localeCompare(b.section_name, {
-                              numeric: true,
-                              sensitivity: 'base'
-                            })
-                          )
-                          .map((product) => (
+                        {eventInfo.sections?.map((product) => (
                           <tr key={product.section_name}>
                             <td className="text-wrap text-break">{product.section_name}</td>
                             <td >{product.price}</td>
@@ -195,25 +168,18 @@ const EventDetail = () => {
                     </table>
                   </div>
                 </div>
-
               </div>
-
-
-            
           </div>
         </div>
       </div>
 
       {eventStatusIdx < 2 && (
         <div className="d-flex justify-content-between my-5  px-sm-5" >
-          <div className="col-6 col-sm-4 pe-2 mx-auto">
+          <div className={`col-6 col-sm-4 pe-2 mx-auto ${eventStatusIdx == 1 ? "d-none" : ""}`}>
             <button
               type="button" 
               className={`btn btn-dark w-100 d-flex align-items-center justify-content-center`}
-              onClick={() =>{
-                if(hasSale) showSwal("warning", "不可編輯已有售票之活動", "")
-                else navigate(`/organizer/event/edit/${evendId}`)
-              }}
+              onClick={() =>navigate(`/organizer/event/edit/${evendId}`)}
             >
               編輯資訊 <BsPencilSquare size={20}  className={`ms-2`}/>
             </button>
@@ -228,8 +194,7 @@ const EventDetail = () => {
               </button>
           </div>
         </div>
-      )
-      }
+      )}
       
 
       {(!loading && apiLoading ) && (<Loading></Loading>)}
