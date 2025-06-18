@@ -10,7 +10,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import Breadcrumb from "../../conponents/Breadcrumb";
 import Loading from "../../conponents/Loading";
 
-import { FaRegPlusSquare } from "react-icons/fa";
+import { RiAddBoxLine } from "react-icons/ri";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 //麵包屑
 const breadcrumb = [
@@ -166,7 +167,7 @@ function Events() {
         }}
       >
         新增活動
-        <FaRegPlusSquare size={22} className={`ms-2`} />
+        <RiAddBoxLine size={25} className={`ms-2`} />
       </button>
 
 
@@ -187,74 +188,79 @@ function Events() {
       </div>
 
       {/* 根據狀態產生活動列表 */}
-      {/* // style={{ maxHeight: '500px', overflowY: 'auto' }} */}
-      <div className="table-responsive ">
-        <table className="table table-striped text-center align-middle table-hover">
-          {/* className="position-sticky top-0" */}
-          <thead>
-            <tr>
-              <th scope="col" className="text-wrap text-break" style={{ minWidth: "150px" }}>
-                活動名稱
-              </th>
-              <th scope="col" className="text-wrap text-break" style={{ minWidth: "120px" }}>
-                表演時段
-              </th>
-              <th scope="col" className="text-wrap text-break" style={{ minWidth: "120px" }}>
-                購票人數
-              </th>
-              <th scope="col" className="text-wrap text-break" style={{ minWidth: "220px" }}>
-                操作
-              </th>
-              <th scope="col" className={`text-wrap text-break ${["checking"].includes(activeState) ? "" : "d-none"}`} style={{ minWidth: "100px" }}>
-                刪除
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filterProducts.map((product) => (
-              <tr key={product.id}>
-                <td className="text-wrap text-break">{product.title}</td>
-                <td className="text-wrap text-break">
-                  {product.start_at.substring(0, 10)}
-                  <br />
-                  {product.start_at.substring(11, 16)}~{product.end_at.substring(11, 16)}
-                </td>
-                <td>
-                  {product.ticket_purchaced}/{product.ticket_total}
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    className={`btn btn-dark mx-1 
-                      ${["checking", "holding"].includes(activeState) ? "" : "d-none"}`}
-                    onClick={() => handleNavigate(`/organizer/event/edit/${product.id}`)}
-                  >
-                    編輯資訊
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-outline-secondary mx-1"
-                    onClick={() => navigate(`/eventDetail/${product.id}`, { state: { activeState: activeState} })}
-                  >
-                    詳細內容
-                  </button>
-                </td>
-
-                <td>
-                  <button
-                    type="button"
-                    className={`btn btn-danger mx-1 ${["checking"].includes(activeState) ? "" : "d-none"}`}
-                    onClick={() => deleteEvent(`${product.id}`)}
-                  >
-                    刪除
-                  </button>
-                </td>
+      {filterProducts.length > 0 ? 
+        <div className="table-responsive" >
+          <table className="table  text-center align-middle table-hover">
+            <thead >
+              <tr>
+                <th scope="col" className="text-wrap text-break text-start" style={{ minWidth: "150px" }}>
+                  活動名稱
+                </th>
+                <th scope="col" className="text-wrap text-break" style={{ minWidth: "120px" }}>
+                  表演時段
+                </th>
+                <th scope="col" className="text-wrap text-break" style={{ minWidth: "120px" }}>
+                  購票人數
+                </th>
+                <th scope="col" className="text-wrap text-break" style={{ minWidth: "220px" }}>
+                  操作
+                </th>
+                <th scope="col" className={`text-wrap text-break ${["checking"].includes(activeState) ? "" : "d-none"}`} style={{ minWidth: "100px" }}>
+                  刪除
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="table-group-divider">
+      
+              {filterProducts.map((product) => (
+                <tr key={product.id}>
+                  <td className="text-wrap text-break text-start">{product.title}</td>
+                  <td className="text-wrap text-break">
+                    {product.start_at.substring(0, 10)}
+                    <br />
+                    {product.start_at.substring(11, 16)}~{product.end_at.substring(11, 16)}
+                  </td>
+                  <td>
+                    {product.ticket_purchaced}/{product.ticket_total}
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className={`btn btn-dark mx-1  
+                        ${["checking", "holding"].includes(activeState) ? "" : "d-none"}`}
+                      onClick={() =>{
+                        if(product.ticket_purchaced > 0) showSwal("warning", "不可編輯已有售票之活動", "")
+                        else handleNavigate(`/organizer/event/edit/${product.id}`)
+                      } }
+                    >
+                      編輯資訊
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary mx-1"
+                      onClick={() => navigate(`/eventDetail/${product.id}`, { state: { activeState: activeState} })}
+                    >
+                      詳細內容
+                    </button>
+                  </td>
 
+                  <td>
+                    <button
+                      type="button"
+                      className={`btn btn-danger mx-1 ${["checking"].includes(activeState) ? "" : "d-none"}`}
+                      onClick={() => deleteEvent(`${product.id}`)}
+                    >
+                      <RiDeleteBin6Line size={22} className={`pb-1`} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      :
+        <h3 className="my-4">無符合狀態活動</h3>
+      }
       {!loading && apiLoading && <Loading></Loading>}
     </div>
   );
