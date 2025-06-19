@@ -131,15 +131,18 @@ function Payments() {
                 Swal.fire({
                     icon: "error",
                     title: '錯誤',
-                    text: "無法建立訂單，請稍後再試",
+                    text: "無法購票，請稍後再試",
+                }).then(() => {
+                    navigate(`/eventInfo/${id}`);
                 });
             }
         } catch (error) {
-            // console.error('建立訂單失敗：', error);
             Swal.fire({
                 icon: "error",
                 title: '錯誤',
-                text: "建立訂單失敗，請稍後再試",
+                text: "購票失敗，請稍後再試",
+            }).then(() => {
+                navigate(`/eventInfo/${id}`);
             });
         }
     };
@@ -197,14 +200,14 @@ function Payments() {
                     onChange={(e) => setPaymentMethod(e.target.value)}
                     label="信用卡"
                 />
-                <PaymentOption
+                {/* <PaymentOption
                     id="linePay"
                     value="linePay"
                     checked={paymentMethod === "linePay"}
                     onChange={(e) => setPaymentMethod(e.target.value)}
                     disabled
                     label="linePay"
-                />
+                /> */}
             </div>
         </div>
     )
