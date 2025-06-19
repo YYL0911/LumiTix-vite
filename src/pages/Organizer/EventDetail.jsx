@@ -10,6 +10,7 @@ import Loading from '../../conponents/Loading';
 
 import { BsQrCodeScan } from "react-icons/bs";
 import { BsPencilSquare } from "react-icons/bs";
+import { BsArrowLeftCircle } from "react-icons/bs";
 
 const eventStatus = [
   { key: "checking", label: '正在審核', class: "bg-danger" },
@@ -85,8 +86,8 @@ const EventDetail = () => {
       {/* 麵包屑 */}
       <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
       <div className='mt-3'>
-        <div className="border border-2 border-secondary p-3">
-         <img src={eventInfo.cover_image_url} alt={eventInfo.title} className="img-fluid " />
+        <div className="mx-100">
+         <img src={eventInfo.cover_image_url} alt={eventInfo.title} className="img-fluid border border-2 border-secondary p-3" />
         </div>
         
         <div className="fs-5">
@@ -173,28 +174,38 @@ const EventDetail = () => {
         </div>
       </div>
 
-      {eventStatusIdx < 2 && (
-        <div className="d-flex justify-content-between my-5  px-sm-5" >
-          <div className={`col-6 col-sm-4 pe-2 mx-auto ${eventStatusIdx == 1 ? "d-none" : ""}`}>
-            <button
-              type="button" 
-              className={`btn btn-dark w-100 d-flex align-items-center justify-content-center`}
-              onClick={() =>navigate(`/organizer/event/edit/${evendId}`)}
-            >
-              編輯資訊 <BsPencilSquare size={20}  className={`ms-2`}/>
-            </button>
-          </div>
-          <div className="col-6 col-sm-4 ps-2 mx-auto">
-              <button
-                type="button"
-                className={`btn  w-100 btn-danger d-flex align-items-center justify-content-center`}
-                onClick={() => scanEvent()}
-              >
-                驗票 <BsQrCodeScan size={20}  className={`ms-2`}/>
-              </button>
-          </div>
+      
+      <div className="d-flex justify-content-between my-5  px-sm-5" >
+        <div className={`col-6 col-sm-4 pe-2 mx-auto `}>
+          <button
+            type="button" 
+            className={`btn btn-dark w-100 d-flex align-items-center justify-content-center`}
+            onClick={() => navigate(-1)}
+          >
+            返回 <BsArrowLeftCircle size={20}  className={`ms-2`}/>
+          </button>
         </div>
-      )}
+
+        <div className={`col-6 col-sm-4 pe-2 mx-auto ${eventStatusIdx == 0 ? "d-block" : "d-none"}`}>
+          <button
+            type="button" 
+            className={`btn btn-danger w-100 d-flex align-items-center justify-content-center`}
+            onClick={() =>navigate(`/organizer/event/edit/${evendId}`)}
+          >
+            編輯資訊 <BsPencilSquare size={20}  className={`ms-2`}/>
+          </button>
+        </div>
+        <div className={`col-6 col-sm-4 pe-2 mx-auto ${eventStatusIdx == 1 ? "d-block" : "d-none"}`}>
+            <button
+              type="button"
+              className={`btn  w-100 btn-danger d-flex align-items-center justify-content-center`}
+              onClick={() => scanEvent()}
+            >
+              驗票 <BsQrCodeScan size={20}  className={`ms-2`}/>
+            </button>
+        </div>
+      </div>
+      
       
 
       {(!loading && apiLoading ) && (<Loading></Loading>)}
