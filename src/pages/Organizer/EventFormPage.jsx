@@ -177,7 +177,8 @@ const EventFormPage = () => {
     formState: { errors },
     control,
     watch,
-    reset, // 用於將 API 資料填入表單
+    reset,
+    getValues,
   } = useForm({
     // 加上 defaultValues 物件，並列出所有需要驗證的欄位
     defaultValues: {
@@ -197,7 +198,48 @@ const EventFormPage = () => {
       eventCoverImage: null,
       venueMapImage: null,
     },
+    mode: "onTouched",
   });
+  
+  // --- 監控所有日期欄位的變化，以便動態更新 UI ---
+  const performanceStartDate = watch("performanceStartDate");
+  const ticketSalesStartDate = watch("ticketSalesStartDate");
+
+  // --- 驗證邏輯函式 ---
+  const validateDates = () => {
+    const {
+      performanceStartDate,
+      performanceStartTime,
+      performanceEndDate,
+      performanceEndTime,
+      ticketSalesStartDate,
+      ticketSalesStartTime,
+      ticketSalesEndDate,
+      ticketSalesEndTime,
+    } = getValues();
+
+    const getCombinedDate = (date, time) => {
+      if (!date || !time) return null;
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes());
+    };
+
+    const now = new Date();
+    // 將 now 的秒和毫秒設為 0，以便和選擇器的時間（只有時/分）精確比較
+    now.setSeconds(0, 0);
+
+    const pStart = getCombinedDate(performanceStartDate, performanceStartTime);
+    const pEnd = getCombinedDate(performanceEndDate, performanceEndTime);
+    const tStart = getCombinedDate(ticketSalesStartDate, ticketSalesStartTime);
+    const tEnd = getCombinedDate(ticketSalesEndDate, ticketSalesEndTime);
+
+    if (pStart && pStart < now) return "演出開始時間不能早於現在";
+    if (tStart && tStart < now) return "售票開始時間不能早於現在";
+    if (pStart && pEnd && pEnd < pStart) return "演出結束時間不能早於演出開始時間";
+    if (tStart && tEnd && tEnd < tStart) return "售票結束時間不能早於售票開始時間";
+    if (tEnd && pStart && tEnd > pStart) return "售票結束時間不能晚於演出開始時間";
+
+    return true; // 所有驗證通過
+  };
 
   const [locationData] = useState([
     "請選擇城市",
@@ -332,7 +374,7 @@ const EventFormPage = () => {
           setApiLoading(false);
         }
       };
-    fetchEventData();
+      fetchEventData();
     }
   }, [isEditMode, eventId, userToken, navigate, reset, locationData, eventTypesOri]);
 
@@ -520,7 +562,6 @@ const EventFormPage = () => {
     }
   };
 
-
   if (apiLoading) {
     return <Loading />;
   }
@@ -686,12 +727,15 @@ const EventFormPage = () => {
                       <Controller
                         name="performanceStartDate"
                         control={control}
-                        rules={{ required: "請選擇開始日期" }}
+                        rules={{ required: "請選擇開始日期", validate: validateDates }}
                         render={({ field }) => (
                           <DatePicker
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
+                            {...field}
                             selected={field.value}
+                            minDate={new Date()}
+                            onChange={(date) => {
+                              field.onChange(date);
+                            }}
                             className={`form-control ${errors.performanceStartDate ? "is-invalid" : ""}`}
                             dateFormat="yyyy-MM-dd (eee)"
                             placeholderText="年 / 月 / 日"
@@ -705,24 +749,34 @@ const EventFormPage = () => {
                       <Controller
                         name="performanceStartTime"
                         control={control}
-                        rules={{ required: "請選擇開始時間" }}
-                        render={({ field }) => (
-                          <DatePicker
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            selected={field.value}
-                            showTimeSelect
-                            showTimeSelectOnly
-                            timeIntervals={30}
-                            timeCaption="時間"
-                            dateFormat="HH:mm"
-                            timeFormat="HH:mm"
-                            className={`form-control ${errors.performanceStartTime ? "is-invalid" : ""}`}
-                            placeholderText="時 : 分"
-                            isClearable
-                            locale="zh-TW"
-                          />
-                        )}
+                        rules={{ required: "請選擇開始時間", validate: validateDates }}
+                        render={({ field }) => {
+                          const isToday =
+                            performanceStartDate &&
+                            new Date(performanceStartDate).toDateString() === new Date().toDateString();
+                          return (
+                            <DatePicker
+                              {...field}
+                              selected={field.value}
+                              minTime={isToday ? new Date() : null}
+                              maxTime={isToday ? new Date(new Date().setHours(23, 59)) : null}
+                              onChange={(date) => {
+                                field.onChange(date);
+                              }}
+                              onBlur={field.onBlur}
+                              showTimeSelect
+                              showTimeSelectOnly
+                              timeIntervals={30}
+                              timeCaption="時間"
+                              dateFormat="HH:mm"
+                              timeFormat="HH:mm"
+                              className={`form-control ${errors.performanceStartTime ? "is-invalid" : ""}`}
+                              placeholderText="時 : 分"
+                              isClearable
+                              locale="zh-TW"
+                            />
+                          );
+                        }}
                       />
                     </div>
                   </div>
@@ -743,12 +797,16 @@ const EventFormPage = () => {
                       <Controller
                         name="performanceEndDate"
                         control={control}
-                        rules={{ required: "請選擇結束日期" }}
+                        rules={{ required: "請選擇結束日期", validate: validateDates }}
                         render={({ field }) => (
                           <DatePicker
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
+                            {...field}
                             selected={field.value}
+                            minDate={performanceStartDate || new Date()}
+                            onChange={(date) => {
+                              field.onChange(date);
+                            }}
+                            onBlur={field.onBlur}
                             className={`form-control ${errors.performanceEndDate ? "is-invalid" : ""}`}
                             dateFormat="yyyy-MM-dd (eee)"
                             placeholderText="年 / 月 / 日"
@@ -762,12 +820,15 @@ const EventFormPage = () => {
                       <Controller
                         name="performanceEndTime"
                         control={control}
-                        rules={{ required: "請選擇結束時間" }}
+                        rules={{ required: "請選擇結束時間", validate: validateDates }}
                         render={({ field }) => (
                           <DatePicker
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
+                            {...field}
                             selected={field.value}
+                            onChange={(date) => {
+                              field.onChange(date);
+                            }}
+                            onBlur={field.onBlur}
                             showTimeSelect
                             showTimeSelectOnly
                             timeIntervals={30}
@@ -801,12 +862,17 @@ const EventFormPage = () => {
                       <Controller
                         name="ticketSalesStartDate"
                         control={control}
-                        rules={{ required: "請選擇售票日期" }}
+                        rules={{ required: "請選擇售票日期", validate: validateDates }}
                         render={({ field }) => (
                           <DatePicker
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
+                            {...field}
                             selected={field.value}
+                            minDate={new Date()}
+                            maxDate={performanceStartDate || null}
+                            onChange={(date) => {
+                              field.onChange(date);
+                            }}
+                            onBlur={field.onBlur}
                             className={`form-control ${errors.ticketSalesStartDate ? "is-invalid" : ""}`}
                             dateFormat="yyyy-MM-dd (eee)"
                             placeholderText="年 / 月 / 日"
@@ -820,24 +886,34 @@ const EventFormPage = () => {
                       <Controller
                         name="ticketSalesStartTime"
                         control={control}
-                        rules={{ required: "請選擇售票時間" }}
-                        render={({ field }) => (
-                          <DatePicker
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            selected={field.value}
-                            showTimeSelect
-                            showTimeSelectOnly
-                            timeIntervals={30}
-                            timeCaption="時間"
-                            dateFormat="HH:mm"
-                            timeFormat="HH:mm"
-                            className={`form-control ${errors.ticketSalesStartTime ? "is-invalid" : ""}`}
-                            placeholderText="時 : 分"
-                            isClearable
-                            locale="zh-TW"
-                          />
-                        )}
+                        rules={{ required: "請選擇售票時間", validate: validateDates }}
+                        render={({ field }) => {
+                          const isToday =
+                            ticketSalesStartDate &&
+                            new Date(ticketSalesStartDate).toDateString() === new Date().toDateString();
+                          return (
+                            <DatePicker
+                              {...field}
+                              selected={field.value}
+                              minTime={isToday ? new Date() : null}
+                              maxTime={isToday ? new Date(new Date().setHours(23, 59)) : null}
+                              onChange={(date) => {
+                                field.onChange(date);
+                              }}
+                              onBlur={field.onBlur}
+                              showTimeSelect
+                              showTimeSelectOnly
+                              timeIntervals={30}
+                              timeCaption="時間"
+                              dateFormat="HH:mm"
+                              timeFormat="HH:mm"
+                              className={`form-control ${errors.ticketSalesStartTime ? "is-invalid" : ""}`}
+                              placeholderText="時 : 分"
+                              isClearable
+                              locale="zh-TW"
+                            />
+                          );
+                        }}
                       />
                     </div>
                   </div>
@@ -857,12 +933,17 @@ const EventFormPage = () => {
                       <Controller
                         name="ticketSalesEndDate"
                         control={control}
-                        rules={{ required: "請選擇截止日期" }}
+                        rules={{ required: "請選擇截止日期", validate: validateDates }}
                         render={({ field }) => (
                           <DatePicker
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
+                            {...field}
                             selected={field.value}
+                            minDate={ticketSalesStartDate || new Date()}
+                            maxDate={performanceStartDate || null}
+                            onChange={(date) => {
+                              field.onChange(date);
+                            }}
+                            onBlur={field.onBlur}
                             className={`form-control ${errors.ticketSalesEndDate ? "is-invalid" : ""}`}
                             dateFormat="yyyy-MM-dd (eee)"
                             placeholderText="年 / 月 / 日"
@@ -876,12 +957,15 @@ const EventFormPage = () => {
                       <Controller
                         name="ticketSalesEndTime"
                         control={control}
-                        rules={{ required: "請選擇截止時間" }}
+                        rules={{ required: "請選擇截止時間", validate: validateDates }}
                         render={({ field }) => (
                           <DatePicker
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
+                            {...field}
                             selected={field.value}
+                            onChange={(date) => {
+                              field.onChange(date);
+                            }}
+                            onBlur={field.onBlur}
                             showTimeSelect
                             showTimeSelectOnly
                             timeIntervals={30}
@@ -910,9 +994,7 @@ const EventFormPage = () => {
                   <label className="text-muted form-label">
                     場地圖 <span className="text-danger">*</span>
                   </label>
-                  <small className="text-muted d-block mb-2">
-                    請上傳圖片（JPG 或 PNG 格式），檔案大小需低於 5MB。
-                  </small>
+                  <small className="text-muted d-block mb-2">請上傳圖片（JPG 或 PNG 格式），檔案大小需低於 5MB。</small>
                   <Controller
                     name="venueMapImage"
                     control={control}
