@@ -2,13 +2,16 @@ import { useEffect, useState, useRef, PureComponent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from '../../contexts/AuthContext';
 import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadialBarChart, RadialBar, Legend } from 'recharts';
+import Swal from 'sweetalert2';
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
 import axios from 'axios';
+
 import Breadcrumb from "../../conponents/Breadcrumb";
 
 function EventRevenue() {
     const { id } = useParams();
+    const navigate = useNavigate();
     const { loading, userToken } = useAuth();
     const isFirstRender = useRef(true);
     const [apiLoading, setApiLoading] = useState(false);
@@ -49,11 +52,16 @@ function EventRevenue() {
 
                 setEvent(eventRes.data.data || []);
                 setEventRevenue(revenueRes.data.data || []);
-                console.log('API 回傳資料:', eventRes.data.data)
+                // console.log('API 回傳資料:', eventRes.data.data)
             } catch (err) {
-                setApiLoading(false);
-                console.error('取得資料失敗', err);
-                navigate('/ErrorPage');
+                // console.error('取得資料失敗', err);
+                Swal.fire({
+                    icon: "error",
+                    title: '錯誤',
+                    text: "無法取得活動資訊，請稍後再試",
+                }).then(() => {
+                    navigate(`/eventsList`);
+                });
             }
         };
         if (isFirstRender.current) {
@@ -125,7 +133,7 @@ function EventRevenue() {
         ];
 
         return (
-            <div className="m-auto d-flex flex-column flex-lg-row align-items-center">
+            <div className="m-auto d-flex flex-column align-items-center">
                 <div style={{ width: 200, height: 200 }}>
                     <ResponsiveContainer width="100%" height="100%">
                         <RadialBarChart

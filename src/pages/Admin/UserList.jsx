@@ -52,8 +52,12 @@ function UserManagementList() {
                 setCurrentPage(1);
             } catch (err) {
                 setApiLoading(false)
-                console.error('取得使用者失敗', err)
-                navigate('/ErrorPage')
+                // console.error('取得使用者失敗', err)
+                Swal.fire({
+                icon: 'error',
+                title: '操作失敗',
+                text: err.response?.data?.message || '請稍後再試',
+            });
             }
         }
 
@@ -104,7 +108,7 @@ function UserManagementList() {
                 showConfirmButton: false,
             });
         } catch (err) {
-            console.error('切換使用者狀態失敗', err.response?.data || err.message);
+            // console.error('切換使用者狀態失敗', err.response?.data || err.message);
             Swal.fire({
                 icon: 'error',
                 title: '操作失敗',
