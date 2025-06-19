@@ -67,8 +67,14 @@ function Payments() {
                     setEvent(res.data.data || {});
                 }
             } catch (err) {
-                console.error('取得活動失敗', err);
-                navigate('/ErrorPage');
+                // console.error('取得活動失敗', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: '錯誤',
+                    text: '無法取得活動資訊，請稍後再試',
+                }).then(() => {
+                    navigate('/allEvents');
+                })
             }
         };
 

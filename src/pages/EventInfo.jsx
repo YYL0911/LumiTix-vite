@@ -77,12 +77,18 @@ function EventInfo() {
 
         if (res.data.status) {
           setEvent(res.data.data || []);
-          console.log('API 回傳資料:', res.data.data);
+          // console.log('API 回傳資料:', res.data.data);
         }
       } catch (err) {
         setApiLoading(false);
         // console.error('取得活動失敗', err);
-        navigate('/ErrorPage');
+        Swal.fire({
+          icon: 'error',
+          title: '錯誤',
+          text: '無法取得活動資訊，請稍後再試',
+        }).then(() => {
+          navigate('/allEvents');
+        })
       }
     };
 
