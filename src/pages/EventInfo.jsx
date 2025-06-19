@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import Swal from 'sweetalert2';
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
+import duration from 'dayjs/plugin/duration';
 import axios from 'axios'
 
 // 元件
@@ -14,12 +15,16 @@ function EventInfo() {
   const { id } = useParams();
   const navigate = useNavigate();
   dayjs.extend(utc);
+  dayjs.extend(duration);
 
   const { userToken, userRole } = useAuth();
 
   const isFirstRender = useRef(true);
   const [apiLoading, setApiLoading] = useState(false);
   const [event, setEvent] = useState({})
+  const [saleStatus, setSaleStatus] = useState("countdown");
+  const [timeLeft, setTimeLeft] = useState(null);
+  const timeRef = useRef(null);
 
   // 麵包屑
   const breadcrumb = [
@@ -136,74 +141,66 @@ function EventInfo() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [activeTab, sections]);
 
-  // 顯示時間倒數及按鈕狀態變化
-  const [saleStatus, setSaleStatus] = useState("countdown");
+  // 格式化剩餘時間
+  function formatTime(ms) {
+    const dd = dayjs.duration(ms);
 
-  const CountdownTimer = ({ startTime, endTime, onStatusChange }) => {
-    const [status, setStatus] = useState("countdown");
-    const [timeLeft, setTimeLeft] = useState(null);
-
-    // 格式化剩餘時間
-    function formatTime(ms) {
-      return {
-        days: Math.floor(ms / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((ms / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((ms / (1000 * 60)) % 60),
-        seconds: Math.floor((ms / 1000) % 60),
-      };
-    }
-
-    function calculateStatusAndTime() {
-      const now = new Date().getTime();
-      const start = new Date(startTime).getTime();
-      const end = new Date(endTime).getTime();
-
-      if (now < start) {
-        return { newStatus: "countdown", time: formatTime(start - now) };
-      } else if (now >= start && now <= end) {
-        if (event.Section?.remainingSeats === 0) {
-          return { newStatus: "ended" }
-        }
-        return { newStatus: "active", time: formatTime(end - now) };
-      } else {
-        return { newStatus: "ended", time: null };
-      }
-    }
-
-    useEffect(() => {
-      const timer = setInterval(() => {
-        const { newStatus, time } = calculateStatusAndTime();
-
-        setStatus(newStatus);
-        onStatusChange && onStatusChange(newStatus);
-        setTimeLeft(time);
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }, [startTime, endTime, status, onStatusChange]);
-
-    const renderStatusText = () => {
-      if (status === "countdown") return "距離開賣";
-      if (status === "active") return "距離截止";
-      return "已結束";
+    return {
+      days: dd.days(),
+      hours: dd.hours(),
+      minutes: dd.minutes(),
+      seconds: dd.seconds(),
     };
+  }
 
-    return (
-      <div className="px-3 py-2 bg-Primary-50">
-        <div className="d-flex justify-content-between fw-bold">
-          <p className="text-Primary-900">{renderStatusText()}</p>
-          {(status === "countdown" || status === "active") && timeLeft && (
-            <div className="d-flex gap-2 text-Primary-700 fw-bold">
-              <p>{String(timeLeft.days).padStart(2, "0")} 天</p>
-              <p>{String(timeLeft.hours).padStart(2, "0")} 時</p>
-              <p>{String(timeLeft.minutes).padStart(2, "0")} 分</p>
-              <p>{String(timeLeft.seconds).padStart(2, "0")} 秒</p>
-            </div>
-          )}
-        </div>
+  // 倒數計時器邏輯
+  useEffect(() => {
+    if (!event.sale_start_at || !event.sale_end_at) return;
+
+    if (timeRef.current) clearInterval(timeRef.current);
+
+    timeRef.current = setInterval(() => {
+      const now = dayjs();
+      const start = dayjs.utc(event.sale_start_at).local();
+      const end = dayjs.utc(event.sale_end_at).subtract(8, 'hour').local();
+
+      let status = "ended";
+      let time = null;
+
+      if (now.isBefore(start)) {
+        status = "countdown";
+        time = formatTime(start.diff(now));
+      } else if (now.isBefore(end)) {
+        status = "active";
+        time = formatTime(end.diff(now));
+      }
+
+      setSaleStatus(status);
+      setTimeLeft(time);
+    }, 1000);
+
+    return () => clearInterval(timeRef.current);
+  }, [event]);
+
+  // 倒數計時元件
+  const CountdownTimer = () => (
+    <div className="px-3 py-2 bg-Primary-50">
+      <div className="d-flex justify-content-between fw-bold">
+        <p className="text-Primary-900">
+          {saleStatus === "countdown" ? "距離開賣" :
+            saleStatus === "active" ? "距離截止" : "已結束"}
+        </p>
+        {(saleStatus === "countdown" || saleStatus === "active") && timeLeft && (
+          <div className="d-flex gap-2 text-Primary-700 fw-bold">
+            <p>{String(timeLeft.days).padStart(2, "0")} 天</p>
+            <p>{String(timeLeft.hours).padStart(2, "0")} 時</p>
+            <p>{String(timeLeft.minutes).padStart(2, "0")} 分</p>
+            <p>{String(timeLeft.seconds).padStart(2, "0")} 秒</p>
+          </div>
+        )}
       </div>
-    );
-  };
+    </div>
+  );
 
   // 轉換UTC時間(演出日期)
   function showTimeStartToEnd(start, end) {
@@ -293,11 +290,7 @@ function EventInfo() {
           </div>
 
           <div className="col w-100">
-            <CountdownTimer
-              startTime={event.sale_start_at}
-              endTime={event.sale_end_at}
-              onStatusChange={setSaleStatus}
-            />
+            <CountdownTimer />
 
             {event.Section?.map((section, index) => {
               const isSoldOut = section.remainingSeats === 0;
