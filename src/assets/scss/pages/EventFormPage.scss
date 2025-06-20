@@ -117,3 +117,8 @@
   background-color: #fd7e14; // 您想要的背景色
   opacity: 0.4;
 }
+// 針對有 .is-invalid class 的 .form-control
+.form-control.is-invalid, .was-validated .form-control:invalid {
+  background-image: none !important; // 移除背景圖示
+  padding-right: 0.75rem !important;  // 將右邊的內距恢復正常，避免 X 按鈕偏移
+}
