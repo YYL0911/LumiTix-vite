@@ -52,7 +52,8 @@ function EventRevenue() {
 
                 setEvent(eventRes.data.data || []);
                 setEventRevenue(revenueRes.data.data || []);
-                // console.log('API 回傳資料:', eventRes.data.data)
+                // console.log('API eventRes 回傳資料:', eventRes.data.data)
+                // console.log('API revenueRes 回傳資料:', revenueRes.data.data)
             } catch (err) {
                 // console.error('取得資料失敗', err);
                 Swal.fire({
@@ -76,7 +77,7 @@ function EventRevenue() {
         const res = eventRevenue.sections.flatMap(section =>
             section.orders.map(order => ({
                 section: section.section_name,
-                created_at: dayjs(order.created_at).format("MM-DD"),
+                created_at: dayjs(order.created_at.replace('Z', '')).format("YYYY-MM-DD HH:mm"),
                 quantity: order.quantity
             }))
         );
@@ -233,34 +234,40 @@ function EventRevenue() {
 
     // 票券銷售圖表
     const TicketSalesChart = ({ event, allOrders, colors }) => {
-        // 產生日期區間
-        function getDateRange(startDay, endDay) {
-            const range = [];
-            let curr = dayjs(startDay);
-            const last = dayjs(endDay);
 
-            while (curr.isBefore(last) || curr.isSame(last)) {
+        const saleStart = dayjs((event.sale_start_at || "").replace('Z', ''));
+        const saleEnd = dayjs((event.sale_end_at || "").replace('Z', ''));
+
+        // 建立日期區間
+        function getDateRange(start, end) {
+            const range = [];
+            let curr = start.startOf('day');
+            while (curr.isBefore(end) || curr.isSame(end, 'day')) {
                 range.push(curr.format("MM-DD"));
                 curr = curr.add(1, 'day');
             }
             return range;
         }
-        const dateRange = getDateRange(event.sale_start_at, event.sale_end_at);
+        const dateRange = getDateRange(saleStart, saleEnd);
 
         // 取得活動所有票區
         const sections = event.sections?.map(s => s.section_name) || [];
-        // 建立票區:{日期:銷售數量}
         const sectionDailyData = {};
-        sections.forEach(section => sectionDailyData[section] = {});
+        sections.forEach(section => {
+            sectionDailyData[section] = {};
+            dateRange.forEach(date => {
+                sectionDailyData[section][date] = 0;
+            });
+        });
+
         // 累積各票區每日總銷售數量
         allOrders.forEach(order => {
             const createdDate = dayjs(order.created_at).format("MM-DD");
             const section = order.section;
 
-            if (!sectionDailyData[section][createdDate]) {
-                sectionDailyData[section][createdDate] = 0;
+            if (sectionDailyData[section] && sectionDailyData[section][createdDate] != null) {
+                sectionDailyData[section][createdDate] += order.quantity
             }
-            sectionDailyData[section][createdDate] += order.quantity;
         });
         // 組成圖表所需陣列資料
         const chartData = dateRange.map(date => {
@@ -270,6 +277,7 @@ function EventRevenue() {
             });
             return dataPoint;
         });
+
         // 累積銷售數
         sections.forEach(section => {
             let cumulative = 0;
@@ -278,7 +286,7 @@ function EventRevenue() {
                 point[`${section}_cumulative`] = cumulative;
             });
         });
-        // 總票券數量
+
         const MaxQuantity = event.sections?.reduce((acc, section) => acc + section.quantity, 0) || 0;
         const Style = {
             top: '50%',
@@ -334,7 +342,7 @@ function EventRevenue() {
                 </div>
             </div>
         );
-    }
+    };
 
     return (
         <>
