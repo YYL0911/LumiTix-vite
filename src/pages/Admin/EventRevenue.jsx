@@ -160,7 +160,7 @@ function EventRevenue() {
                         fontWeight: 'bold',
                         fontSize: '14px'
                     }}>
-                        總售票率<br />{Math.round(percent)}%
+                        總售票率<br />{percent.toFixed(2)}%
                     </div>
                 </div>
 
@@ -219,7 +219,7 @@ function EventRevenue() {
                         fontWeight: 'bold',
                         fontSize: '14px'
                     }}>
-                        {section.section_name}區售票率<br />{Math.round(percent)}%
+                        {section.section_name}區售票率<br />{percent.toFixed(2)}%
                     </div>
                 </div>
 
