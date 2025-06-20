@@ -53,7 +53,7 @@ const DataTable = memo(({filterProducts, handleNavigate}) => {
                         <p className=" m-0 ms-1 align-self-end" >{product.location}</p>
                       </div>
 
-                      {product.sale_status != "待審核" && <p className=" m-0 mt-2" >售票率：{product.sale_rate*100}%</p>}
+                      {product.sale_status != "待審核" && <p className=" m-0 mt-2" >售票率：{Math.round(product.sale_rate * 10000) / 100}%</p>}
                       
                     </div>
                     
