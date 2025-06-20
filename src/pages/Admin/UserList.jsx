@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { useAuth } from '../../contexts/AuthContext';
 import Swal from 'sweetalert2';
 import axios from 'axios'
@@ -13,6 +13,16 @@ function UserManagementList() {
     const [apiLoading, setApiLoading] = useState(false);
     const [users, setUsers] = useState([])
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const initialSearch = searchParams.get("search") || "";
+    const initialPage = parseInt(searchParams.get("page")) || 1;
+
+    const [currentPage, setCurrentPage] = useState(initialPage);
+    const [pagedUsers, setPagedUsers] = useState([]);
+    const [totalPages, setTotalPages] = useState(Math.ceil(users.length / 10));
+    const [searchTerm, setSearchTerm] = useState(initialSearch);
+    const [tempSearchTerm, setTempSearchTerm] = useState(initialSearch);
 
     // 麵包屑
     const breadcrumb = [
@@ -21,10 +31,6 @@ function UserManagementList() {
     ];
 
     // 列表分頁
-    const [pagedUsers, setPagedUsers] = useState([]);
-    const [totalPages, setTotalPages] = useState(Math.ceil(users.length / 10));
-    const [currentPage, setCurrentPage] = useState(1);
-
     useEffect(() => {
         const pageSize = 10;
         const startIndex = (currentPage - 1) * pageSize;
@@ -54,10 +60,10 @@ function UserManagementList() {
                 setApiLoading(false)
                 // console.error('取得使用者失敗', err)
                 Swal.fire({
-                icon: 'error',
-                title: '操作失敗',
-                text: err.response?.data?.message || '請稍後再試',
-            });
+                    icon: 'error',
+                    title: '操作失敗',
+                    text: err.response?.data?.message || '請稍後再試',
+                });
             }
         }
 
@@ -71,13 +77,13 @@ function UserManagementList() {
     const changeUserState = async (id, name, isBlocked) => {
         const action = isBlocked ? '取消封鎖' : '封鎖';
         const confirmResult = await Swal.fire({
-          title: `確定要${action} 使用者 ${name}嗎？`,
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#6c757d',
-          confirmButtonText: `是的，${action}`,
-          cancelButtonText: '取消',
+            title: `確定要${action} 使用者 ${name}嗎？`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: `是的，${action}`,
+            cancelButtonText: '取消',
         });
 
         if (!confirmResult.isConfirmed) return;
@@ -118,12 +124,10 @@ function UserManagementList() {
     };
 
     // 收尋會員
-    const [searchTerm, setSearchTerm] = useState('');
-    const [tempSearchTerm, setTempSearchTerm] = useState('');
-
     const handleSearch = () => {
-        setCurrentPage(1);
         setSearchTerm(tempSearchTerm);
+        setSearchParams({ search: tempSearchTerm, page: 1 });
+        setCurrentPage(1);
     };
 
     useEffect(() => {
@@ -184,6 +188,7 @@ function UserManagementList() {
                                     setTempSearchTerm("");
                                     setSearchTerm("");
                                     setCurrentPage(1);
+                                    setSearchParams({});
                                 }}
                             >
                                 取消搜尋
@@ -260,7 +265,10 @@ function UserManagementList() {
                         <PaginationComponent
                             totalPages={totalPages}
                             currentPage={currentPage}
-                            onPageChange={(page) => setCurrentPage(page)}
+                            onPageChange={(page) => {
+                                setCurrentPage(page);
+                                setSearchParams({ search: searchTerm, page });
+                            }}
                         />
                     </div>
                 </div>
