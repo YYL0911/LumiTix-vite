@@ -4,8 +4,6 @@ import { useAuth } from '../contexts/AuthContext';
 import Swal from 'sweetalert2';
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
-import duration from 'dayjs/plugin/duration';
-import timezone from 'dayjs/plugin/timezone';
 import axios from 'axios'
 
 // 元件
@@ -17,7 +15,6 @@ function EventInfo() {
   const navigate = useNavigate();
   dayjs.extend(utc);
   dayjs.extend(duration);
-  dayjs.extend(timezone);
 
   const { userToken, userRole } = useAuth();
 
