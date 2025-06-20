@@ -125,7 +125,7 @@ const EventDetail = () => {
           </div>
           <div className="d-flex mb-3">
             <div className="fw-semibold text-nowrap">售票結束：</div>
-            <div className=" flex-grow-1 ms-2">{eventInfo.sale_end_at?.substring(0,10)} {eventInfo.sale_start_at?.substring(11,16)}</div>
+            <div className=" flex-grow-1 ms-2">{eventInfo.sale_end_at?.substring(0,10)} {eventInfo.sale_end_at?.substring(11,16)}</div>
           </div>
           <div className="d-flex mb-3">
             <div className="fw-semibold text-nowrap">表演人員：</div>
