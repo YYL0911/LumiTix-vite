@@ -167,8 +167,8 @@ function EventInfo() {
     if (timeRef.current) clearInterval(timeRef.current);
 
     timeRef.current = setInterval(() => {
-      const now = dayjs(); // 使用本地時間
-      const start = dayjs(event.sale_start_at.replace('Z', '')); // 不換時區
+      const now = dayjs();
+      const start = dayjs(event.sale_start_at.replace('Z', ''));
       const end = dayjs(event.sale_end_at.replace('Z', ''));
 
       let status = "ended";
