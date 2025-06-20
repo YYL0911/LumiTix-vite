@@ -1,13 +1,15 @@
 # LumiTix 售票系統
 LumiTix 是一個基於 Vite 構建的輕量級前端票務管理應用，旨在幫助活動主辦方便捷地管理票務系統，包括創建、分發、查詢和追蹤門票。這個專案使用現代化的 Web 技術供快速、流暢的體驗。
-使用 React + TypeScript + Vite 打造，搭配 Bootstrap 美化介面。
+使用 React + Vite 打造，搭配 Bootstrap 美化介面。
 
 ## 目錄
 - 簡介
+- 快速連結
 - 功能
 - 安裝與設置
 - 專案技術
 - 資料夾說明
+- 聯絡資訊
 
 ## 簡介
 > 本專案使用了 Vite 以及 React 作為構建工具，並且支持現代化的 JavaScript 和 CSS 特性。
@@ -15,9 +17,19 @@ LumiTix 是一個基於 Vite 構建的輕量級前端票務管理應用，旨在
 我們希望為台灣的藝文活動提供更加便捷、安全和高效的票務服務。
 作品願景為成為連結藝文活動與觀眾的橋樑，為活動主辦方提供強大的票務工具，為觀眾提供優質的購票體驗，最終促進台灣藝文活動的繁榮發展。
 
+## 快速連結
+- 網站前台：https://yyl0911.github.io/LumiTix-vite/
+- 後端gitHub repo：https://github.com/bingss/N7_Backend
+- Api路徑：https://n7-backend.onrender.com/
+
+
 ## 功能
 > 你可以在本地環境中運行專案，並進行測試。
 ### 使用者
+```bash
+帳號：test1@gmail.com
+密碼：Abc123456
+```
 -  **註冊帳號並登入**：可使用Google或帳號密碼進行註冊登入。
 -  **查看活動**：
    - 看當前活動的時間、地點等信息。
@@ -31,6 +43,10 @@ LumiTix 是一個基於 Vite 構建的輕量級前端票務管理應用，旨在
    - 綁定第三方平台
 
 ### 活動方
+```bash
+帳號：organizer@gmail.com
+密碼：Abcd1234
+```
 -  **活動票券銷售**：
    - 查看當前活動的銷售信息。
    - 根據地點、時間、活動類型以及關鍵字來搜尋想要的活動。
@@ -40,6 +56,10 @@ LumiTix 是一個基於 Vite 構建的輕量級前端票務管理應用，旨在
    - 票種與價格設定。
      
 ### 平台方
+```bash
+帳號：admin@gmail.com
+密碼：Abcd1234
+```
 -  **管理使用者帳號**：
    - 可使封鎖有疑慮或不法之帳號。
    - 查看會員購票詳細資訊
@@ -78,7 +98,6 @@ npm run build
 此命令會將應用打包為生產環境的靜態資源。
 
 
-
 ## 專案技術
 - Node.js v16.15.0
 - Vite v5.4.0
@@ -95,3 +114,11 @@ npm run build
   - context - 共用context
   - pages - 頁面
   - App.jsx - 管理頁面導向
+ 
+## 聯絡資訊
+> 以下為製作團隊GitHub
+- YYL：https://github.com/YYL0911
+- sain：https://github.com/bingss
+- Carson：https://github.com/Carson0220
+- LKP：https://github.com/LKP0617
+- Mos：https://github.com/mos25399
