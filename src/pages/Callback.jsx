@@ -73,7 +73,8 @@ function Callback() {
 
             const paramToken = searchParams.get("token");
             const paramName = searchParams.get("name");
-            login("General", paramName, paramToken)
+            const paramRole = searchParams.get("role");
+            login(paramRole, paramName, paramToken)
             localStorage.removeItem('googleInfo');
             navigate("/")
           }
