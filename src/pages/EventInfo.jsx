@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
 import duration from 'dayjs/plugin/duration';
+import timezone from 'dayjs/plugin/timezone';
 import axios from 'axios'
 
 // 元件
@@ -16,6 +17,7 @@ function EventInfo() {
   const navigate = useNavigate();
   dayjs.extend(utc);
   dayjs.extend(duration);
+  dayjs.extend(timezone);
 
   const { userToken, userRole } = useAuth();
 
@@ -149,14 +151,13 @@ function EventInfo() {
 
   // 格式化剩餘時間
   function formatTime(ms) {
-    const dd = dayjs.duration(ms);
+    const totalSeconds = Math.floor(ms / 1000);
+    const days = Math.floor(totalSeconds / (60 * 60 * 24));
+    const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
+    const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+    const seconds = totalSeconds % 60;
 
-    return {
-      days: dd.days(),
-      hours: dd.hours(),
-      minutes: dd.minutes(),
-      seconds: dd.seconds(),
-    };
+    return { days, hours, minutes, seconds };
   }
 
   // 倒數計時器邏輯
@@ -166,9 +167,9 @@ function EventInfo() {
     if (timeRef.current) clearInterval(timeRef.current);
 
     timeRef.current = setInterval(() => {
-      const now = dayjs();
-      const start = dayjs.utc(event.sale_start_at).local();
-      const end = dayjs.utc(event.sale_end_at).subtract(8, 'hour').local();
+      const now = dayjs(); // 使用本地時間
+      const start = dayjs(event.sale_start_at.replace('Z', '')); // 不換時區
+      const end = dayjs(event.sale_end_at.replace('Z', ''));
 
       let status = "ended";
       let time = null;
