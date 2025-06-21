@@ -1,0 +1,12 @@
+.truncate-text {
+  // 這三行是截斷文字的核心
+  white-space: nowrap;      // 強制文字不換行
+  overflow: hidden;         // 隱藏超出範圍的文字
+  text-overflow: ellipsis;  // 在結尾顯示刪節號 (...)
+
+  // 您可以根據您的版面設定一個最大寬度
+  // 例如，在表格中，我們不希望它超過 300px
+  max-width: 300px; 
+  display: inline-block; // 讓 max-width 生效
+  vertical-align: middle; // 確保文字垂直置中
+}
