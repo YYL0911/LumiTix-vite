@@ -279,7 +279,7 @@ const EventFormPage = () => {
     // 狀況一：進入「新增模式」
     // 如果 isEditMode 是 false，代表現在是 /new 的路徑
     if (!isEditMode) {
-      console.log("偵測到進入「新增模式」，正在清空表單...");
+      //console.log("偵測到進入「新增模式」，正在清空表單...");
       // 1. 重設 react-hook-form 的所有欄位
       reset({
         eventName: "",
@@ -476,30 +476,30 @@ const EventFormPage = () => {
       const uploadPromises = [];
       // 檢查是否有新的活動封面照
       if (data.eventCoverImage && data.eventCoverImage[0]) {
-        console.log("偵測到新的封面圖，準備上傳...");
+        //console.log("偵測到新的封面圖，準備上傳...");
         uploadPromises.push(
           // --- 在此傳入 'cover' ---
           uploadImage(data.eventCoverImage[0], "cover", userToken).then((url) => {
             coverImageUrl = url;
-            console.log("封面圖上傳成功，URL:", url);
+            //console.log("封面圖上傳成功，URL:", url);
           })
         );
       }
 
       // 檢查是否有新的場地圖
       if (data.venueMapImage && data.venueMapImage[0]) {
-        console.log("偵測到新的場地圖，準備上傳...");
+        //console.log("偵測到新的場地圖，準備上傳...");
         uploadPromises.push(
           // --- 在此傳入 'section' ---
           uploadImage(data.venueMapImage[0], "section", userToken).then((url) => {
             venueMapImageUrl = url;
-            console.log("場地圖上傳成功，URL:", url);
+            //console.log("場地圖上傳成功，URL:", url);
           })
         );
       }
       // 等待所有圖片上傳完成
       await Promise.all(uploadPromises);
-      console.log("所有圖片處理完畢。");
+      //console.log("所有圖片處理完畢。");
 
       // --- 步驟二：準備並提交主要的活動資料 (JSON) ---
       const apiData = {
