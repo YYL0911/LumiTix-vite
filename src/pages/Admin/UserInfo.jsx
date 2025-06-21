@@ -3,13 +3,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import axios from "axios";
 import Swal from "sweetalert2";
+import "../../assets/scss/pages/UserInfo.scss";
 // 元件
 import Breadcrumb from "../../conponents/Breadcrumb";
 import Loading from "../../conponents/Loading";
 import PaginationComponent from "../../conponents/Pagination";
 
 // 定義此頁面的麵包屑靜態結構
-const breadcrumb = [{ name: "首頁", path: "/" }, { name: "一般會員列表", path: "/userList" }, { name: "會員詳情" }];
+const breadcrumb = [{ name: "首頁", path: "/" }, { name: "一般會員管理", path: "/userList" }, { name: "會員詳情" }];
 
 const UserInfo = () => {
   const { userId } = useParams();
@@ -24,7 +25,7 @@ const UserInfo = () => {
   const [pagedOrders, setPagedOrders] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const ordersPerPage = 10; // 可以自行調整每頁顯示幾筆訂單
+  const ordersPerPage = 8; // 可以自行調整每頁顯示幾筆訂單
 
   // --- 新增處理分頁邏輯的 useEffect ---
   useEffect(() => {
@@ -166,48 +167,61 @@ const UserInfo = () => {
       </div>
 
       <h4 className="mt-5">購票紀錄</h4>
-      <div className="table-responsive">
-        <table className="table table-hover align-middle">
-          <thead className="table-light text-center">
-            <tr>
-              <th className="text-start">表演名稱</th>
-              <th>購買張數</th>
-              <th>購買總金額</th>
-              <th>已使用張數</th>
-            </tr>
-          </thead>
-          <tbody className="text-center">
-            {pagedOrders.length > 0 ? (
-              pagedOrders.map((order) => (
-                <tr key={order.order_id}>
-                  <td className="text-start">{order.event_title}</td>
-                  <td>{order.ticket_puchased}</td>
-                  <td className="text-end">{(order.total_price ?? 0).toLocaleString()}</td>
-                  <td className="text-end">{order.ticket_used}</td>
-                </tr>
-              ))
-            ) : (
+      <div className="d-flex flex-column" style={{ minHeight: "530px" }}>
+        <div className="table-responsive flex-grow-1">
+          <table className="table table-hover align-middle">
+            <thead className="table-light">
               <tr>
-                <td colSpan="4" className="text-center py-4">
-                  無購票紀錄
-                </td>
+                <th className="text-start" style={{ minWidth: "350px" }}>
+                  表演名稱
+                </th>
+                <th className="text-end" style={{ minWidth: "120px" }}>
+                  購買張數
+                </th>
+                <th className="text-end" style={{ minWidth: "150px" }}>
+                  購買總金額
+                </th>
+                <th className="text-end" style={{ minWidth: "120px" }}>
+                  已使用張數
+                </th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* --- 在表格下方加入分頁元件 --- */}
-      {totalPages > 1 && (
-        <div className="d-flex justify-content-center mt-4">
-          <PaginationComponent
-            totalPages={totalPages}
-            currentPage={currentPage}
-            onPageChange={(page) => setCurrentPage(page)}
-          />
+            </thead>
+            <tbody className="text-center">
+              {pagedOrders.length > 0 ? (
+                pagedOrders.map((order) => (
+                  <tr key={order.order_id}>
+                    <td className="text-start">
+                      <div className="truncate-text" title={order.event_title}>
+                        {order.event_title}
+                      </div>
+                    </td>
+                    <td className="text-end">{order.ticket_puchased}</td>
+                    <td className="text-end">{(order.total_price ?? 0).toLocaleString()}</td>
+                    <td className="text-end">{order.ticket_used}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="text-center py-4">
+                    無購票紀錄
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
 
+        {/* --- 在表格下方加入分頁元件 --- */}
+        {totalPages > 1 && (
+          <div className="d-flex justify-content-center mt-auto pt-3">
+            <PaginationComponent
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onPageChange={(page) => setCurrentPage(page)}
+            />
+          </div>
+        )}
+      </div>
       <div className="mt-5 d-flex justify-content-center gap-3">
         <button className="btn btn-primary px-4" onClick={() => navigate("/userList")}>
           返回
