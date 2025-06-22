@@ -86,9 +86,15 @@ function EventRevenue() {
 
     // 轉換UTC時間(演出日期)
     function showTimeStartToEnd(start, end) {
-        const startTime = dayjs.utc(start).format("YYYY-MM-DD HH:mm");
-        const endTime = dayjs.utc(end).format("HH:mm");
-        return `${startTime} ～ ${endTime}`;
+        if (dayjs.utc(start).format("YYYY-MM-DD") === dayjs.utc(end).format("YYYY-MM-DD")) {
+            const startTime = dayjs.utc(start).format("YYYY-MM-DD HH:mm");
+            const endTime = dayjs.utc(end).format("HH:mm");
+            return `${startTime} ～ ${endTime}`;
+        } else {
+            const startTime = dayjs.utc(start).format("YYYY-MM-DD HH:mm");
+            const endTime = dayjs.utc(end).format("YYYY-MM-DD HH:mm");
+            return `${startTime} ～ ${endTime}`;
+        }
     }
 
     // 轉換UTC時間(售票時間)
