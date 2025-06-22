@@ -204,7 +204,7 @@ function Payments() {
                     value="creditCard"
                     checked={paymentMethod === "creditCard"}
                     onChange={(e) => setPaymentMethod(e.target.value)}
-                    label="信用卡"
+                    label="WebATM"
                 />
                 {/* <PaymentOption
                     id="linePay"
