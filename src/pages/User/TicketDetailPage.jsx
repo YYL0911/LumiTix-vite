@@ -11,9 +11,11 @@ import Loading from "../../conponents/Loading";// 自訂組件，用於顯示載
 const formatDisplayTime = (dateString) => {
   if (!dateString) return "N/A";
   try {
-    // new Date() 可以直接解析後端回傳的 UTC 時間字串，並自動轉換為瀏覽器的本地時區
-    const date = new Date(dateString);
-    // 使用 (eeeee) 來顯示中文單字的星期，例如 (一), (二)
+    // 先檢查字串結尾是否有 'Z'，如果有就移除它
+    const cleanDateString = dateString.endsWith("Z") ? dateString.slice(0, -1) : dateString;
+    // 將處理過的字串傳給 new Date()，它會被當作本地時間解析
+    const date = new Date(cleanDateString);
+    // 使用 date-fns 進行格式化，並加入 (eeeee) 和中文語系
     return format(date, "yyyy-MM-dd (eeeee) HH:mm", { locale: zhTW });
   } catch (e) {
     console.error("日期格式化失敗:", dateString, e);
