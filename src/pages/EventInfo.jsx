@@ -209,9 +209,15 @@ function EventInfo() {
 
   // 轉換UTC時間(演出日期)
   function showTimeStartToEnd(start, end) {
-    const startTime = dayjs.utc(start).format("YYYY-MM-DD HH:mm");
-    const endTime = dayjs.utc(end).format("HH:mm");
-    return `${startTime} ～ ${endTime}`;
+    if (dayjs.utc(start).format("YYYY-MM-DD") === dayjs.utc(end).format("YYYY-MM-DD")) {
+      const startTime = dayjs.utc(start).format("YYYY-MM-DD HH:mm");
+      const endTime = dayjs.utc(end).format("HH:mm");
+      return `${startTime} ～ ${endTime}`;
+    } else {
+      const startTime = dayjs.utc(start).format("YYYY-MM-DD HH:mm");
+      const endTime = dayjs.utc(end).format("YYYY-MM-DD HH:mm");
+      return `${startTime} ～ ${endTime}`;
+    }
   }
 
   // 轉換UTC時間(售票時間)
@@ -230,26 +236,26 @@ function EventInfo() {
       <div className="border border-2 border-top-0 border-Neutral-700 px-lg-4 px-3 py-lg-6 py-4">
         <div className="d-flex flex-column gap-6">
           <div className="d-flex justify-content-between">
-            <p className="text-Neutral-700 me-3" style={{ minWidth : "70px" }}>演出日期</p>
+            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>演出日期</p>
             <p className="fw-bold">{showTimeStartToEnd(event.start_at, event.end_at)}</p>
           </div>
           <div className="d-flex justify-content-between">
-            <p className="text-Neutral-700 me-3" style={{ minWidth : "70px" }}>演出人員</p>
+            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>演出人員</p>
             <p className="fw-bold">{event.performance_group}</p>
           </div>
           <div className="d-flex justify-content-between">
-            <p className="text-Neutral-700 me-3" style={{ minWidth : "70px" }}>演出地點</p>
+            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>演出地點</p>
             <div>
               <p className="fw-bold text-end">{event.location}</p>
               <p className="fw-bold text-end">{event.address}</p>
             </div>
           </div>
           <div className="d-flex justify-content-between">
-            <p className="text-Neutral-700 me-3" style={{ minWidth : "70px" }}>演出類型</p>
+            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>演出類型</p>
             <p className="fw-bold">{event.Type?.name}</p>
           </div>
           <div className="d-flex justify-content-between">
-            <p className="text-Neutral-700 me-3" style={{ minWidth : "70px" }}>售票時間</p>
+            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>售票時間</p>
             <div className="d-flex flex-column flex-sm-row gap-1">
               <p className="fw-bold">{showSaleTime(event.sale_start_at, event.sale_end_at)}</p>
             </div>
