@@ -86,9 +86,15 @@ function EventRevenue() {
 
     // 轉換UTC時間(演出日期)
     function showTimeStartToEnd(start, end) {
-        const startTime = dayjs.utc(start).format("YYYY-MM-DD HH:mm");
-        const endTime = dayjs.utc(end).format("HH:mm");
-        return `${startTime} ～ ${endTime}`;
+        if (dayjs.utc(start).format("YYYY-MM-DD") === dayjs.utc(end).format("YYYY-MM-DD")) {
+            const startTime = dayjs.utc(start).format("YYYY-MM-DD HH:mm");
+            const endTime = dayjs.utc(end).format("HH:mm");
+            return `${startTime} ～ ${endTime}`;
+        } else {
+            const startTime = dayjs.utc(start).format("YYYY-MM-DD HH:mm");
+            const endTime = dayjs.utc(end).format("YYYY-MM-DD HH:mm");
+            return `${startTime} ～ ${endTime}`;
+        }
     }
 
     // 轉換UTC時間(售票時間)
@@ -384,8 +390,8 @@ function EventRevenue() {
                     <div className="border-bottom border-2 pb-3">
                         <h4 className="fw-bold">座位售票率</h4>
                     </div>
-                    <div className="nav eventInfo-nav">
-                        <div className="d-flex gap-4 p-2 ">
+                    <div className="nav">
+                        <div className="d-flex gap-4 p-2 eventRevenue-overflow-auto" >
                             {/* 座位售票率圖表 */}
                             {event.sections?.map((section, index) => (
                                 <SeatTicketSalePieChart
