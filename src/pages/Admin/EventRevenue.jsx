@@ -384,8 +384,8 @@ function EventRevenue() {
                     <div className="border-bottom border-2 pb-3">
                         <h4 className="fw-bold">座位售票率</h4>
                     </div>
-                    <div className="nav eventInfo-nav">
-                        <div className="d-flex gap-4 p-2 ">
+                    <div className="nav">
+                        <div className="d-flex gap-4 p-2 eventRevenue-overflow-auto" >
                             {/* 座位售票率圖表 */}
                             {event.sections?.map((section, index) => (
                                 <SeatTicketSalePieChart
