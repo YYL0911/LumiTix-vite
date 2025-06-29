@@ -3,6 +3,7 @@ import './assets/all.scss'
 import Navbar from './conponents/Navbar';
 import Footer from './conponents/Footer';
 import Top from './conponents/Top';
+import AICompanion from './conponents/AICompanion';
 import { Routes, Route } from 'react-router-dom';
 
 import PrivateRoute from './conponents/PrivateRoute';
@@ -87,6 +88,7 @@ function App() {
       </div>
       <Footer />
       <Top />
+      <AICompanion />
     </div>
     // </HashRouter>
   );

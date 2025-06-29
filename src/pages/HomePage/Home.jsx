@@ -436,9 +436,9 @@ function Home() {
                   <h5 className="fw-bold text-start">{mapContent.title}</h5>
                   <p className="small text-muted text-start">{mapContent.text}</p>
                 </div>
-              </div>{" "}
+              </div>
               {/* 內部網格容器結束 */}
-            </div>{" "}
+            </div>
             {/* 右欄結束 */}
           </div>
         </div>

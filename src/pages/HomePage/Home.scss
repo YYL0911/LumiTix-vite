@@ -10,8 +10,8 @@
   padding-top: 15vh; // 使用 align-items 和 margin 控制垂直位置
   text-align: center;
   color: #fff;
-  position: relative; // **** 重要：為了讓內部的絕對定位元素 (粒子畫布、內容) 相對於它 ****
-  overflow: hidden;   // **** 重要：避免粒子或內容溢出 (可選，但通常建議) ****
+  position: relative; // 重要：為了讓內部的絕對定位元素 (粒子畫布、內容) 相對於它
+  overflow: hidden;   // 重要：避免粒子或內容溢出 (可選，但通常建議)
 }
 // 新增：粒子畫布的樣式
 .hero-particles-canvas {
@@ -116,7 +116,7 @@
     text-align: left; // 文字靠左
     font-weight: bold; // p 文字粗體
   }
-  // **** 新增：直接給文字區塊 div 添加 margin-top: auto ****
+  // 新增：直接給文字區塊 div 添加 margin-top: auto 
   // 選中 feature-col 下的第二個直接子元素 div (第一個是 img)
   > div { // 這個 div 現在沒有 mt-auto class 了
       margin-top: auto; // <--- 讓這個 div 的上方自動填滿空間
@@ -162,10 +162,10 @@
       text-align: left; // 文字靠左
       font-weight: bold; // p 文字粗體
     } 
-    // **** 手機版：移除桌面的 margin-top: auto，恢復預設 ****
+    // 手機版：移除桌面的 margin-top: auto，恢復預設
     > div {
         margin-top: 0.5rem; // 給一個固定的上方間距
-        // **** 注意：不再需要 !important ****
+        // 意：不再需要 !important
     }
   }
   // 手機版完全統一圖示/圖片樣式
@@ -339,11 +339,11 @@
   background-position: 50% 44.5%;
   background-size: contain; // 或 cover，看你要填滿還是等
   overflow: hidden; // 避免背景圖超出區塊
-  background-color: #ffffff; // *** CHANGED: Section 背景改為白色 ***
-  color: #212529;         // *** CHANGED: 預設文字顏色改為深色 ***
-  padding-top: 3rem;      // 增加一些上下 padding
+  background-color: #ffffff; // Section 背景改為白色 
+  color: #212529; // 預設文字顏色改為深色
+  padding-top: 3rem; // 增加一些上下 padding
   padding-bottom: 3rem;
-  // ✅ 提高區塊內部所有內容的層級
+  // 提高區塊內部所有內容的層級
 > .border,
 > .position-relative,
 .container {
@@ -369,8 +369,8 @@
       width: 100%;
       position: relative;
       border: 1px solid #000000;
-      padding: 1.5rem; // <<<<<<< 調整這個值來控制間距大小，例如 0.5rem 或 10px
-      background-color: #fff; // <<<<<<< 這個是間距區域的背景色，通常是白色，
+      padding: 1.5rem; // 調整這個值來控制間距大小，例如 0.5rem 或 10px
+      background-color: #fff; // 這個是間距區域的背景色，通常是白色，
       aspect-ratio: 3 / 4; // 這是整個 wrapper (包含邊框和padding) 的長寬比，
       .event-card-main-img {
         display: block; // 移除預設的行內元素底部空白
@@ -391,7 +391,7 @@
       .event-card-info-top {
         .event-date, .event-location {
           font-size: 1rem;
-          color: #555555; // *** CHANGED: 日期和地點文字顏色改為深灰色 ***
+          color: #555555; // 日期和地點文字顏色改為深灰色
         }
         .event-location i {
           font-size: 0.9rem;
@@ -400,11 +400,12 @@
       .event-title {
         font-size: 1.4rem;
         font-weight: bold;
-        color: #000000; // *** CHANGED: 活動標題文字顏色改為黑色 ***
+        color: #000000; // 活動標題文字顏色改為黑色
         line-height: 1.3;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
+        line-clamp: 2;
         overflow: hidden;
         text-overflow: ellipsis;
         min-height: calc(1.4rem * 1.3 * 2);
@@ -506,7 +507,7 @@
   color: #212529; // 預設文字顏色改為深色
   padding-top: 3rem; // 增加一些上下 padding
   padding-bottom: 3rem;
-  // ✅ 提高區塊內部所有內容的層級
+  // 提高區塊內部所有內容的層級
 > .border,
 > .position-relative,
 .container {
@@ -561,11 +562,12 @@
       .event-title {
         font-size: 1.4rem;
         font-weight: bold;
-        color: #ffffff; // 活動標題文字顏色改為黑色
+        color: #ffffff; // 活動標題文字顏色改為白色
         line-height: 1.3;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
+        line-clamp: 2;
         overflow: hidden;
         text-overflow: ellipsis;
         min-height: calc(1.4rem * 1.3 * 2);
