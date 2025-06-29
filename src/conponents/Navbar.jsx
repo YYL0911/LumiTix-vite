@@ -109,6 +109,9 @@ export default function Navbar() {
                   <li className="nav-item ps-3 dropdown-item">
                     <Link className="nav-link" to='/tickets'>票務管理</Link>
                   </li>
+                  <li className="nav-item ps-3 dropdown-item">
+                    <Link className="nav-link" to='/collectEvent'>我的收藏</Link>
+                  </li>
                   <li className="nav-item ps-3 dropdown-item" onClick={() => logout()}>
                     <Link className="nav-link" to='/'>登出</Link>
                   </li>
