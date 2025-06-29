@@ -23,7 +23,7 @@ function EventInfo() {
   dayjs.extend(utc);
   dayjs.extend(duration);
 
-  const { userToken, userRole } = useAuth();
+  const { userToken, userRole, logout } = useAuth();
 
   const isFirstRender = useRef(true);
   const [apiLoading, setApiLoading] = useState(false);
@@ -91,7 +91,9 @@ function EventInfo() {
     if (!userToken){
       alert('請先登入，再收藏活動', '/login')
       return
-    } 
+    } else if (userRole != 'General') {
+      alert('請先登入一般會員，再收藏活動', '/login')
+    }
 
     try {
       const res = await axios.patch(
@@ -113,10 +115,21 @@ function EventInfo() {
         alert(res.message, '/allEvents')
       }
     } catch (err) {
-      alert("發生異常，請稍後在試", '/allEvents')
+      if(err.response.data.message == "使用者已被封鎖") {
+        Swal.fire({
+          title: "帳號已被封鎖",
+          text: "您的帳號因違反使用條款已被停權，如有疑問請聯繫客服。",
+          icon: "error",
+          confirmButtonText: "了解",
+        }).then(() => {
+            logout()
+            setIsCollect(false)
+        });
+      }
+      else alert("發生異常，請稍後在試", '/allEvents')
     }
   };
-  
+
   useEffect(() => {
   }, [isCollect]);
 

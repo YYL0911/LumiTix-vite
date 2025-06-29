@@ -1,6 +1,7 @@
 
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect, useRef} from 'react';
+import Swal from "sweetalert2";
 
 // Context
 import { useAuth } from '../contexts/AuthContext';
@@ -108,7 +109,7 @@ const breadcrumb = [
 
 
 function AllEvents() {
-  const { loading, eventTypes } = useAuth();
+  const { loading, eventTypes, userToken, logout, userRole } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   //跳轉頁面
@@ -208,19 +209,34 @@ function AllEvents() {
     setCurrentPage(1);
   };
 
+  const blockUser = () => {
+    Swal.fire({
+      title: "帳號已被封鎖",
+      text: "您的帳號因違反使用條款已被停權，如有疑問請聯繫客服。",
+      icon: "error",
+      confirmButtonText: "了解",
+    }).then(() => {
+        logout()
+    });
+  }
 
   const  onToggleCollect = (eventId) => {
-    const token = localStorage.getItem("token");
     fetch(`https://n7-backend.onrender.com/api/v1/users/toggle-collect/${eventId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // token 放這
+          "Authorization": `Bearer ${userToken}`, // token 放這
         },
       })
         .then((res) => res.json())
         .then((result) => {
-          setCollectEventData(prev => prev.filter(item => item.id !== eventId));
+          if(!result.status){
+            if(result.message == "使用者已被封鎖") {
+              blockUser()
+              setCollectEventData([])
+            }
+          }
+          else setCollectEventData(prev => prev.filter(item => item.id !== eventId));
         })
         .catch((err) => {
           navigate("/ErrorPage")
@@ -254,20 +270,25 @@ function AllEvents() {
           navigate("/ErrorPage")
         });
 
-      const token = localStorage.getItem("token");
-      if(token){
+      if(userToken && userRole == 'General'){
         setApiLoading(true);
         fetch("https://n7-backend.onrender.com/api/v1/users/collect", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`, // token 放這
+            "Authorization": `Bearer ${userToken}`, // token 放這
           },
         })
           .then((res) => res.json())
           .then((result) => {
             setApiLoading(false);
-            setCollectEventData(result.data);
+
+            if(!result.status){
+              if(result.message == "使用者已被封鎖") {
+               blockUser()
+              }
+            }
+            else setCollectEventData(result.data);
           })
           .catch((err) => {
             navigate("/ErrorPage")
