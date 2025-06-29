@@ -22,6 +22,7 @@ import EventDetail from './pages/Organizer/EventDetail';
 import TicketScaner from './pages/Organizer/TicketScaner';
 import TicketScanerResult from './pages/Organizer/TicketScanerResult';
 import EventFormPage from './pages/Organizer/EventFormPage';
+import CollectEvent from './pages/User/CollectEvent';
 
 import Payments from './pages/Payments';
 import PaymentResult from './pages/PaymentResult';
@@ -59,6 +60,7 @@ function App() {
             <Route path="/ticketInfo/:id" element={<TicketDetailPage />} />
             <Route path="/eventInfo/:id/payments" element={<Payments />} />
             <Route path="/tickets/:id/payment_result" element={<PaymentResult />} />
+            <Route path="/collectEvent" element={<CollectEvent />} />
           </Route>
 
           {/* 只有活動方可以看的頁面 */}
