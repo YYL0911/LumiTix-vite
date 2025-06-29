@@ -78,7 +78,7 @@ function EventInfo() {
 
 
   const onToggleCollect = async () => {
-    const alert = (message, page) => {
+    const sweetAlert = (message, page) => {
       Swal.fire({
         icon: 'warning',
         title: message,
@@ -89,10 +89,10 @@ function EventInfo() {
     }
 
     if (!userToken){
-      alert('請先登入，再收藏活動', '/login')
+      sweetAlert('請先登入，再收藏活動', '/login')
       return
     } else if (userRole != 'General') {
-      alert('請先登入一般會員，再收藏活動', '/login')
+      sweetAlert('請先登入一般會員，再收藏活動', '/login')
     }
 
     try {
@@ -112,7 +112,7 @@ function EventInfo() {
         setIsCollect(!isCollect)
       }
       else{
-        alert(res.message, '/allEvents')
+        sweetAlert(res.message, '/allEvents')
       }
     } catch (err) {
       if(err.response.data.message == "使用者已被封鎖") {
@@ -126,7 +126,7 @@ function EventInfo() {
             setIsCollect(false)
         });
       }
-      else alert("發生異常，請稍後在試", '/allEvents')
+      else sweetAlert("發生異常，請稍後在試", '/allEvents')
     }
   };
 
