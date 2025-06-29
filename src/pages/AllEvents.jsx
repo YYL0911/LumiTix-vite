@@ -14,6 +14,8 @@ import locationIcon from "../assets/img/location_on.png"
 import searchIcon from "../assets/img/Search.png"
 import searchBG from "../assets/img/AlleventsBg.png"
 
+import { IoHeartCircleOutline } from "react-icons/io5";
+
 
 const daysFromToday = (dateStr, targetDelt) => {
   const today = new Date();
@@ -25,15 +27,23 @@ const daysFromToday = (dateStr, targetDelt) => {
 }
 
 
-// 列表元件
-const CardItem = ({ id, imgSrc, title, showTime, location, category, handleNavigate }) => (
+// 列表元件 onToggleCollect={onToggleCollect}
+const CardItem = ({ id, imgSrc, title, showTime, location, category, collect, handleNavigate, onToggleCollect }) => (
   <a className="allEventHover card mb-5 col-md-3 col-6 text-decoration-none" style={{ border: 'none' }} href="#" onClick={(e) => {
     e.preventDefault();
-    handleNavigate(`/eventInfo/${id}`)
+    handleNavigate(`/eventInfo/${id}`, collect)
   }}>
     
     <div className="allEventImg border border-2 border-secondary ratio" style={{ '--bs-aspect-ratio': '145.78%' }}>
       <img src={imgSrc} className="img-fluid object-fit-cover w-100 h-100 p-2" alt={title} />
+      <div className={`top-0 end-0  ${collect ? "" : "d-none"}`}>
+        <IoHeartCircleOutline size={30} color="red" className="position-absolute top-0 end-0" type="button"
+        onClick={(e) => {
+          e.stopPropagation(); // 阻止事件冒泡到 a
+          e.preventDefault();  // 阻止 <a> 的預設跳轉行為
+          onToggleCollect(id)
+        }} />
+      </div>
     </div>
     <div className="d-flex flex-column justify-content-between mt-3" >
       
@@ -53,11 +63,10 @@ const CardItem = ({ id, imgSrc, title, showTime, location, category, handleNavig
       <span className=" border-bottom border-top border-danger border-3 p-2" >{category}</span>
     </div>
   </a>
-
 );
 
-// 製造表演列表
-const DataTable = ({ filterProducts, handleNavigate, currentPage }) => {
+// 製造表演列表 collectEventData={collectEventData} onToggleCollect={onToggleCollect}
+const DataTable = ({ filterProducts, handleNavigate, currentPage, collectEventData, onToggleCollect }) => {
   const pageSize = 8;
   const start = (currentPage - 1) * pageSize;
   const end = start + pageSize;
@@ -79,7 +88,9 @@ const DataTable = ({ filterProducts, handleNavigate, currentPage }) => {
               showTime={product.start_at}
               location={product.city}
               category={product.type}
+              collect={collectEventData.some(item => item.id === product.id)}
               handleNavigate={handleNavigate}
+              onToggleCollect={onToggleCollect}
             />
           ))
         )
@@ -101,10 +112,11 @@ function AllEvents() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   //跳轉頁面
-  const handleNavigate = (path) => navigate(path);
+  const handleNavigate = (path, collect) => navigate(path, { state: { collect } });
   const [apiLoading, setApiLoading] = useState(false);
 
   const [sampleData, setSampleData] = useState([]);
+  const [collectEventData, setCollectEventData] = useState([]);
 
   const [totalPages, setTotalPages] = useState(Math.ceil(sampleData.length / 8));
   const [currentPage, setCurrentPage] = useState(0);
@@ -181,7 +193,10 @@ function AllEvents() {
     setFilteredProducts(result); // 更新顯示的資料
     if (Math.ceil(result.length / 8) < 1) setTotalPages(1);
     else setTotalPages(Math.ceil(result.length / 8));
-  }, [searchParams, sampleData, apiLoading, eventTypes]); // 原為 [searchParams]
+
+
+  }, [searchParams, sampleData, apiLoading, eventTypes, collectEventData]); // 原為 [searchParams]
+
 
   const handleSeach = () => {
     const newParams = new URLSearchParams();
@@ -192,6 +207,28 @@ function AllEvents() {
     setSearchParams(newParams);
     setCurrentPage(1);
   };
+
+
+  const  onToggleCollect = (eventId) => {
+    const token = localStorage.getItem("token");
+    fetch(`https://n7-backend.onrender.com/api/v1/users/toggle-collect/${eventId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // token 放這
+        },
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          setCollectEventData(prev => prev.filter(item => item.id !== eventId));
+        })
+        .catch((err) => {
+          navigate("/ErrorPage")
+        });
+   
+    //   setCollectEvent(prev => [...prev, newCollect]);
+    
+  }
 
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
   useEffect(() => {
@@ -216,6 +253,27 @@ function AllEvents() {
         .catch((err) => {
           navigate("/ErrorPage")
         });
+
+      const token = localStorage.getItem("token");
+      if(token){
+        setApiLoading(true);
+        fetch("https://n7-backend.onrender.com/api/v1/users/collect", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`, // token 放這
+          },
+        })
+          .then((res) => res.json())
+          .then((result) => {
+            setApiLoading(false);
+            setCollectEventData(result.data);
+          })
+          .catch((err) => {
+            navigate("/ErrorPage")
+          });
+
+      }
     }
   }, []);
 
@@ -322,6 +380,8 @@ function AllEvents() {
             filterProducts={filteredProducts}
             handleNavigate={handleNavigate}
             currentPage={currentPage}
+            collectEventData={collectEventData}
+            onToggleCollect={onToggleCollect}
           ></DataTable>
         </div>
 

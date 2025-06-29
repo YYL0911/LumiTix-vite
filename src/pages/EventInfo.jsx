@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation, } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
 import Swal from 'sweetalert2';
 import dayjs from "dayjs";
@@ -11,7 +11,13 @@ import axios from 'axios'
 import Breadcrumb from "../conponents/Breadcrumb";
 import InfoSection from "../conponents/InfoSection";
 
+import { IoHeartCircleOutline } from "react-icons/io5";
+import { IoHeartCircleSharp } from "react-icons/io5";
+
 function EventInfo() {
+  const location = useLocation();
+  // location.state?.collect
+  const { collect } = location.state || false;  // 要加 || {} 防止錯誤
   const { id } = useParams();
   const navigate = useNavigate();
   dayjs.extend(utc);
@@ -25,6 +31,8 @@ function EventInfo() {
   const [saleStatus, setSaleStatus] = useState("countdown");
   const [timeLeft, setTimeLeft] = useState(null);
   const timeRef = useRef(null);
+
+  const [isCollect, setIsCollect] = useState(collect);
 
   // 麵包屑
   const breadcrumb = [
@@ -67,6 +75,51 @@ function EventInfo() {
       });
     }
   };
+
+
+  const onToggleCollect = async () => {
+    const alert = (message, page) => {
+      Swal.fire({
+        icon: 'warning',
+        title: message,
+        confirmButtonText: `確認`,
+      }).then(() => {
+        navigate( page)
+      });
+    }
+
+    if (!userToken){
+      alert('請先登入，再收藏活動', '/login')
+      return
+    } 
+
+    try {
+      const res = await axios.patch(
+          `https://n7-backend.onrender.com/api/v1/users/toggle-collect/${id}`,
+          {},
+          {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken}`,
+            },
+          }
+      );
+      
+      if (res.data.status) {
+        setIsCollect(!isCollect)
+      }
+      else{
+        alert(res.message, '/allEvents')
+      }
+    } catch (err) {
+      alert("發生異常，請稍後在試", '/allEvents')
+    }
+  };
+  
+  useEffect(() => {
+  }, [isCollect]);
+
 
   // 取得單一活動資訊
   useEffect(() => {
@@ -290,8 +343,18 @@ function EventInfo() {
   // 票券區域
   const TicketSection = ({ id, title, event, saleStatus, setSaleStatus, handleNavigate }) => (
     <div className="mb-lg-7 mb-4 sectionTop" id={id}>
-      <div className="border border-2 border-Neutral-700 px-4 py-3 bg-Neutral-700">
+      <div className="border border-2 border-Neutral-700 px-4 py-3 bg-Neutral-700 d-flex justify-content-between">
         <h5 className="text-white fw-bold">{title}</h5>
+        {isCollect && (
+          <IoHeartCircleOutline size={30}  color="red" className={`me-2`} type="button"
+          onClick={(e) => {onToggleCollect()}}/>
+        )}
+        {!isCollect && (
+          <IoHeartCircleSharp size={30}  color="#fff" className={`me-2`} type="button"
+          onClick={(e) => {onToggleCollect()}}/>
+        )}
+        
+        
       </div>
       <div className="border border-2 border-top-0 border-Neutral-700 px-lg-4 px-3 py-lg-6 py-4">
         <div className="d-flex flex-column flex-lg-row gap-6">
