@@ -33,12 +33,12 @@ const DataTable = memo(({filterProducts, handleNavigate, onToggleCollect}) => {
       {filterProducts.map((product) =>{
         return(
           <div  key={product.id}>
-            <a className="text-decoration-none position-relative" href="#" onClick={(e) => {
+            <a className="text-decoration-none " href="#" onClick={(e) => {
               e.preventDefault();
               handleNavigate(`/eventInfo/${product.id}`);
             }}>
 
-              <div  className="bg-white my-3 d-flex align-items-center border border-2 border-black p-3">
+              <div  className="bg-white my-3 d-flex align-items-center border border-2 border-black p-3 position-relative">
                 
                 <div className={`top-0 end-0 `}>
                   <IoHeartCircleOutline size={30} color="red" className="position-absolute top-0 end-0" type="button"
@@ -253,6 +253,7 @@ function Tickets() {
             style={{
               position: isFixed ? 'fixed' : 'static',
               top: `${headerHeight}px`,
+              zIndex: 10
             }}
             className={`   bg-white py-2   border-dark-subtle 
               ${isFixed ? 
