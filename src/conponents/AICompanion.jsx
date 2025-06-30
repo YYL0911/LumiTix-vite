@@ -47,7 +47,7 @@ const AICompanion = () => {
     return (
       <div className="ai-companion-widget">
         <button className="btn btn-danger bg-gradient floating-button shadow-lg" onClick={() => setIsOpen(true)}>
-          <i class="bi bi-headset"></i>
+          <i className="bi bi-headset"></i>
         </button>
       </div>
     );
