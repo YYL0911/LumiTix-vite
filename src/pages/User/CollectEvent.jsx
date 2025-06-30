@@ -253,7 +253,7 @@ function Tickets() {
             style={{
               position: isFixed ? 'fixed' : 'static',
               top: `${headerHeight}px`,
-              zIndex: 10
+              zIndex: 1
             }}
             className={`   bg-white py-2   border-dark-subtle 
               ${isFixed ? 
@@ -263,7 +263,7 @@ function Tickets() {
                 {tabs.map((tab) => (
                     <li className="nav-item" key={tab.key}>
                       <button
-                        className={`nav-underline-custom nav-link ${activeState === tab.key ? 'active' : ''}`}
+                        className={`nav-underline-custom nav-link pe-2 ${activeState === tab.key ? 'active' : ''}`}
                         onClick={() => setActiveState(tab.key)}
                       >
                         {tab.label}
