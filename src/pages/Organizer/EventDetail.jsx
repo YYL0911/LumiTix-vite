@@ -81,22 +81,23 @@ const EventDetail = () => {
 
 
   return (
-    <div className='container py-3 d-flex flex-column '>
-
+    <div className="container py-3 d-flex flex-column ">
       {/* 麵包屑 */}
-      <Breadcrumb breadcrumbs = {breadcrumb}></Breadcrumb>
-      <div className='mt-3'>
+      <Breadcrumb breadcrumbs={breadcrumb}></Breadcrumb>
+      <div className="mt-3">
         <div className="mx-100">
-         <img src={eventInfo.cover_image_url} alt={eventInfo.title} className="img-fluid border border-2 border-secondary p-3" />
+          <img
+            src={eventInfo.cover_image_url}
+            alt={eventInfo.title}
+            className="img-fluid border border-2 border-secondary p-3"
+          />
         </div>
-        
+
         <div className="fs-5">
           <div className="d-flex my-3">
             <div className="fw-semibold text-nowrap">活動狀態：</div>
             <div className=" flex-grow-1 ms-2">
-              <span className={`badge ${eventStatus[eventStatusIdx].class}`}>
-                {eventStatus[eventStatusIdx].label}
-              </span>
+              <span className={`badge ${eventStatus[eventStatusIdx].class}`}>{eventStatus[eventStatusIdx].label}</span>
             </div>
           </div>
           <div className="d-flex my-3">
@@ -113,19 +114,27 @@ const EventDetail = () => {
           </div>
           <div className="d-flex mb-3">
             <div className="fw-semibold text-nowrap">演出開始：</div>
-            <div className=" flex-grow-1 ms-2">{eventInfo.start_at?.substring(0,10)} {eventInfo.start_at?.substring(11,16)}</div>
+            <div className=" flex-grow-1 ms-2">
+              {eventInfo.start_at?.substring(0, 10)} {eventInfo.start_at?.substring(11, 16)}
+            </div>
           </div>
           <div className="d-flex mb-3">
             <div className="fw-semibold text-nowrap">演出結束：</div>
-            <div className=" flex-grow-1 ms-2">{eventInfo.end_at?.substring(0,10)} {eventInfo.end_at?.substring(11,16)}</div>
+            <div className=" flex-grow-1 ms-2">
+              {eventInfo.end_at?.substring(0, 10)} {eventInfo.end_at?.substring(11, 16)}
+            </div>
           </div>
           <div className="d-flex mb-3">
             <div className="fw-semibold text-nowrap">售票開始：</div>
-            <div className=" flex-grow-1 ms-2">{eventInfo.sale_start_at?.substring(0,10)} {eventInfo.sale_start_at?.substring(11,16)}</div>
+            <div className=" flex-grow-1 ms-2">
+              {eventInfo.sale_start_at?.substring(0, 10)} {eventInfo.sale_start_at?.substring(11, 16)}
+            </div>
           </div>
           <div className="d-flex mb-3">
             <div className="fw-semibold text-nowrap">售票結束：</div>
-            <div className=" flex-grow-1 ms-2">{eventInfo.sale_end_at?.substring(0,10)} {eventInfo.sale_end_at?.substring(11,16)}</div>
+            <div className=" flex-grow-1 ms-2">
+              {eventInfo.sale_end_at?.substring(0, 10)} {eventInfo.sale_end_at?.substring(11, 16)}
+            </div>
           </div>
           <div className="d-flex mb-3">
             <div className="fw-semibold text-nowrap">表演人員：</div>
@@ -136,79 +145,86 @@ const EventDetail = () => {
             <div className=" flex-grow-1 ms-2">{eventInfo.type}</div>
           </div>
           <div className="d-flex mb-3">
-            <div className="pe-2 fw-semibold text-nowrap" >活動介紹：</div>
-            <div className=" ">{eventInfo.description}</div>
+            <div className="pe-2 fw-semibold text-nowrap" style={{ alignSelf: "start" }}>
+              活動介紹：
+            </div>
+            <div dangerouslySetInnerHTML={{ __html: eventInfo.description }} />
           </div>
 
-          <div className='mb-3'> 
+          <div className="mb-3">
             <p className="fs-5 fw-semibold">分區設定：</p>
-              <div className="row  justify-content-between  align-items-start">
-                <div className=" col-12 col-md-7">
-                  <img src={eventInfo.section_image_url} alt={eventInfo.title} className="img-fluid " />
-                </div>
+            <div className="row  justify-content-between  align-items-start">
+              <div className=" col-12 col-md-7">
+                <img src={eventInfo.section_image_url} alt={eventInfo.title} className="img-fluid " />
+              </div>
 
-                <div className=" col-12 col-md-5">
-                  <div className="table-responsive" >
-                    <table className="table  text-center align-middle table-hover">
-                      <thead >
-                        <tr>
-                          <th scope="col" className="text-wrap text-break" style={{ minWidth: '90px'}}>分區名稱</th>
-                          <th scope="col" className="text-wrap text-break" style={{ minWidth: '70px'}}>票價</th>
-                          <th scope="col" className="text-wrap text-break" style={{ minWidth: '110px'}}>購票人數</th>
+              <div className=" col-12 col-md-5">
+                <div className="table-responsive">
+                  <table className="table  text-center align-middle table-hover">
+                    <thead>
+                      <tr>
+                        <th scope="col" className="text-wrap text-break" style={{ minWidth: "90px" }}>
+                          分區名稱
+                        </th>
+                        <th scope="col" className="text-wrap text-break" style={{ minWidth: "70px" }}>
+                          票價
+                        </th>
+                        <th scope="col" className="text-wrap text-break" style={{ minWidth: "110px" }}>
+                          購票人數
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="table-group-divider">
+                      {eventInfo.sections?.map((product) => (
+                        <tr key={product.section_name}>
+                          <td className="text-wrap text-break">{product.section_name}</td>
+                          <td>{product.price}</td>
+                          <td>
+                            {product.ticket_purchaced}/{product.ticket_total}
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody className="table-group-divider">
-                        {eventInfo.sections?.map((product) => (
-                          <tr key={product.section_name}>
-                            <td className="text-wrap text-break">{product.section_name}</td>
-                            <td >{product.price}</td>
-                            <td>{product.ticket_purchaced}/{product.ticket_total}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
+            </div>
           </div>
         </div>
       </div>
 
-      
-      <div className="d-flex justify-content-between my-5  px-sm-5" >
+      <div className="d-flex justify-content-between my-5  px-sm-5">
         <div className={`col-6 col-sm-4 pe-2 mx-auto `}>
           <button
-            type="button" 
+            type="button"
             className={`btn btn-dark w-100 d-flex align-items-center justify-content-center`}
             onClick={() => navigate(-1)}
           >
-            返回 <BsArrowLeftCircle size={20}  className={`ms-2`}/>
+            返回 <BsArrowLeftCircle size={20} className={`ms-2`} />
           </button>
         </div>
 
         <div className={`col-6 col-sm-4 pe-2 mx-auto ${eventStatusIdx == 0 ? "d-block" : "d-none"}`}>
           <button
-            type="button" 
+            type="button"
             className={`btn btn-danger w-100 d-flex align-items-center justify-content-center`}
-            onClick={() =>navigate(`/organizer/event/edit/${evendId}`)}
+            onClick={() => navigate(`/organizer/event/edit/${evendId}`)}
           >
-            編輯資訊 <BsPencilSquare size={20}  className={`ms-2`}/>
+            編輯資訊 <BsPencilSquare size={20} className={`ms-2`} />
           </button>
         </div>
         <div className={`col-6 col-sm-4 pe-2 mx-auto ${eventStatusIdx == 1 ? "d-block" : "d-none"}`}>
-            <button
-              type="button"
-              className={`btn  w-100 btn-danger d-flex align-items-center justify-content-center`}
-              onClick={() => scanEvent()}
-            >
-              驗票 <BsQrCodeScan size={20}  className={`ms-2`}/>
-            </button>
+          <button
+            type="button"
+            className={`btn  w-100 btn-danger d-flex align-items-center justify-content-center`}
+            onClick={() => scanEvent()}
+          >
+            驗票 <BsQrCodeScan size={20} className={`ms-2`} />
+          </button>
         </div>
       </div>
-      
-      
 
-      {(!loading && apiLoading ) && (<Loading></Loading>)}
+      {!loading && apiLoading && <Loading></Loading>}
     </div>
   );
 }
