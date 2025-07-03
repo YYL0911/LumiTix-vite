@@ -104,7 +104,7 @@ const DataTable = ({ filterProducts, handleNavigate, currentPage, collectEventDa
 // 麵包屑
 const breadcrumb = [
   { name: "首頁", path: "/" },
-  { name: "活動資訊", path: "/allEvents" }, // 確認路徑與 App.jsx 中定義的一致
+  { name: "活動列表", path: "/allEvents" }, // 確認路徑與 App.jsx 中定義的一致
 ];
 
 

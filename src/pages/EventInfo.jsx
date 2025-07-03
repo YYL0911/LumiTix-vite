@@ -17,7 +17,7 @@ import { IoHeartCircleSharp } from "react-icons/io5";
 function EventInfo() {
   const location = useLocation();
   // location.state?.collect
-  const { collect } = location.state || false;  // 要加 || {} 防止錯誤
+  const { collect } = location.state || false; // 要加 || {} 防止錯誤
   const { id } = useParams();
   const navigate = useNavigate();
   dayjs.extend(utc);
@@ -27,7 +27,7 @@ function EventInfo() {
 
   const isFirstRender = useRef(true);
   const [apiLoading, setApiLoading] = useState(false);
-  const [event, setEvent] = useState({})
+  const [event, setEvent] = useState({});
   const [saleStatus, setSaleStatus] = useState("countdown");
   const [timeLeft, setTimeLeft] = useState(null);
   const timeRef = useRef(null);
@@ -36,42 +36,42 @@ function EventInfo() {
 
   // 麵包屑
   const breadcrumb = [
-    { name: '首頁', path: "/" },
-    { name: '活動列表', path: "/allEvents" },
-    { name: `${event.title}`, path: "/eventInfo/:id" }
+    { name: "首頁", path: "/" },
+    { name: "活動列表", path: "/allEvents" },
+    { name: `${event.title}`, path: "/eventInfo/:id" },
   ];
 
   // section
   const sections = [
-    { id: 'section1', label: '活動詳情' },
-    { id: 'section2', label: '注意事項' },
-    { id: 'section3', label: '購票須知' },
-    { id: 'section4', label: '票券區域' }
+    { id: "section1", label: "活動詳情" },
+    { id: "section2", label: "注意事項" },
+    { id: "section3", label: "購票須知" },
+    { id: "section4", label: "票券區域" },
   ];
 
   // 前往購票
   const handleNavigate = (section) => {
     const LoginAlert = (message) => {
       Swal.fire({
-        icon: 'warning',
+        icon: "warning",
         title: message,
         confirmButtonText: `確認`,
       }).then(() => {
-        navigate('/login')
+        navigate("/login");
       });
-    }
+    };
 
     if (!userToken) {
-      LoginAlert('請先登入，再購買票券')
-    } else if (userRole != 'General') {
-      LoginAlert('請先登入一般會員，再購買票券')
+      LoginAlert("請先登入，再購買票券");
+    } else if (userRole != "General") {
+      LoginAlert("請先登入一般會員，再購買票券");
     } else {
       navigate(`/eventInfo/${id}/payments`, {
         state: {
           sectionId: section.id,
           sectionName: section.section,
-          price: section.price_default
-        }
+          price: section.price_default,
+        },
       });
     }
   };
@@ -80,13 +80,13 @@ function EventInfo() {
   const onToggleCollect = async () => {
     const sweetAlert = (message, page) => {
       Swal.fire({
-        icon: 'warning',
+        icon: "warning",
         title: message,
         confirmButtonText: `確認`,
       }).then(() => {
         navigate(page)
       });
-    }
+    };
 
     if (!userToken) {
       sweetAlert('請先登入，再收藏活動', '/login')
@@ -125,28 +125,32 @@ function EventInfo() {
           logout()
           setIsCollect(false)
         });
-      }
-      else sweetAlert("發生異常，請稍後在試", '/allEvents')
+      } else sweetAlert("發生異常，請稍後在試", "/allEvents");
     }
   };
 
-  useEffect(() => {
-  }, [isCollect]);
-
+  useEffect(() => {}, [isCollect]);
 
   // 取得單一活動資訊
   useEffect(() => {
+    // 增加一個前置檢查，確保 id 存在才執行
+    if (!id) {
+      setApiLoading(false);
+      return;
+    }
+
     const fetchEvent = async () => {
+      setApiLoading(true); // 將 setApiLoading 移至函式內部
       try {
         const res = await axios.get(`https://n7-backend.onrender.com/api/v1/events/${id}`);
-        setApiLoading(false);
 
         if (res.data.status) {
-          setEvent(res.data.data || []);
+          setEvent(res.data.data || {}); // 使用 || {} 避免 event 為 null
+        } else {
+          throw new Error(res.data.message);
           // console.log('API 回傳資料:', res.data.data);
         }
       } catch (err) {
-        setApiLoading(false);
         // console.error('取得活動失敗', err);
         Swal.fire({
           icon: 'error',
@@ -155,24 +159,24 @@ function EventInfo() {
         }).then(() => {
           navigate('/allEvents');
         })
+      } finally {
+        setApiLoading(false);
       }
     };
 
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      fetchEvent();
-    }
-  }, []);
+    fetchEvent();
+    
+  }, [id, navigate]); // <--- 關鍵修正：將 id 加入到依賴項陣列中
 
   // 滾動到指定區塊的函數
-  const [activeTab, setActiveTab] = useState('section1');
+  const [activeTab, setActiveTab] = useState("section1");
   const [showStickyNavbar, setShowStickyNavbar] = useState(false);
   const unStickyNavbarRef = useRef(null);
 
   // 滾動到指定區塊
   const scrollToSection = (id) => {
     const section = document.getElementById(id);
-    const navbar = document.querySelector('.sticky-navbar');
+    const navbar = document.querySelector(".sticky-navbar");
     if (section) {
       const navbarHeight = navbar?.offsetHeight || 0;
       const offsetTop = section.offsetTop - navbarHeight;
@@ -200,9 +204,7 @@ function EventInfo() {
         return { id, top: Infinity };
       });
 
-      const visibleSection = sectionOffsets
-        .filter(section => section.top <= 150)
-        .sort((a, b) => b.top - a.top)[0];
+      const visibleSection = sectionOffsets.filter((section) => section.top <= 150).sort((a, b) => b.top - a.top)[0];
 
       if (visibleSection && visibleSection.id !== activeTab) {
         setActiveTab(visibleSection.id);
@@ -232,8 +234,8 @@ function EventInfo() {
 
     timeRef.current = setInterval(() => {
       const now = dayjs();
-      const start = dayjs(event.sale_start_at.replace('Z', ''));
-      const end = dayjs(event.sale_end_at.replace('Z', ''));
+      const start = dayjs(event.sale_start_at.replace("Z", ""));
+      const end = dayjs(event.sale_end_at.replace("Z", ""));
 
       let status = "ended";
       let time = null;
@@ -258,8 +260,7 @@ function EventInfo() {
     <div className="px-3 py-2 bg-Primary-50">
       <div className="d-flex justify-content-between fw-bold">
         <p className="text-Primary-900">
-          {saleStatus === "countdown" ? "距離開賣" :
-            saleStatus === "active" ? "距離截止" : "已結束"}
+          {saleStatus === "countdown" ? "距離開賣" : saleStatus === "active" ? "距離截止" : "已結束"}
         </p>
         {(saleStatus === "countdown" || saleStatus === "active") && timeLeft && (
           <div className="d-flex gap-2 text-Primary-700 fw-bold">
@@ -302,35 +303,43 @@ function EventInfo() {
       <div className="border border-2 border-top-0 border-Neutral-700 px-lg-4 px-3 py-lg-6 py-4">
         <div className="d-flex flex-column gap-6">
           <div className="d-flex justify-content-between">
-            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>演出日期</p>
+            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>
+              演出日期
+            </p>
             <p className="fw-bold">{showTimeStartToEnd(event.start_at, event.end_at)}</p>
           </div>
           <div className="d-flex justify-content-between">
-            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>演出人員</p>
+            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>
+              演出人員
+            </p>
             <p className="fw-bold">{event.performance_group}</p>
           </div>
           <div className="d-flex justify-content-between">
-            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>演出地點</p>
+            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>
+              演出地點
+            </p>
             <div>
               <p className="fw-bold text-end">{event.location}</p>
               <p className="fw-bold text-end">{event.address}</p>
             </div>
           </div>
           <div className="d-flex justify-content-between">
-            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>演出類型</p>
+            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>
+              演出類型
+            </p>
             <p className="fw-bold">{event.Type?.name}</p>
           </div>
           <div className="d-flex justify-content-between">
-            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>售票時間</p>
+            <p className="text-Neutral-700 me-3" style={{ minWidth: "70px" }}>
+              售票時間
+            </p>
             <div className="d-flex flex-column flex-sm-row gap-1">
               <p className="fw-bold">{showSaleTime(event.sale_start_at, event.sale_end_at)}</p>
             </div>
           </div>
         </div>
         <div className="border-2 border-top border-Neutral-700 my-6"></div>
-        <div>
-          <p>{event.description}</p>
-        </div>
+        <div dangerouslySetInnerHTML={{ __html: event.description }} />
       </div>
     </div>
   );
@@ -371,7 +380,6 @@ function EventInfo() {
       </div>
       <div className="border border-2 border-top-0 border-Neutral-700 px-lg-4 px-3 py-lg-6 py-4">
         <div className="d-flex flex-column flex-lg-row gap-6">
-
           <div className="col m-auto">
             <img className="w-100" src={event.section_image_url} alt="票券區域圖" />
           </div>
@@ -391,17 +399,16 @@ function EventInfo() {
                 <div key={index}>
                   <div className="d-flex align-items-center justify-content-between my-lg-4 my-3">
                     <div className="d-flex gap-3">
-                      <p className="text-Neutral-700" style={{ minWidth: '60px' }}>
+                      <p className="text-Neutral-700" style={{ minWidth: "60px" }}>
                         {section.section} 區
                       </p>
-                      <p className="fw-bold">
-                        NT$ {section.price_default.toLocaleString()}
-                      </p>
+                      <p className="fw-bold">NT$ {section.price_default.toLocaleString()}</p>
                     </div>
 
                     <button
-                      className={`border-0 py-2 px-3 ${saleStatus === "active" && !isSoldOut ? "btn-sale" : "btn-unsale"
-                        }`}
+                      className={`border-0 py-2 px-3 ${
+                        saleStatus === "active" && !isSoldOut ? "btn-sale" : "btn-unsale"
+                      }`}
                       disabled={saleStatus !== "active" || isSoldOut}
                       onClick={(e) => {
                         e.preventDefault();
@@ -415,7 +422,6 @@ function EventInfo() {
                 </div>
               );
             })}
-
           </div>
         </div>
       </div>
@@ -426,12 +432,16 @@ function EventInfo() {
     <>
       <div className="container container-sm">
         <div className="m-xy-1">
-
           <Breadcrumb breadcrumbs={breadcrumb} />
 
           {/* 活動封面 */}
           <div className="border border-2 border-black p-lg-7 p-2 mb-4">
-            <img className="coverImg img-contain p-lg-0 p-1" src={event.cover_image_url} alt={event.title || "活動封面"} style={{ maxWidth: '1212px', maxHeight: '660px' }} />
+            <img
+              className="coverImg img-contain p-lg-0 p-1"
+              src={event.cover_image_url}
+              alt={event.title || "活動封面"}
+              style={{ maxWidth: "1212px", maxHeight: "660px" }}
+            />
           </div>
 
           {/* 活動標題 */}
@@ -440,19 +450,21 @@ function EventInfo() {
             <button
               className={`border-0 py-3 px-4 saleStatusBtn ${saleStatus === "active" ? "btn-sale" : "btn-unsale"}`}
               disabled={saleStatus !== "active"}
-              onClick={() => scrollToSection('section4')}
+              onClick={() => scrollToSection("section4")}
             >
               <p className="fw-bold m-0 text-center">
                 {saleStatus === "countdown" ? "尚未開賣" : saleStatus === "active" ? "立即購票" : "販售結束"}
               </p>
             </button>
           </div>
-
         </div>
       </div>
 
       {/* navbar sticky */}
-      <ul className="nav eventInfo-nav border-bottom border-2 border-black p-2 sticky-navbar" style={{ display: showStickyNavbar ? "block" : "none" }}>
+      <ul
+        className="nav eventInfo-nav border-bottom border-2 border-black p-2 sticky-navbar"
+        style={{ display: showStickyNavbar ? "block" : "none" }}
+      >
         <div className="container">
           <div className="m-x-1">
             <div className="d-flex gap-2">
@@ -471,7 +483,12 @@ function EventInfo() {
       {/* navbar unSticky */}
       <div className="container">
         <div className="m-x-1">
-          <ul ref={unStickyNavbarRef} className={`nav eventInfo-nav border border-2 border-black p-2 mb-4 mb-lg-7 ${showStickyNavbar === false ? "" : "hide-visibility"}`}>
+          <ul
+            ref={unStickyNavbarRef}
+            className={`nav eventInfo-nav border border-2 border-black p-2 mb-4 mb-lg-7 ${
+              showStickyNavbar === false ? "" : "hide-visibility"
+            }`}
+          >
             <div className="d-flex gap-2">
               {sections.map(({ id, label }) => (
                 <li key={id} className={`nav-item ${activeTab === id ? "border-bottom border-3 border-danger" : ""}`}>
@@ -487,7 +504,6 @@ function EventInfo() {
 
       <div className="container">
         <div className="m-xy-2">
-
           {/* 活動詳情 */}
           <EventDetail id="section1" title="活動詳情" event={event} />
 
@@ -498,8 +514,14 @@ function EventInfo() {
           <InfoSection id="section3" title="購票須知" items={buyTicketInfo} />
 
           {/* 票券區域 */}
-          <TicketSection id="section4" title="票券區域" event={event} saleStatus={saleStatus} setSaleStatus={setSaleStatus} handleNavigate={handleNavigate} />
-
+          <TicketSection
+            id="section4"
+            title="票券區域"
+            event={event}
+            saleStatus={saleStatus}
+            setSaleStatus={setSaleStatus}
+            handleNavigate={handleNavigate}
+          />
         </div>
       </div>
     </>

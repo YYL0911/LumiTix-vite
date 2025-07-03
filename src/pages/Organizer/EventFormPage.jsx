@@ -13,6 +13,7 @@ import zhTW from "date-fns/locale/zh-TW"; // 引入繁體中文語系
 registerLocale("zh-TW", zhTW); // 註冊語系
 import Breadcrumb from "../../conponents/Breadcrumb";
 import Loading from "../../conponents/Loading";
+import RichTextEditor from "../../conponents/RichTextEditor";
 // --- 9.場地圖 的 import ---
 import venuePreview from "../../assets/img/venuePreview.png";
 // --- dnd-kit 分區設定拖曳套件---
@@ -234,7 +235,7 @@ const EventFormPage = () => {
 
     if (pStart && pStart < now) return "演出開始時間不能早於現在";
     if (tStart && tStart < now) return "售票開始時間不能早於現在";
-    if (pStart && pEnd && pEnd < pStart) return "演出結束時間不能早於演出開始時間";
+    if (pStart && pEnd && pEnd < pStart) return "演出開始時間不能晚於演出結束時間";
     if (tStart && tEnd && tEnd < tStart) return "售票結束時間不能早於售票開始時間";
     if (tEnd && pStart && tEnd > pStart) return "售票結束時間不能晚於演出開始時間";
 
@@ -1099,14 +1100,27 @@ const EventFormPage = () => {
                 <label htmlFor="eventDescription" className="text-muted form-label">
                   活動介紹<span className="text-danger">*</span>
                 </label>
-                <textarea
-                  className={`form-control ${errors.eventDescription ? "is-invalid" : ""}`}
-                  id="eventDescription"
-                  rows="5"
-                  placeholder="請詳細介紹您的活動內容"
-                  {...register("eventDescription", { required: "活動介紹為必填" })}
-                ></textarea>
-                <div className="invalid-feedback">{errors.eventDescription?.message}</div>
+                <Controller
+                  name="eventDescription" // 對應到 useForm 中的欄位名稱
+                  control={control}
+                  rules={{
+                    required: "活動介紹為必填",
+                    validate: (value) =>
+                      (value && value.replace(/<(.|\n)*?>/g, "").trim().length > 0) || "活動介紹為必填",
+                  }}
+                  render={({ field }) => (
+                    <RichTextEditor
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      isInvalid={!!errors.eventDescription}
+                      placeholder="請詳細介紹您的活動內容..."
+                    />
+                  )}
+                />
+                {errors.eventDescription && (
+                  <small className="text-danger mt-1 d-block">{errors.eventDescription.message}</small>
+                )}
               </div>
               {/* 12. 類型 (Radio buttons) */}
               <div className="my-3">
