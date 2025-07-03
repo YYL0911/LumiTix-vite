@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react"; 
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import axios from "axios";
+import Swal from 'sweetalert2';
 import { format } from "date-fns";
 import { zhTW } from "date-fns/locale";
 
@@ -130,6 +131,54 @@ const TicketDetailPage = () => {
     }
   };
 
+  const refundOrder = async () => {
+    const refundResult = await Swal.fire({
+      icon: 'warning',
+      title: '確定要退票嗎？',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      cancelButtonText: '取消',
+      confirmButtonText: '確認',
+    })
+    if (!refundResult.isConfirmed) return;
+
+    try {
+      const res = await axios.post(`https://n7-backend.onrender.com/api/v1/orders/${orderId}/refund`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${userToken}` },
+        }
+      )
+
+      if (res.data?.status) {
+        await Swal.fire({
+          icon: 'success',
+          title: '退票成功！',
+          confirmButtonText: `確認`,
+        })
+        navigate('/tickets');
+      } else {
+        throw new Error(response.data.message),
+        await Swal.fire({
+          icon: 'error',
+          title: '退票失敗！',
+          text: res.data.message || '',
+          confirmButtonText: `確認`,
+        });
+      }
+    } catch (error) {
+      const errMessage = error.response?.data?.message || "退票過程發生錯誤";
+      console.error("Refund Error:", error);
+      await Swal.fire({
+        icon: 'error',
+        title: '退票失敗',
+        text: errMessage,
+        confirmButtonText: '確認'
+      });
+    }
+  };
+
   if (loading) return <Loading />;
   // 根據載入後的資料，動態產生麵包屑
   const breadcrumb = [
@@ -178,10 +227,21 @@ const TicketDetailPage = () => {
           </div>
           <p className="mb-2 text-muted">
             入場QRCODE
-            <span
-              className={`badge fs-6 ${currentTicket.status === "used" ? "bg-secondary" : "bg-danger bg-gradient"}`}
+            {/* <span
+              className={`badge ms-2 fs-6 ${currentTicket.status === "used" ? "bg-secondary" : "bg-danger bg-gradient"}`}
             >
               {currentTicket.status === "used" ? "已使用" : "未使用"}
+            </span> */}
+            <span
+              className={`badge ms-2 fs-6 bg-gradient
+              ${currentTicket.status === "used" ? "bg-secondary" : ""}
+              ${currentTicket.status === "unused" ? "bg-danger" : ""}
+              ${currentTicket.status === "refunded" ? "bg-dark text-light" : ""}`
+              }
+            >
+              {currentTicket.status === "used" && "已使用"}
+              {currentTicket.status === "unused" && "未使用"}
+              {currentTicket.status === "refunded" && "已退票"}
             </span>
           </p>
           <p className="mb-1">訂單編號：{ticketData.order_no}</p>
@@ -194,7 +254,7 @@ const TicketDetailPage = () => {
             </div>
             <div className="col-4 border-start border-end">
               <small className="text-muted d-block fs-6">票價</small>
-              <div>{(currentTicket.price ?? 0).toLocaleString()} TWD</div>
+              <div>NT$ {(currentTicket.price ?? 0).toLocaleString()}</div>
             </div>
             <div className="col-4">
               <small className="text-muted d-block fs-6">座位</small>
@@ -227,7 +287,9 @@ const TicketDetailPage = () => {
           )}
         </div>
       </div>
+
       <h5 className="mb-3 text-start">詳細資訊</h5>
+
       <div className="card">
         <div className="card-body py-2 px-3">
           <div className="mb-3 d-flex flex-column border-bottom py-2">
@@ -261,7 +323,25 @@ const TicketDetailPage = () => {
           </div>
         </div>
       </div>
-    </div>
+
+      <div className="d-flex flex-column flex-lg-row gap-4 col-6 mx-auto mt-3">
+        <button
+          className="col btn btn-secondary text-white fw-bold"
+          onClick={() => navigate(-1)}
+        >
+          返回頁面
+        </button>
+        <button
+          type="button"
+          className="col btn btn-danger py-2"
+          onClick={refundOrder}
+          disabled={currentTicket.status === 'refunded'}
+        >
+          我要退票
+        </button>
+      </div>
+
+    </div >
   );
 };
 

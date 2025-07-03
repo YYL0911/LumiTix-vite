@@ -143,13 +143,15 @@ function Payments() {
                 });
             }
         } catch (error) {
-            Swal.fire({
-                icon: "error",
-                title: '錯誤',
-                text: "購票失敗，請稍後再試",
-            }).then(() => {
-                navigate(`/eventInfo/${id}`);
+            const errMessage = error.response?.data?.message || "購票失敗，請稍後再試";
+            console.error("Refund Error:", error);
+            await Swal.fire({
+                icon: 'error',
+                title: '購票失敗',
+                text: errMessage,
+                confirmButtonText: '確認'
             });
+            navigate(`/eventInfo/${id}`);
         }
     };
 

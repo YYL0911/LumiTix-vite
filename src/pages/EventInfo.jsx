@@ -76,7 +76,7 @@ function EventInfo() {
     }
   };
 
-
+  // 將活動加入收藏
   const onToggleCollect = async () => {
     const sweetAlert = (message, page) => {
       Swal.fire({
@@ -84,11 +84,11 @@ function EventInfo() {
         title: message,
         confirmButtonText: `確認`,
       }).then(() => {
-        navigate( page)
+        navigate(page)
       });
     }
 
-    if (!userToken){
+    if (!userToken) {
       sweetAlert('請先登入，再收藏活動', '/login')
       return
     } else if (userRole != 'General') {
@@ -97,33 +97,33 @@ function EventInfo() {
 
     try {
       const res = await axios.patch(
-          `https://n7-backend.onrender.com/api/v1/users/toggle-collect/${id}`,
-          {},
-          {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${userToken}`,
-            },
-          }
+        `https://n7-backend.onrender.com/api/v1/users/toggle-collect/${id}`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${userToken}`,
+          },
+        }
       );
-      
+
       if (res.data.status) {
         setIsCollect(!isCollect)
       }
-      else{
+      else {
         sweetAlert(res.message, '/allEvents')
       }
     } catch (err) {
-      if(err.response.data.message == "使用者已被封鎖") {
+      if (err.response.data.message == "使用者已被封鎖") {
         Swal.fire({
           title: "帳號已被封鎖",
           text: "您的帳號因違反使用條款已被停權，如有疑問請聯繫客服。",
           icon: "error",
           confirmButtonText: "了解",
         }).then(() => {
-            logout()
-            setIsCollect(false)
+          logout()
+          setIsCollect(false)
         });
       }
       else sweetAlert("發生異常，請稍後在試", '/allEvents')
@@ -359,15 +359,15 @@ function EventInfo() {
       <div className="border border-2 border-Neutral-700 px-4 py-3 bg-Neutral-700 d-flex justify-content-between">
         <h5 className="text-white fw-bold">{title}</h5>
         {isCollect && (
-          <IoHeartCircleOutline size={30}  color="red" className={`me-2`} type="button"
-          onClick={(e) => {onToggleCollect()}}/>
+          <IoHeartCircleOutline size={30} color="red" className={`me-2`} type="button"
+            onClick={(e) => { onToggleCollect() }} />
         )}
         {!isCollect && (
-          <IoHeartCircleSharp size={30}  color="#fff" className={`me-2`} type="button"
-          onClick={(e) => {onToggleCollect()}}/>
+          <IoHeartCircleSharp size={30} color="#fff" className={`me-2`} type="button"
+            onClick={(e) => { onToggleCollect() }} />
         )}
-        
-        
+
+
       </div>
       <div className="border border-2 border-top-0 border-Neutral-700 px-lg-4 px-3 py-lg-6 py-4">
         <div className="d-flex flex-column flex-lg-row gap-6">
