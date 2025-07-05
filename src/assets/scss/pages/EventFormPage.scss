@@ -122,3 +122,30 @@
   background-image: none !important; // 移除背景圖示
   padding-right: 0.75rem !important;  // 將右邊的內距恢復正常，避免 X 按鈕偏移
 }
+// --- 客製化 react-datepicker 的禁用日期樣式 --- //
+.react-datepicker__day--disabled {
+  color: #ccc !important; // 將文字顏色變得更淺
+  background-color: #f0f0f0 !important; // 加上淺灰色背景
+  text-decoration: line-through; // 加上刪除線
+  pointer-events: none; // 讓滑鼠移上去時，完全沒有任何點擊效果
+}
+.tiptap-editor {
+  min-height: 150px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  
+  > .ProseMirror:focus {
+    outline: none;
+  }
+
+  p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: #adb5bd;
+    pointer-events: none;
+    height: 0;
+  }
+}
+.tiptap-editor.is-invalid {
+  border-color: var(--bs-danger);
+}
