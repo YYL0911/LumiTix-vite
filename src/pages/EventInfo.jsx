@@ -11,8 +11,8 @@ import axios from 'axios'
 import Breadcrumb from "../conponents/Breadcrumb";
 import InfoSection from "../conponents/InfoSection";
 
-import { IoHeartCircleOutline } from "react-icons/io5";
-import { IoHeartCircleSharp } from "react-icons/io5";
+import { IoMdHeart } from "react-icons/io";
+import { IoMdHeartDislike } from "react-icons/io";
 
 function EventInfo() {
   const location = useLocation();
@@ -110,6 +110,19 @@ function EventInfo() {
       
       if (res.data.status) {
         setIsCollect(!isCollect)
+
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "bottom", // ✅ 如果你想改成下方顯示
+          showConfirmButton: false,
+          timer: 1500,
+          timerProgressBar: true,
+        });
+        Toast.fire({
+          icon: "success",
+          title: res.data.message
+        });
+
       }
       else{
         sweetAlert(res.message, '/allEvents')
@@ -358,14 +371,7 @@ function EventInfo() {
     <div className="mb-lg-7 mb-4 sectionTop" id={id}>
       <div className="border border-2 border-Neutral-700 px-4 py-3 bg-Neutral-700 d-flex justify-content-between">
         <h5 className="text-white fw-bold">{title}</h5>
-        {isCollect && (
-          <IoHeartCircleOutline size={30}  color="red" className={`me-2`} type="button"
-          onClick={(e) => {onToggleCollect()}}/>
-        )}
-        {!isCollect && (
-          <IoHeartCircleSharp size={30}  color="#fff" className={`me-2`} type="button"
-          onClick={(e) => {onToggleCollect()}}/>
-        )}
+        
         
         
       </div>
@@ -437,17 +443,30 @@ function EventInfo() {
           {/* 活動標題 */}
           <div className="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-4 mb-lg-8 mb-7">
             <h1 className="fw-bold">{event.title}</h1>
-            <button
-              className={`border-0 py-3 px-4 saleStatusBtn ${saleStatus === "active" ? "btn-sale" : "btn-unsale"}`}
-              disabled={saleStatus !== "active"}
-              onClick={() => scrollToSection('section4')}
-            >
-              <p className="fw-bold m-0 text-center">
-                {saleStatus === "countdown" ? "尚未開賣" : saleStatus === "active" ? "立即購票" : "販售結束"}
-              </p>
-            </button>
-          </div>
 
+
+            <div className="saleStatusBtn flex-shrink-0 d-flex align-items-stretch gap-2">
+              {/* 購票按鈕 */}
+              <button
+                className={`border-0 py-3 px-4 saleStatusBtn ${saleStatus === "active" ? "btn-sale" : "btn-unsale"} h-100`}
+                disabled={saleStatus !== "active"}
+                onClick={() => scrollToSection('section4')}
+              >
+                <p className="fw-bold m-0 text-center">
+                  {saleStatus === "countdown" ? "尚未開賣" : saleStatus === "active" ? "立即購票" : "販售結束"}
+                </p>
+              </button>
+
+              {/* 收藏按鈕 */}
+              <button
+                className={`border-0 py-3 px-4 bg-danger  h-100 d-flex align-items-center justify-content-center `}
+                onClick={onToggleCollect}
+              >
+                {isCollect ? (<IoMdHeart size={25} color="#fff" />) 
+                : ( <IoMdHeartDislike size={25} color="#fff" />)}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

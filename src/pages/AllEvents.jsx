@@ -236,14 +236,25 @@ function AllEvents() {
               setCollectEventData([])
             }
           }
-          else setCollectEventData(prev => prev.filter(item => item.id !== eventId));
+          else{
+            setCollectEventData(prev => prev.filter(item => item.id !== eventId));
+            
+            const Toast = Swal.mixin({
+              toast: true,
+              position: "bottom", // ✅ 如果你想改成下方顯示
+              showConfirmButton: false,
+              timer: 1500,
+              timerProgressBar: true,
+            });
+            Toast.fire({
+              icon: "success",
+              title: result.message
+            });
+          } 
         })
         .catch((err) => {
           navigate("/ErrorPage")
         });
-   
-    //   setCollectEvent(prev => [...prev, newCollect]);
-    
   }
 
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染

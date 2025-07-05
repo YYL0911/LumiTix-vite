@@ -1,7 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo, memo, useRef } from 'react';
-import dayjs from "dayjs";
+import Swal from 'sweetalert2';
 
 // Context
 import { useAuth } from '../../contexts/AuthContext';
@@ -13,7 +13,7 @@ import Loading from "../../conponents/Loading";
 // 圖片
 import locationIcon from "../../assets/img/location_on.png"
 
-import { IoHeartCircleOutline } from "react-icons/io5";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 //麵包屑
 const breadcrumb = [
@@ -39,16 +39,16 @@ const DataTable = memo(({filterProducts, handleNavigate, onToggleCollect}) => {
             }}>
 
               <div  className="bg-white my-3 d-flex align-items-center border border-2 border-black p-3 position-relative">
-                
-                <div className={`top-0 end-0 `}>
-                  <IoHeartCircleOutline size={30} color="red" className="position-absolute top-0 end-0" type="button"
+                <button
+                  className={`bg-danger border-0 top-0 end-0 position-absolute p-2`}
                   onClick={(e) => {
                     e.stopPropagation(); // 阻止事件冒泡到 a
                     e.preventDefault();  // 阻止 <a> 的預設跳轉行為
                     onToggleCollect(product.id)
-                  }} />
-                </div>
-                
+                  }}
+                >
+                  <RiDeleteBin6Line size={25} color="#fff" />
+                </button>
                 
                 <div className="flex-shrink-0 " style={{width:120+'px', height:160+'px'}}>
                   <img src={ product.cover_image_url} className="img-fluid object-fit-cover h-100 " alt="..."/>
@@ -211,6 +211,18 @@ function Tickets() {
 
           
           setAllData(prev => prev.filter(item => item.id !== eventId));
+
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "bottom", // ✅ 如果你想改成下方顯示
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+          });
+          Toast.fire({
+            icon: "success",
+            title: result.message
+          });
         })
         .catch((err) => {
           navigate("/ErrorPage")
@@ -253,7 +265,7 @@ function Tickets() {
             style={{
               position: isFixed ? 'fixed' : 'static',
               top: `${headerHeight}px`,
-              zIndex: 10
+              zIndex: 1
             }}
             className={`   bg-white py-2   border-dark-subtle 
               ${isFixed ? 
@@ -263,7 +275,7 @@ function Tickets() {
                 {tabs.map((tab) => (
                     <li className="nav-item" key={tab.key}>
                       <button
-                        className={`nav-underline-custom nav-link ${activeState === tab.key ? 'active' : ''}`}
+                        className={`nav-underline-custom nav-link pe-2 ${activeState === tab.key ? 'active' : ''}`}
                         onClick={() => setActiveState(tab.key)}
                       >
                         {tab.label}
