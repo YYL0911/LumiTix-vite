@@ -16,6 +16,21 @@ const AICompanion = () => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isOpen]); // 當 messages 或 isOpen 改變時觸發
+  
+  // 這個 effect 專門用來鎖定背景滾動
+  useEffect(() => {
+    // 當 isOpen 狀態變為 true (視窗打開) 時
+    if (isOpen) {
+      // 為 body 加上 style，禁止滾動
+      document.body.style.overflow = "hidden";
+    }
+    // 這個 effect 的「清除函式 (cleanup function)」
+    return () => {
+      // 當元件卸載或 isOpen 變為 false (視窗關閉) 時，恢復 body 的滾動功能
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]); // 這個 effect 只監聽 isOpen 狀態的變化
+
   // 事件處理函式 - 處理搜尋
   const handleSearch = async (e) => {
     e.preventDefault(); // 防止表單提交時頁面重新整理
