@@ -16,20 +16,33 @@ const AICompanion = () => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isOpen]); // 當 messages 或 isOpen 改變時觸發
-  
+
   // 這個 effect 專門用來鎖定背景滾動
   useEffect(() => {
-    // 當 isOpen 狀態變為 true (視窗打開) 時
-    if (isOpen) {
-      // 為 body 加上 style，禁止滾動
-      document.body.style.overflow = "hidden";
-    }
-    // 這個 effect 的「清除函式 (cleanup function)」
+    // 定義一個函式，專門用來處理滾動鎖定的邏輯
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      // 只有在「視窗開啟」且「是手機尺寸」時，才鎖定滾動
+      if (isOpen && isMobile) {
+        document.body.style.overflow = "hidden";
+      } else {
+        // 在其他所有情況下 (視窗關閉，或是電腦版)，都恢復滾動
+        document.body.style.overflow = "auto";
+      }
+    };
+
+    // 當視窗開啟或關閉時，立刻執行一次這個函式，確保狀態正確
+    handleResize();
+
+    // 為 window 加上「縮放」事件的監聽器
+    window.addEventListener("resize", handleResize);
+
+    // 清除函式：當元件卸載或 effect 重新執行前，務必移除監聽器並恢復滾動
     return () => {
-      // 當元件卸載或 isOpen 變為 false (視窗關閉) 時，恢復 body 的滾動功能
+      window.removeEventListener("resize", handleResize);
       document.body.style.overflow = "auto";
     };
-  }, [isOpen]); // 這個 effect 只監聽 isOpen 狀態的變化
+  }, [isOpen]); // 這個 effect 依然只監聽 isOpen 狀態的變化
 
   // 事件處理函式 - 處理搜尋
   const handleSearch = async (e) => {
