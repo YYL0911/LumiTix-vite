@@ -221,11 +221,11 @@ const EventReviewPage = () => {
             </div>
             <div className="fw-bold flex-grow-1">{eventData.type}</div>
           </div>
-          <div className="d-flex flex-column flex-sm-row mb-3">
-            <div className="fw-semibold text-nowrap" style={{ flexBasis: "120px", flexShrink: 0 }}>
-              活動介紹：
+          <div className="d-flex flex-column flex-md-row mb-3">
+            <div className="text-nowrap text-muted me-md-3 mb-2 mb-md-0" style={{ width: "120px" }}>
+              活動的介紹：
             </div>
-            <div className="fw-bold" dangerouslySetInnerHTML={{ __html: eventData.description }} />
+            <div className="fw-bold flex-grow-1" dangerouslySetInnerHTML={{ __html: eventData.description }} />
           </div>
 
           <div className="my-4">
