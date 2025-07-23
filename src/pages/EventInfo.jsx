@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useLocation, } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
+import {patchCollect, getEventInfo} from '../api/user'
 import Swal from 'sweetalert2';
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
 import duration from 'dayjs/plugin/duration';
-import axios from 'axios'
 
 // 元件
 import Breadcrumb from "../conponents/Breadcrumb";
@@ -95,51 +95,27 @@ function EventInfo() {
       sweetAlert('請先登入一般會員，再收藏活動', '/login')
     }
 
-    try {
-      const res = await axios.patch(
-        `https://n7-backend.onrender.com/api/v1/users/toggle-collect/${id}`,
-        {},
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${userToken}`,
-          },
-        }
-      );
 
-      if (res.data.status) {
-        setIsCollect(!isCollect)
+    patchCollect(id)
+    .then(result => {
+      setIsCollect(!isCollect)
 
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "bottom", // ✅ 如果你想改成下方顯示
-          showConfirmButton: false,
-          timer: 1500,
-          timerProgressBar: true,
-        });
-        Toast.fire({
-          icon: "success",
-          title: res.data.message
-        });
-
-      }
-      else {
-        sweetAlert(res.message, '/allEvents')
-      }
-    } catch (err) {
-      if (err.response.data.message == "使用者已被封鎖") {
-        Swal.fire({
-          title: "帳號已被封鎖",
-          text: "您的帳號因違反使用條款已被停權，如有疑問請聯繫客服。",
-          icon: "error",
-          confirmButtonText: "了解",
-        }).then(() => {
-          logout()
-          setIsCollect(false)
-        });
-      } else sweetAlert("發生異常，請稍後在試", "/allEvents");
-    }
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "bottom", // ✅ 如果你想改成下方顯示
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true,
+      });
+      Toast.fire({
+        icon: "success",
+        title: result.message
+      });
+    })
+    .catch(err => {
+      if(err.type == "BLOCKED") logout()
+      navigate(err.route)
+    })
   };
 
   useEffect(() => {}, [isCollect]);
@@ -154,17 +130,12 @@ function EventInfo() {
 
     const fetchEvent = async () => {
       setApiLoading(true); // 將 setApiLoading 移至函式內部
-      try {
-        const res = await axios.get(`https://n7-backend.onrender.com/api/v1/events/${id}`);
 
-        if (res.data.status) {
-          setEvent(res.data.data || {}); // 使用 || {} 避免 event 為 null
-        } else {
-          throw new Error(res.data.message);
-          // console.log('API 回傳資料:', res.data.data);
-        }
-      } catch (err) {
-        // console.error('取得活動失敗', err);
+      getEventInfo(id)
+      .then(result => {
+        setEvent(result.data || {}); // 使用 || {} 避免 event 為 null
+      })
+      .catch(err => {
         Swal.fire({
           icon: 'error',
           title: '錯誤',
@@ -172,9 +143,10 @@ function EventInfo() {
         }).then(() => {
           navigate('/allEvents');
         })
-      } finally {
+      })
+      .finally (() =>{
         setApiLoading(false);
-      }
+      })
     };
 
     fetchEvent();

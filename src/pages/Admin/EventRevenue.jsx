@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef, PureComponent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from '../../contexts/AuthContext';
+import {getRevenue, getEventInfo} from '../../api/admin'
 import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadialBarChart, RadialBar, Legend } from 'recharts';
 import Swal from 'sweetalert2';
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
-import axios from 'axios';
 
 import Breadcrumb from "../../conponents/Breadcrumb";
 
@@ -34,24 +34,11 @@ function EventRevenue() {
         const fetchData = async () => {
             try {
                 const [eventRes, revenueRes] = await Promise.all([
-                    axios.get(`https://n7-backend.onrender.com/api/v1/admin/events/${id}`, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'Authorization': `Bearer ${userToken}`,
-                        }
-                    }),
-                    axios.get(`https://n7-backend.onrender.com/api/v1/admin/events/revenue/${id}`, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'Authorization': `Bearer ${userToken}`,
-                        }
-                    }),
+                    getEventInfo(id), getRevenue(id)
                 ]);
 
-                setEvent(eventRes.data.data || []);
-                setEventRevenue(revenueRes.data.data || []);
+                setEvent(eventRes.data || []);
+                setEventRevenue(revenueRes.data || []);
                 // console.log('API eventRes 回傳資料:', eventRes.data.data)
                 // console.log('API revenueRes 回傳資料:', revenueRes.data.data)
             } catch (err) {

@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, memo, useRef } from 'react';
 
 // Context
 import { useAuth } from '../../contexts/AuthContext';
+import {getAllEvents} from '../../api/admin'
 
 // 元件
 import Breadcrumb from "../../conponents/Breadcrumb";
@@ -98,7 +99,7 @@ const tabs = [
 ];
 
 function EventsList() {
-  const { headerHeight, loading, userToken } = useAuth();
+  const { headerHeight} = useAuth();
   const navigate = useNavigate();
   const [activeState, setActiveState] = useState('全部'); 
   const [allData, setAllData] = useState([]); 
@@ -111,27 +112,18 @@ function EventsList() {
         isFirstRender.current = false; // 更新為 false，代表已執行過
         // console.log("✅ useEffect 只執行一次");
         setApiLoading(true)
-        fetch("https://n7-backend.onrender.com/api/v1/admin/events",{
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${userToken}`, // token 放這
-          }}) 
-          .then(res => res.json())
-          .then(result => {
-            setApiLoading(false)
 
-            if(!result.status){
-              if(result.message == "尚未登入") navigate("/login");
-              else navigate("/");
-            }
-            else{
-              setAllData(result.data.events)
-            }
-          })
-          .catch(err => {
-            navigate("/ErrorPage")
-          });
+        getAllEvents()
+        .then(result => {
+          setAllData(result.data.events)
+        })
+        .catch(err => {
+          navigate(err.route)
+        })
+        .finally (() =>{
+          setApiLoading(false)
+        })
+
       }
     }, []);
 

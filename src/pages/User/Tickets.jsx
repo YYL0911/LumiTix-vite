@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, memo, useRef } from 'react';
 
 // Context
 import { useAuth } from '../../contexts/AuthContext';
+import {getAllOrder} from '../../api/user'
 
 // 元件
 import Breadcrumb from "../../conponents/Breadcrumb";
@@ -95,7 +96,7 @@ const tabs = [
 ];
 
 function Tickets() {
-  const { headerHeight, loading, userToken } = useAuth();
+  const { headerHeight, loading } = useAuth();
   const navigate = useNavigate();
   const [activeState, setActiveState] = useState(null);
   const [allData, setAllData] = useState(null);
@@ -109,31 +110,19 @@ function Tickets() {
       isFirstRender.current = false; // 更新為 false，代表已執行過
       // console.log("✅ useEffect 只執行一次");
       setApiLoading(true)
-      fetch("https://n7-backend.onrender.com/api/v1/orders", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${userToken}`, // token 放這
-        }
+      getAllOrder()
+      .then(result => {
+        setAllData(result.data)
+        setOrignDataLen(result.data.length)
+        setUserBlock(1)
       })
-        .then(res => res.json())
-        .then(result => {
-          setApiLoading(false)
-
-          if (!result.status) {
-            if (result.message == "尚未登入") navigate("/login");
-            else if (result.message == "使用者已被封鎖") setUserBlock(-1)
-            else navigate("/");
-          }
-          else {
-            setAllData(result.data)
-            setOrignDataLen(result.data.length)
-            setUserBlock(1)
-          }
-        })
-        .catch(err => {
-          navigate("/ErrorPage")
-        });
+      .catch(err => {
+        if(err.type == "BLOCKED") setUserBlock(-1)
+        else navigate(err.route)
+      })
+      .finally (() =>{
+        setApiLoading(false);
+      })
     }
   }, []);
 

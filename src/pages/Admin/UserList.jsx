@@ -1,14 +1,13 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { useAuth } from '../../contexts/AuthContext';
+import {getAllUsers, blockUser} from '../../api/admin'
 import Swal from 'sweetalert2';
-import axios from 'axios'
 
 import Breadcrumb from "../../conponents/Breadcrumb";
 import PaginationComponent from "../../conponents/Pagination";
 
 function UserManagementList() {
-    const { loading, userToken } = useAuth();
     const isFirstRender = useRef(true);
     const [apiLoading, setApiLoading] = useState(false);
     const [users, setUsers] = useState([])
@@ -43,28 +42,23 @@ function UserManagementList() {
     // 取得一般會員列表
     useEffect(() => {
         const getUsers = async () => {
-            try {
-                const res = await axios.get('https://n7-backend.onrender.com/api/v1/admin/users', {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${userToken}`,
-                    }
-                })
-
+            getAllUsers()
+            .then(result => {
+                setUsers(result.data || [])
+            })
+            .catch(err => {
+                if(err.type == "OTHER"){
+                    Swal.fire({
+                        icon: 'error',
+                        title: '操作失敗',
+                        text: err.response?.data?.message || '請稍後再試',
+                    });
+                }
+                else navigate(err.route)
+            })
+            .finally (() =>{
                 setApiLoading(false)
-                setUsers(res.data.data || [])
-                // console.log('API 回傳資料:', res.data.data)
-                setCurrentPage(1);
-            } catch (err) {
-                setApiLoading(false)
-                // console.error('取得使用者失敗', err)
-                Swal.fire({
-                    icon: 'error',
-                    title: '操作失敗',
-                    text: err.response?.data?.message || '請稍後再試',
-                });
-            }
+            })
         }
 
         if (isFirstRender.current) {
@@ -88,19 +82,8 @@ function UserManagementList() {
 
         if (!confirmResult.isConfirmed) return;
 
-        try {
-            const res = await axios.patch(
-                `https://n7-backend.onrender.com/api/v1/admin/users/${id}/toggle-block`,
-                {},
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${userToken}`,
-                    },
-                }
-            );
-
+        blockUser(id)
+        .then(result => {
             const updatedUsers = users.map(user =>
                 user.id === id ? { ...user, isBlocked: !user.isBlocked } : user
             );
@@ -113,14 +96,20 @@ function UserManagementList() {
                 timer: 1500,
                 showConfirmButton: false,
             });
-        } catch (err) {
-            // console.error('切換使用者狀態失敗', err.response?.data || err.message);
-            Swal.fire({
-                icon: 'error',
-                title: '操作失敗',
-                text: err.response?.data?.message || '請稍後再試',
-            });
-        }
+        })
+        .catch(err => {
+            if(err.type == "OTHER"){
+                Swal.fire({
+                    icon: 'error',
+                    title: '操作失敗',
+                    text: err.response?.data?.message || '請稍後再試',
+                });
+            }
+            else navigate(err.route)
+        })
+        .finally (() =>{
+            setApiLoading(false)
+        })
     };
 
     // 收尋會員

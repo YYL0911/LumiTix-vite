@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import {getOrderInfo, refundTicket} from '../../api/user'
+
 import axios from "axios";
 import Swal from 'sweetalert2';
 import { format } from "date-fns";
@@ -59,57 +61,50 @@ const TicketDetailPage = () => {
       // 只在初次載入時，才顯示全頁的 Loading 動畫
       if (isInitialFetch) setLoading(true);
 
-      try {
-        const response = await axios.get(`https://n7-backend.onrender.com/api/v1/orders/${orderId}`, {
-          headers: { Authorization: `Bearer ${userToken}` },
-        });
+      getOrderInfo(orderId)
+      .then(result => {
 
-        if (!isMounted) return; // 如果在請求過程中元件被卸載，則直接返回
-
-        if (response.data?.status) {
-          const newApiData = response.data.data;
-
-          setTicketData((prevData) => {
-            // 如果是初次載入，或根本沒有舊資料，直接回傳新資料來更新畫面
-            if (isInitialFetch || !prevData) {
-              return newApiData;
-            }
-            // 比對新舊資料中，票券的狀態是否有任何不同
-            const hasStatusChanged = newApiData.tickets.some(
-              (newTicket, index) => prevData.tickets[index]?.status !== newTicket.status
-            );
-            // 如果狀態沒變，回傳舊的資料，React 會進行優化，不觸發不必要的畫面刷新
-            if (!hasStatusChanged) {
-              return prevData;
-            }
-            // 如果狀態改變了，執行「索引校正」邏輯，確保使用者看到的還是同一張票
-            const currentTicketId = prevData.tickets[currentIndexRef.current]?.ticket_no;
-
-            if (currentTicketId) {
-              const newIndex = newApiData.tickets.findIndex((ticket) => ticket.ticket_no === currentTicketId);
-              if (newIndex !== -1) {
-                setCurrentTicketIndex(newIndex); // 更新當前票券的索引
-              }
-            }
-            return newApiData; // 回傳新資料來更新畫面
-          });
-          // 檢查是否所有票券都已使用，如果是，則停止輪詢
-          const allTicketsAreUsed = newApiData.tickets.every((ticket) => ticket.status === "used");
-          if (allTicketsAreUsed) {
-            clearInterval(intervalId);
+        const newApiData = result.data;
+        setTicketData((prevData) => {
+          // 如果是初次載入，或根本沒有舊資料，直接回傳新資料來更新畫面
+          if (isInitialFetch || !prevData) {
+            return newApiData;
           }
-        } else {
-          throw new Error(response.data?.message || "無法取得票券資訊");
+          // 比對新舊資料中，票券的狀態是否有任何不同
+          const hasStatusChanged = newApiData.tickets.some(
+            (newTicket, index) => prevData.tickets[index]?.status !== newTicket.status
+          );
+          // 如果狀態沒變，回傳舊的資料，React 會進行優化，不觸發不必要的畫面刷新
+          if (!hasStatusChanged) {
+            return prevData;
+          }
+          // 如果狀態改變了，執行「索引校正」邏輯，確保使用者看到的還是同一張票
+          const currentTicketId = prevData.tickets[currentIndexRef.current]?.ticket_no;
+
+          if (currentTicketId) {
+            const newIndex = newApiData.tickets.findIndex((ticket) => ticket.ticket_no === currentTicketId);
+            if (newIndex !== -1) {
+              setCurrentTicketIndex(newIndex); // 更新當前票券的索引
+            }
+          }
+          return newApiData; // 回傳新資料來更新畫面
+        });
+        // 檢查是否所有票券都已使用，如果是，則停止輪詢
+        const allTicketsAreUsed = newApiData.tickets.every((ticket) => ticket.status === "used");
+        if (allTicketsAreUsed) {
+          clearInterval(intervalId);
         }
-      } catch (error) {
+      })
+      .catch(err => {
         if (!isMounted) return;
-        const message = error.response?.data?.message || "發生未知錯誤";
+        const message = err?.message || "發生未知錯誤";
         setErrorMessage(message);
-        console.error("Fetch Error:", error.response || error);
         clearInterval(intervalId); // 發生無法恢復的錯誤時，也停止輪詢
-      } finally {
+        
+      })
+      .finally (() =>{
         if (isMounted && isInitialFetch) setLoading(false);
-      }
+      })
     };
 
     fetchTicketDetails(true); // 立即執行第一次，顯示 Loading
@@ -143,40 +138,27 @@ const TicketDetailPage = () => {
     })
     if (!refundResult.isConfirmed) return;
 
-    try {
-      const res = await axios.post(`https://n7-backend.onrender.com/api/v1/orders/${orderId}/refund`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${userToken}` },
-        }
-      )
 
-      if (res.data?.status) {
-        await Swal.fire({
+    refundTicket(orderId)
+      .then(result => {
+        Swal.fire({
           icon: 'success',
           title: '退票成功！',
           confirmButtonText: `確認`,
+        }).then(() => {
+          navigate('/tickets');
         })
-        navigate('/tickets');
-      } else {
-        throw new Error(response.data.message),
-        await Swal.fire({
-          icon: 'error',
-          title: '退票失敗！',
-          text: res.data.message || '',
-          confirmButtonText: `確認`,
-        });
-      }
-    } catch (error) {
-      const errMessage = error.response?.data?.message || "退票過程發生錯誤";
-      console.error("Refund Error:", error);
-      await Swal.fire({
+       
+      })
+      .catch(err => {
+        Swal.fire({
         icon: 'error',
         title: '退票失敗',
-        text: errMessage,
+        text: err.message,
         confirmButtonText: '確認'
       });
-    }
+      })
+      
   };
 
   if (loading) return <Loading />;

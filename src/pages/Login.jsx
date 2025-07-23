@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 // Context
 import { useAuth } from '../contexts/AuthContext';
+import {signin} from '../api/user'
 
 // 元件
 import Input from '../conponents/Input';
@@ -43,43 +44,38 @@ function Login() {
     // console.log(data);
     setloading(true)
     // 登入api
-    fetch("https://n7-backend.onrender.com/api/v1/users/signin",{
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: data.email,
-        password: data.password
-      })
-    }) 
-    .then(res => res.json())
+
+    signin({
+      email: data.email,
+      password: data.password
+    })
     .then(result => {
-      setloading(false)
-      if(!result.status){
+      if(result.data.user.role == "General"){
+        login("General", result.data.user.name, result.data.token)
+        navigate("/");
+      } 
+      else if(result.data.user.role == "Organizer"){
+        login("Organizer", result.data.user.name, result.data.token)
+        navigate("/events");
+        
+      } 
+      else if(result.data.user.role == "Admin"){
+        login("Admin", result.data.user.name, result.data.token)
+        navigate("/eventsList");
+      } 
+    })
+    .catch(err => {
+      if(err.type == "OTHER"){
+        // 顯示錯誤資訊
         setErrMessage(result.message) 
         setShowErrorInfo(true)
         setCheckOk(false)
       }
-      else{
-        if(result.data.user.role == "General"){
-          login("General", result.data.user.name, result.data.token)
-          navigate("/");
-        } 
-        else if(result.data.user.role == "Organizer"){
-          login("Organizer", result.data.user.name, result.data.token)
-          navigate("/events");
-          
-        } 
-        else if(result.data.user.role == "Admin"){
-          login("Admin", result.data.user.name, result.data.token)
-          navigate("/eventsList");
-        } 
-      }
+      else navigate("/ErrorPage")
     })
-    .catch(err => {
-      navigate("/ErrorPage")
-    });
+    .finally (() =>{
+      setloading(false); // 關閉loading
+    })
 
   };
 

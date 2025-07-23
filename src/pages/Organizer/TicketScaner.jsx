@@ -6,6 +6,7 @@ import withReactContent from 'sweetalert2-react-content'
 
 // Context
 import { useAuth } from '../../contexts/AuthContext';
+import {getHoldingEvent, scanResult} from '../../api/organizer'
 
 // 元件
 import Loading from "../../conponents/Loading";
@@ -24,7 +25,7 @@ const showSwal = (icon, title, info) => {
 }
 
 function TicketScaner() {
-  const { userToken, loading  } = useAuth();
+  const {loading  } = useAuth();
   const navigate = useNavigate(); 
   const [apiLoading, setApiLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -47,44 +48,34 @@ function TicketScaner() {
     
       // console.log(" useEffect 只執行一次");
       setApiLoading(true)
-      fetch("https://n7-backend.onrender.com/api/v1/organizer/events/by-status?status=holding",{
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${userToken}`, // token 放這
-        }}) 
-        .then(res => res.json())
-        .then(result => {
-          setApiLoading(false)
-          
-          if(!result.status){
-            if(result.message == "尚未登入") navigate("/login");
-            else navigate("/");
-          }
+
+      getHoldingEvent()
+      .then(result => {
+        setOptions(result.data)
+        if(result.data.length > 0){
+          setEventID(result.data[0].id)
+          eventIDRef.current = result.data[0].id; // 同步更新 ref
+        } 
+        const eventIDStorage = localStorage.getItem("scanEventID");
+        if(eventIDStorage){
+          setEventID(eventIDStorage)
+          eventIDRef.current = eventIDStorage; // 同步更新 ref
+          if (!result.data.some((item) => item.id == eventIDStorage) ){
+            setEventID("")
+            eventIDRef.current = ""; // 同步更新 ref
+          } 
           else{
-            setOptions(result.data)
-            if(result.data.length > 0){
-              setEventID(result.data[0].id)
-              eventIDRef.current = result.data[0].id; // 同步更新 ref
-            } 
-            const eventIDStorage = localStorage.getItem("scanEventID");
-            if(eventIDStorage){
-              setEventID(eventIDStorage)
-              eventIDRef.current = eventIDStorage; // 同步更新 ref
-              if (!result.data.some((item) => item.id == eventIDStorage) ){
-                setEventID("")
-                eventIDRef.current = ""; // 同步更新 ref
-              } 
-              else{
-                setEventID(eventIDStorage)
-                eventIDRef.current = eventIDStorage; 
-              } 
-            } 
-          }
-        })
-        .catch(err => {
-          navigate("/ErrorPage")
-        });
+            setEventID(eventIDStorage)
+            eventIDRef.current = eventIDStorage; 
+          } 
+        } 
+      })
+      .catch(err => {
+        navigate(err.route)
+      })
+      .finally (() =>{
+        setApiLoading(false);
+      })
     }
   }, []);
 
@@ -100,23 +91,19 @@ function TicketScaner() {
   const handleScan = (data) => {
     let ticket403 = false
     //由DATA抓到QRCORD資訊
-    fetch(`https://n7-backend.onrender.com/api/v1/organizer/events/${eventIDRef.current}/verify/?token=${data}`, {
-      method: "PATCH",
-      headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${userToken}`, // token 放這
-    }}) 
-    .then((res) =>{
-      if(res.status == 403 ) ticket403 = true
-      return res.json()
-    } )
-    .then((res) => {
-      if (res.status) navigate('/ticketScanerResult', { state: { result: res} });
-      else if(res.message == "尚未登入" )navigate("/login");
-      else if(ticket403 ) navigate('/');
-      else navigate('/ticketScanerResult', { state: { result: res} });
-    })
-    .catch(() => {});
+    scanResult(eventIDRef.current, data)
+      .then(result => {
+        navigate('/ticketScanerResult', { state: { result: result} });
+      })
+      .catch(err => {
+        if(err.type == "OTHER" && err.row.response.status != 403){
+          navigate('/ticketScanerResult', { state: { result: res} });
+        }
+        else navigate(err.route)
+      })
+      .finally (() =>{
+        setApiLoading(false);
+      })
   };
 
  // 需要等畫面渲染完成，才能抓到ID

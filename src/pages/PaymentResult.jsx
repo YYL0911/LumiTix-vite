@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
+import {getNewOrderInfo} from '../api/user'
 import Swal from 'sweetalert2';
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
-import axios from 'axios';
 
 import Loading from "../conponents/Loading";
 
@@ -29,21 +29,12 @@ function CreatOrder() {
     useEffect(() => {
         const fetchOrder = async () => {
             setApiLoading(true);
-            try {
-                const res = await axios.get(`https://n7-backend.onrender.com/api/v1/orders/${orderId}`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${userToken}`,
-                    },
-                });
-                setApiLoading(false);
-                if (res.data.status) {
-                    setOrder(res.data.data || {});
-                    // console.log('API 回傳資料:', res.data.data);
-                }
-            } catch (err) {
-                setApiLoading(false);
+
+            getNewOrderInfo(orderId)
+            .then(result => {
+                setOrder(result.data || {});
+            })
+            .catch(err => {
                 // console.error('取得訂單失敗', err);
                 Swal.fire({
                     icon: 'error',
@@ -52,7 +43,10 @@ function CreatOrder() {
                 }).then(() => {
                     navigate('/tickets');
                 })
-            }
+            })
+            .finally (() =>{
+                setApiLoading(false);
+            })
         };
 
         if (isFirstRender.current) {

@@ -3,7 +3,11 @@ import { createContext, useEffect, useContext, useState, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
+
 import Loading from '../conponents/Loading';
+
+import {checkAuth, getEventTypes} from '../api/user'
+import { setTokenGetter } from '../utils/token'
 
 const AuthContext = createContext();
 
@@ -28,87 +32,72 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("token", token);
     localStorage.setItem("role", role);
     localStorage.setItem("name", name);
+
+    setTokenGetter(() => token)
   } ;
   const logout = () =>{
     setUserRole(null);
     setUserName(null);
     setUserToken(null);
     localStorage.clear();
+    setTokenGetter(() => "")
   } 
 
  
   const getEventTypeApi  = () => {
-    fetch("https://n7-backend.onrender.com/api/v1/event-types",{
-      method: "GET", headers: {"Content-Type": "application/json"}}) 
-    .then(res => res.json())
+    getEventTypes()
     .then(result => {
-      if(!result.status){navigate("/ErrorPage")}
-      else{
-         // 新增一個自定義類別
-        const customType = {
-          id: 'all', // 可自定義為固定值，前端辨識用途
-          name: '全部種類',
-        };
+      // 新增一個自定義類別
+      const customType = {
+        id: 'all', // 可自定義為固定值，前端辨識用途
+        name: '全部種類',
+      };
 
-        const sorted = [...result.data].sort((a, b) => {
-          if (a.name === '其他') return 1;
-          if (b.name === '其他') return -1;
-          return 0;
-        });
-        setEventTypesOri([...sorted])
-        setEventTypes([customType, ...sorted])
-      } 
+      const sorted = [...result.data].sort((a, b) => {
+        if (a.name === '其他') return 1;
+        if (b.name === '其他') return -1;
+        return 0;
+      });
+      setEventTypesOri([...sorted])
+      setEventTypes([customType, ...sorted])
+    })
+    .catch(err => {
+      navigate("/ErrorPage")
+    })
+    .finally (() =>{
       setLoading(false); // 驗證結束
     })
-    .catch(err => navigate("/ErrorPage") );
   }
 
+  
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
   //取得使用者資料
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (isFirstRender.current && token) {
+      setTokenGetter(() => token)
       isFirstRender.current = false; // 更新為 false，代表已執行過
-      // console.log("✅ useEffect 只執行一次");
-      fetch("https://n7-backend.onrender.com/api/v1/users/auth",{
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // token 放這
-        }}) 
-      .then(res => res.json())
-      .then(result => {
-        if(!result.status){
-          localStorage.clear();
-          if(result.message == "使用者已被封鎖"){
-            logout();
-            Swal.fire({
-              title: "帳號已被封鎖",
-              text: "您的帳號因違反使用條款已被停權，如有疑問請聯繫客服。",
-              icon: "error",
-              confirmButtonText: "了解",
-            });
-          }
-          navigate("/")
-        }
-        else{
-          const role = localStorage.getItem("role");
-          const name = localStorage.getItem("name");
-          setUserRole(role)
-          setUserName(name)
-          setUserToken(token)
-        }
       
+      checkAuth()
+      .then(res => {
+        const role = localStorage.getItem("role");
+        const name = localStorage.getItem("name");
+        setUserRole(role)
+        setUserName(name)
+        setUserToken(token)
         getEventTypeApi()
       })
       .catch(err => {
-        navigate("/ErrorPage")
-      });
+        getEventTypeApi()
+        logout();
+        navigate("/")
+      })
+
     }
     else if(!token){
       getEventTypeApi()
     }
-  
+
   }, []);
 
  

@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 
 // Context
 import { useAuth } from '../../contexts/AuthContext';
+import {getCollect, patchCollect} from '../../api/user'
 
 // 元件
 import Breadcrumb from "../../conponents/Breadcrumb";
@@ -112,41 +113,32 @@ function Tickets() {
         isFirstRender.current = false; // 更新為 false，代表已執行過
         // console.log("✅ useEffect 只執行一次");
         setApiLoading(true)
-        fetch("https://n7-backend.onrender.com/api/v1/users/collect",{
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${userToken}`, // token 放這
-          }}) 
-          .then(res => res.json())
-          .then(result => {
-            setApiLoading(false)
 
-            if(!result.status){
-              if(result.message == "尚未登入") navigate("/login");
-              else if(result.message == "使用者已被封鎖") setUserBlock(-1)
-              else navigate("/");
-            }
-            else{
-              const now = new Date();
-              const eventsWithStatus = [...result.data].map(event => {
-                const start = new Date(event.sale_start_at);
-                const end = new Date(event.sale_end_at);
 
-                let status = "";
-                if (now < start) status = "unstart";
-                else if (now >= start && now <= end) status = "ing";
-                else status = "finish";
-                return { ...event, status };
-              });
+        // 取得所有收藏活動api
+        getCollect()
+        .then(result => {
+          setApiLoading(false);
+          const now = new Date();
+          const eventsWithStatus = [...result.data].map(event => {
+            const start = new Date(event.sale_start_at);
+            const end = new Date(event.sale_end_at);
 
-              setAllData(eventsWithStatus)
-              setUserBlock(1)
-            }
-          })
-          .catch(err => {
-            navigate("/ErrorPage")
+            let status = "";
+            if (now < start) status = "unstart";
+            else if (now >= start && now <= end) status = "ing";
+            else status = "finish";
+            return { ...event, status };
           });
+
+          setAllData(eventsWithStatus)
+          setUserBlock(1)
+        })
+        .catch(err => {
+          if(err.type == "BLOCKED") logout()
+          navigate(err.route)
+        })
+       
       }
     }, []);
 
@@ -198,37 +190,27 @@ function Tickets() {
 
 
   const  onToggleCollect = (eventId) => {
-    const token = localStorage.getItem("token");
-    fetch(`https://n7-backend.onrender.com/api/v1/users/toggle-collect/${eventId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // token 放這
-        },
-      })
-        .then((res) => res.json())
-        .then((result) => {
-
-          
-          setAllData(prev => prev.filter(item => item.id !== eventId));
-
-          const Toast = Swal.mixin({
-            toast: true,
-            position: "bottom", // ✅ 如果你想改成下方顯示
-            showConfirmButton: false,
-            timer: 1500,
-            timerProgressBar: true,
-          });
-          Toast.fire({
-            icon: "success",
-            title: result.message
-          });
-        })
-        .catch((err) => {
-          navigate("/ErrorPage")
-        });
-   
-    //   setCollectEvent(prev => [...prev, newCollect]);
+    patchCollect(eventId)
+    .then(result => {
+      // 刪除該收藏
+      setAllData(prev => prev.filter(item => item.id !== eventId));
+      // 提示成功    
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "bottom", // ✅ 如果你想改成下方顯示
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true,
+      });
+      Toast.fire({
+        icon: "success",
+        title: result.message
+      });
+    })
+    .catch(err => {
+      if(err.type == "BLOCKED") logout()
+      navigate(err.route)
+    })
     
   }
 

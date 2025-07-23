@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 // Context
 import { useAuth } from '../../contexts/AuthContext';
+import {getProfile, updateProfile, updatePassword, cancleGoogleBind, setGoogleBind} from '../../api/user'
 
 // 元件
 import Input from '../../conponents/Input';
@@ -25,7 +26,7 @@ const breadcrumb = [
 ];
 
 function Personal() {
-  const { setUserName, userToken, loading, userName  } = useAuth(); // [變更使用者名稱, token]
+  const { setUserName, loading, userName  } = useAuth(); // [變更使用者名稱, token]
   const navigate = useNavigate(); // 跳轉頁面
 
   const [apiLoading, setApiLoading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
@@ -42,44 +43,33 @@ function Personal() {
       isFirstRender.current = false; // 更新為 false，代表已執行過
       // console.log("✅ useEffect 只執行一次");
       setApiLoading(true)
-      fetch("https://n7-backend.onrender.com/api/v1/users/profile",{
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${userToken}`, // token 放這
-        }}) 
-        .then(res => res.json())
-        .then(result => {
-          setApiLoading(false)
-          if(!result.status){
-            if(result.message == "尚未登入") navigate("/login");
-
-            if(result.message == "使用者已被封鎖") setUserBlock(-1)
-            else setUserBlock(1)
-          }
-          else{
-            // ✅ 用 reset 動態設定預設值
-            mainReset({
-              userID: result.data.serialNo,
-              email: result.data.email,
-              name: result.data.name,
-            });
-            setIsBindGoogle(result.data.google_bind)
-            setUserBlock(1)
-
-            const googleInfo = localStorage.getItem("googleInfo");
-            if(googleInfo){
-              if(googleInfo == "bind") setUpdateNameResult("已取消綁定") 
-              else setUpdateNameResult(googleInfo); 
-              setModalTitle("綁定結果")
-              successModalRef.current.open();
-              localStorage.removeItem('googleInfo');
-            }
-          }
-        })
-        .catch(err => {
-          navigate("/ErrorPage")
+      getProfile()
+      .then(result => {
+        // ✅ 用 reset 動態設定預設值
+        mainReset({
+          userID: result.data.serialNo,
+          email: result.data.email,
+          name: result.data.name,
         });
+        setIsBindGoogle(result.data.google_bind)
+        setUserBlock(1)
+
+        const googleInfo = localStorage.getItem("googleInfo");
+        if(googleInfo){
+          if(googleInfo == "bind") setUpdateNameResult("已取消綁定") 
+          else setUpdateNameResult(googleInfo); 
+          setModalTitle("綁定結果")
+          successModalRef.current.open();
+          localStorage.removeItem('googleInfo');
+        }
+      })
+      .catch(err => {
+        if(err.type == "BLOCKED") setUserBlock(-1)
+        else navigate(err.route)
+      })
+      .finally (() =>{
+        setApiLoading(false)
+      })
     }
   }, []);
 
@@ -102,31 +92,26 @@ function Personal() {
   const onMainSubmit = (data) => {
     // console.log("主表單資料", data);
     setApiLoading(true)
-    fetch("https://n7-backend.onrender.com/api/v1/users/profile",{
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${userToken}`, // token 放這
-      },
-      body: JSON.stringify({
-        name: data.name
-      })
-    }) 
-    .then(res => res.json())
+
+    setModalTitle("修改名稱結果")
+    updateProfile({
+      name: data.name
+    })
     .then(result => {
-      setApiLoading(false)
-      if(result.status){
-        setUserName(data.name);
-        setModalTitle("修改名稱結果")
-        setUpdateNameResult(`成功修改名稱為${data.name}`);
-        localStorage.setItem("name", data.name);
-      }
-      else setUpdateNameResult(result.message)
+      setUserName(data.name);
+      setUpdateNameResult(`成功修改名稱為${data.name}`);
+      localStorage.setItem("name", data.name);
       successModalRef.current.open();
     })
     .catch(err => {
-      navigate("/ErrorPage")
-    });
+      if(err.type == "OTHER") setUpdateNameResult(err.message)
+      else navigate(err.route)
+      successModalRef.current.open();
+    })
+    .finally (() =>{
+      setApiLoading(false)
+    })
+    
   };
 
   const watchMain = useWatch({ control: mainControl }); // 監看表單狀態
@@ -187,41 +172,32 @@ function Personal() {
   const onPasswordSubmit = (data) => {
     // console.log("密碼表單資料", data);
     setApiPasLoading(true)
-    fetch("https://n7-backend.onrender.com/api/v1/users/password",{
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${userToken}`, // token 放這
-      },
-      body: JSON.stringify({
-        password: data.oldPassword,
-        new_password: data.password,
-        confirm_new_password: data.confirmPassword,
-      })
-    }) 
-    .then(res => res.json())
+    updatePassword({
+      password: data.oldPassword,
+      new_password: data.password,
+      confirm_new_password: data.confirmPassword,
+    })
     .then(result => {
-      setApiPasLoading(false)
-      if(result.status){
-        passwordModal.current.hide(); // 提交成功關閉 Modal
-        passwordReset();
-        setShowErrorInfo(false)
-        setIsConfirmTouched(false)
-      }
-      else{
-        if(result.message == "尚未登入"){
-          passwordModal.current.hide()
-          navigate("/login")
-          return
-        }
-        setErrMessage(result.message)
-        setShowErrorInfo(true)
-      }
-      
+      passwordModal.current.hide(); // 提交成功關閉 Modal
+      passwordReset();
+      setShowErrorInfo(false)
+      setIsConfirmTouched(false)
     })
     .catch(err => {
-      navigate("/ErrorPage")
-    });
+      if(err.type == "UNLOGIN"){
+        passwordModal.current.hide()
+        navigate("/login")
+        return
+      }
+      setErrMessage(err.message)
+      setShowErrorInfo(true)
+    })
+    .finally (() =>{
+      setApiPasLoading(false)
+    })
+
+    
+   
   };
 
   // 監看表單狀態
@@ -248,75 +224,57 @@ function Personal() {
   const googleBind = () => {
     setApiPasLoading(true)
     if(isBindGoogle){
-      
-      fetch("https://n7-backend.onrender.com/api/v1/google/bind",{
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${userToken}`, // token 放這
-        },
-      }) 
-      .then(res => res.json())
-      .then(result => {
-        setApiPasLoading(false)
-        setModalTitle("解除綁定結果")
-        if(result.status){
-          setIsBindGoogle(false)
-          setUpdateNameResult(`${result.message}`);
-        }
-        else{
-          if(result.message == "尚未登入"){
-            navigate("/login")
-            return
-          }
-          else{
-            let context = result.message
-            if(context == "僅有Google登入方式，請於更新密碼後再解除綁定"){
-              context += "\n備註：修改密碼中舊密碼請隨意輸入8-32 字元，需包含英文數字大小寫"
-            }
-            
-            setUpdateNameResult(context);
-          }
-        }
 
+      setModalTitle("解除綁定結果")
+      cancleGoogleBind()
+      .then(result => {
+        setIsBindGoogle(false)
+        setUpdateNameResult(`${result.message}`);
         successModalRef.current.open();
       })
       .catch(err => {
-        navigate("/ErrorPage")
-      });
-
+        if(err.type != "OTHER"){
+          navigate(err.route)
+          return
+        }
+        else{
+          let context = err.message
+          if(context == "僅有Google登入方式，請於更新密碼後再解除綁定"){
+            context += "\n備註：修改密碼中舊密碼請隨意輸入8-32 字元，需包含英文數字大小寫"
+          }
+          setUpdateNameResult(context);
+          successModalRef.current.open();
+        }
+      })
+      .finally (() =>{
+        setApiPasLoading(false)
+      })
     }
     else{
       const url = `${window.location.origin}${window.location.pathname}#/callback`;
-      fetch(`https://n7-backend.onrender.com/api/v1/google/bind?redirectUri=${encodeURIComponent(url)}`,{
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${userToken}`, // token 放這
-        },
-      }) 
-      .then(res => res.json())
+      
+      setGoogleBind(encodeURIComponent(url))
       .then(result => {
-        if(result.status){
-          localStorage.setItem("googleInfo", "bind");
-          window.location.href = result.data.redirectUrl;
-        }
-        else{
-          if(result.message == "尚未登入"){
-            navigate("/login")
-            return
-          }
-          else{
-            setApiPasLoading(false)
-            setModalTitle("結果")
-            setUpdateNameResult(`${result.message}`);
-            successModalRef.current.open();
-          }
-        }
+        console.log(result)
+        localStorage.setItem("googleInfo", "bind");
+        window.location.href = result.data.redirectUrl;
       })
       .catch(err => {
-        navigate("/ErrorPage")
-      });
+        console.log(err)
+        if(err.type != "OTHER") {
+          navigate(err.route)
+          return
+        }
+        else{
+          setApiPasLoading(false)
+          setModalTitle("結果")
+          setUpdateNameResult(`${err.message}`);
+          successModalRef.current.open();
+        }
+      })
+      .finally (() =>{
+        setApiPasLoading(false)
+      })
     }
   }
 

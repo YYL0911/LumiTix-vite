@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
+import {getEventInfo, newOrder} from '../api/user'
 import Swal from 'sweetalert2';
-import axios from 'axios'
 
 // 元件
 import Breadcrumb from "../conponents/Breadcrumb";
@@ -59,14 +59,12 @@ function Payments() {
     // 取得單一活動資訊
     useEffect(() => {
         const fetchEvent = async () => {
-            try {
-                const res = await axios.get(`https://n7-backend.onrender.com/api/v1/events/${id}`);
-                setLoading(false);
 
-                if (res.data.status) {
-                    setEvent(res.data.data || {});
-                }
-            } catch (err) {
+            getEventInfo(id)
+            .then(result => {
+                setEvent(result.data || {});
+            })
+            .catch(err => {
                 // console.error('取得活動失敗', err);
                 Swal.fire({
                     icon: 'error',
@@ -75,7 +73,10 @@ function Payments() {
                 }).then(() => {
                     navigate('/allEvents');
                 })
-            }
+            })
+            .finally (() =>{
+                setLoading(false);
+            })
         };
 
         if (isFirstRender.current) {
@@ -105,54 +106,35 @@ function Payments() {
 
     // 回傳訂單
     const createOrder = async () => {
-        try {
-            const tickets = Array.from({ length: quantity }).map(() => ({
-                section_id: selectedArea.id,
-                quantity: 1,
-            }));
+        
+        const tickets = Array.from({ length: quantity }).map(() => ({
+            section_id: selectedArea.id,
+            quantity: 1,
+        }));
 
-            // console.log("送出訂單資料", {
-            //     event_id: id,
-            //     tickets,
-            // });
 
-            const res = await axios.post('https://n7-backend.onrender.com/api/v1/orders/create',
-                {
-                    event_id: id,
-                    tickets,
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${userToken}`,
-                    },
-                }
-            );
-
-            if (res.data.status) {
-                const { MerchantID, TradeInfo, TradeSha, Version } = res.data.data;
-                sendToNewebPay({ MerchantID, TradeInfo, TradeSha, Version });
-            } else {
-                Swal.fire({
-                    icon: "error",
-                    title: '錯誤',
-                    text: "無法購票，請稍後再試",
-                }).then(() => {
-                    navigate(`/eventInfo/${id}`);
-                });
-            }
-        } catch (error) {
-            const errMessage = error.response?.data?.message || "購票失敗，請稍後再試";
-            console.error("Refund Error:", error);
-            await Swal.fire({
-                icon: 'error',
-                title: '購票失敗',
+        newOrder({
+            event_id: id,
+            tickets,
+        })
+        .then(result => {
+            const { MerchantID, TradeInfo, TradeSha, Version } = result.data;
+            sendToNewebPay({ MerchantID, TradeInfo, TradeSha, Version });
+        })
+        .catch(err => {
+            const errMessage = err?.message || "購票失敗，請稍後再試";
+            Swal.fire({
+                icon: "error",
+                title: '錯誤',
                 text: errMessage,
-                confirmButtonText: '確認'
+            }).then(() => {
+                navigate(`/eventInfo/${id}`);
             });
-            navigate(`/eventInfo/${id}`);
-        }
+        })
+        .finally (() =>{
+            setLoading(false);
+        })
+           
     };
 
     // 前往藍星

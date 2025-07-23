@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 
 // Context
 import { useAuth } from '../contexts/AuthContext';
+import {getAllEvents, getCollect, patchCollect} from '../api/user'
 
 // 元件
 import Breadcrumb from "../conponents/Breadcrumb";
@@ -18,6 +19,7 @@ import searchBG from "../assets/img/AlleventsBg.png"
 import { IoHeartCircleOutline } from "react-icons/io5";
 
 
+//活動時間距離當天還有多久(比對時間，時間差距限制)
 const daysFromToday = (dateStr, targetDelt) => {
   const today = new Date();
   const targetDate = new Date(dateStr);
@@ -42,7 +44,7 @@ const CardItem = ({ id, imgSrc, title, showTime, location, category, collect, ha
         onClick={(e) => {
           e.stopPropagation(); // 阻止事件冒泡到 a
           e.preventDefault();  // 阻止 <a> 的預設跳轉行為
-          onToggleCollect(id)
+          onToggleCollect(id); // 取消收藏
         }} />
       </div>
     </div>
@@ -66,7 +68,7 @@ const CardItem = ({ id, imgSrc, title, showTime, location, category, collect, ha
   </a>
 );
 
-// 製造表演列表 collectEventData={collectEventData} onToggleCollect={onToggleCollect}
+// 製造表演列表 
 const DataTable = ({ filterProducts, handleNavigate, currentPage, collectEventData, onToggleCollect }) => {
   const pageSize = 8;
   const start = (currentPage - 1) * pageSize;
@@ -114,6 +116,7 @@ function AllEvents() {
   const navigate = useNavigate();
   //跳轉頁面
   const handleNavigate = (path, collect) => navigate(path, { state: { collect } });
+  
   const [apiLoading, setApiLoading] = useState(false);
 
   const [sampleData, setSampleData] = useState([]);
@@ -198,7 +201,7 @@ function AllEvents() {
 
   }, [searchParams, sampleData, apiLoading, eventTypes, collectEventData]); // 原為 [searchParams]
 
-
+  // 開始收尋
   const handleSeach = () => {
     const newParams = new URLSearchParams();
     if (keyword) newParams.set("keyword", keyword);
@@ -209,52 +212,29 @@ function AllEvents() {
     setCurrentPage(1);
   };
 
-  const blockUser = () => {
-    Swal.fire({
-      title: "帳號已被封鎖",
-      text: "您的帳號因違反使用條款已被停權，如有疑問請聯繫客服。",
-      icon: "error",
-      confirmButtonText: "了解",
-    }).then(() => {
-        logout()
-    });
-  }
-
-  const  onToggleCollect = (eventId) => {
-    fetch(`https://n7-backend.onrender.com/api/v1/users/toggle-collect/${eventId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${userToken}`, // token 放這
-        },
-      })
-        .then((res) => res.json())
-        .then((result) => {
-          if(!result.status){
-            if(result.message == "使用者已被封鎖") {
-              blockUser()
-              setCollectEventData([])
-            }
-          }
-          else{
-            setCollectEventData(prev => prev.filter(item => item.id !== eventId));
-            
-            const Toast = Swal.mixin({
-              toast: true,
-              position: "bottom", // ✅ 如果你想改成下方顯示
-              showConfirmButton: false,
-              timer: 1500,
-              timerProgressBar: true,
-            });
-            Toast.fire({
-              icon: "success",
-              title: result.message
-            });
-          } 
-        })
-        .catch((err) => {
-          navigate("/ErrorPage")
-        });
+  // 取消收藏(活動id)
+  const onToggleCollect = (eventId) => {
+    patchCollect(eventId)
+    .then(result => {
+      // 刪除該收藏
+      setCollectEventData(prev => prev.filter(item => item.id !== eventId));
+      // 提示成功    
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "bottom", // ✅ 如果你想改成下方顯示
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true,
+      });
+      Toast.fire({
+        icon: "success",
+        title: result.message
+      });
+    })
+    .catch(err => {
+      if(err.type == "BLOCKED") logout()
+      navigate(err.route)
+    })
   }
 
   const isFirstRender = useRef(true); // 記錄是否是第一次渲染
@@ -263,48 +243,40 @@ function AllEvents() {
       isFirstRender.current = false; // 更新為 false，代表已執行過
       // console.log("✅ useEffect 只執行一次");
       setApiLoading(true);
-      fetch("https://n7-backend.onrender.com/api/v1/events", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((res) => res.json())
-        .then((result) => {
-          setApiLoading(false);
-          setSampleData(result.data);
-          setTotalPages(Math.ceil(result.data.length / 8));
-          setFilteredProducts(result.data);
-          setCurrentPage(1);
-        })
-        .catch((err) => {
-          navigate("/ErrorPage")
-        });
+      
+      // 取得所有活動api
+      getAllEvents()
+      .then(result => {
+        setSampleData(result.data);
+        setTotalPages(Math.ceil(result.data.length / 8));
+        setFilteredProducts(result.data);
+        setCurrentPage(1);
 
+      })
+      .catch(err => {
+        if(err.type == "BLOCKED") logout()
+        navigate(err.route)
+      })
+      .finally (() =>{
+        setApiLoading(false);
+      })
+
+      // 在登入並且是使用者身分下 => 取得收藏
       if(userToken && userRole == 'General'){
         setApiLoading(true);
-        fetch("https://n7-backend.onrender.com/api/v1/users/collect", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${userToken}`, // token 放這
-          },
+        
+        // 取得所有收藏活動api
+        getCollect()
+        .then(result => {
+          setCollectEventData(result.data);
         })
-          .then((res) => res.json())
-          .then((result) => {
-            setApiLoading(false);
-
-            if(!result.status){
-              if(result.message == "使用者已被封鎖") {
-               blockUser()
-              }
-            }
-            else setCollectEventData(result.data);
-          })
-          .catch((err) => {
-            navigate("/ErrorPage")
-          });
-
+        .catch(err => {
+          if(err.type == "BLOCKED") logout()
+          navigate(err.route)
+        })
+        .finally (() =>{
+          setApiLoading(false);
+        })
       }
     }
   }, []);

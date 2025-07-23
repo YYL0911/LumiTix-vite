@@ -3,6 +3,7 @@ import { useState, useEffect, useRef  } from 'react';
 
 // Context
 import { useAuth } from '../../contexts/AuthContext';
+import {getEventInfo} from '../../api/organizer'
 
 // 元件
 import Breadcrumb from "../../conponents/Breadcrumb";
@@ -23,7 +24,7 @@ const eventStatus = [
 const EventDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { id: evendId } = useParams();
+  const { id: eventId } = useParams();
   const { activeState } = location.state || {};  // 要加 || {} 防止錯誤
 
   const { userToken, loading,  } = useAuth();
@@ -47,25 +48,17 @@ const EventDetail = () => {
       
       isFirstRender.current = false; // 更新為 false，代表已執行過
       setApiLoading(true)
-      fetch(`https://n7-backend.onrender.com/api/v1/organizer/events/${evendId}`,{
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${userToken}`, // token 放這
-        }}) 
-      .then(res => res.json())
+
+      getEventInfo(eventId)
       .then(result => {
-        setApiLoading(false)
-        if(!result.status){
-          if(result.message == "尚未登入") navigate("/login");
-        }
-        else{
-          setEventInfo(result.data)
-        }
+        setEventInfo(result.data)
       })
       .catch(err => {
-        navigate("/ErrorPage")
-      });
+        navigate(err.route)
+      })
+      .finally (() =>{
+        setApiLoading(false);
+      })
     }
   }, []);
 
@@ -74,7 +67,7 @@ const EventDetail = () => {
 
 
   const scanEvent = () => {
-    localStorage.setItem("scanEventID", evendId);
+    localStorage.setItem("scanEventID", eventId);
     navigate(`/ticketScaner`)
   }
   
@@ -208,7 +201,7 @@ const EventDetail = () => {
           <button
             type="button"
             className={`btn btn-danger w-100 d-flex align-items-center justify-content-center`}
-            onClick={() => navigate(`/organizer/event/edit/${evendId}`)}
+            onClick={() => navigate(`/organizer/event/edit/${eventId}`)}
           >
             編輯資訊 <BsPencilSquare size={20} className={`ms-2`} />
           </button>

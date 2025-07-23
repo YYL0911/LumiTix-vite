@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 
 // Context
 import { useAuth } from '../../contexts/AuthContext';
+import {signup, signin} from '../../api/user'
 
 // 使用元件
 import Input from '../../conponents/Input';
@@ -55,71 +56,53 @@ function Register() {
   }, [passwordValue, trigger]);
 
   const onSubmit = (data) => {
-    // console.log(errors);
-    // console.log(data);
     setloading(true); // 開啟loading開啟loading
     // 註冊api
-    fetch("https://n7-backend.onrender.com/api/v1/users/signup",{
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: data.username,
-        email: data.email,
-        password: data.password,
-        confirm_password: data.confirmPassword,
-      })
-    }) 
-    .then(res => res.json())
-    .then(result => {
-      // 註冊失敗
-      if(!result.status){
-        setloading(false); // 關閉loading
-        // 顯示錯誤資訊
-        setErrMessage(result.message);
-        setShowErrorInfo(true);
-        setCheckOk(false); // 禁止再次發送 => 需有變過表單內任一資訊
-      }
-      else{
+    signup({
+      name: data.username,
+      email: data.email,
+      password: data.password,
+      confirm_password: data.confirmPassword,
+    })
+      .then(result => {
         // 註冊成功 => 直接呼叫登入
         callLoginApi(data);
-      }
-    })
-    .catch(err => {
-      navigate("/ErrorPage")
-    });
+      })
+      .catch(err => {
+        setloading(false); // 關閉loading
 
+        if(err.type == "OTHER"){
+          // 顯示錯誤資訊
+          setErrMessage(err.message);
+          setShowErrorInfo(true);
+          setCheckOk(false); // 禁止再次發送 => 需有變過表單內任一資訊
+        }
+        else navigate("/ErrorPage")
+      })
   };
 
   // 呼叫登入
   const callLoginApi = (data) => {
     // 登入api
-    fetch("https://n7-backend.onrender.com/api/v1/users/signin",{
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    signin({
         email: data.email,
         password: data.password
       })
-    }) 
-    .then(res => res.json())
-    .then(result => {
-      setloading(false);
-      if(!result.status){
-        setErrMessage(result.message) ;
-        setShowErrorInfo(true);
-      }
-      else{
+      .then(result => {
         login("General", result.data.user.name, result.data.token)
         modalRef.current.open();
-      }
-    })
-    .catch(err => {
-      navigate("/ErrorPage")
-    });
+      })
+      .catch(err => {
+        if(err.type == "OTHER"){
+          // 顯示錯誤資訊
+          setErrMessage(result.message) ;
+          setShowErrorInfo(true);
+        }
+        else navigate("/ErrorPage")
+      })
+      .finally (() =>{
+        setloading(false); // 關閉loading
+      })
   };
   
   //確認當前表單狀態

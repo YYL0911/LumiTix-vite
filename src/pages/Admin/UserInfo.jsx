@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import axios from "axios";
+import {blockUser, getUserInfo} from '../../api/admin'
 import Swal from "sweetalert2";
 import "../../assets/scss/pages/UserInfo.scss";
 // 元件
@@ -55,30 +55,28 @@ const UserInfo = () => {
 
     const fetchUserData = async () => {
       setApiLoading(true);
-      try {
-        const url = `https://n7-backend.onrender.com/api/v1/admin/users/${userId}`;
-        const response = await axios.get(url, {
-          headers: { Authorization: `Bearer ${userToken}` },
-        });
 
-        if (response.data.status) {
-          setUser(response.data.data.user);
-          setOrders(response.data.data.orders);
-        } else {
-          throw new Error(response.data.message || "無法取得使用者資料");
-        }
-      } catch (error) {
-        console.error("獲取會員資料失敗", error);
-        Swal.fire({
-          icon: "error",
-          title: "載入失敗",
-          text: error.response?.data?.message || "無法取得使用者資料，請稍後再試。",
-        }).then(() => {
-          navigate("/userList");
-        });
-      } finally {
-        setApiLoading(false);
-      }
+      getUserInfo(userId)
+      .then(result => {
+          setUser(result.data.user);
+          setOrders(result.data.orders);
+      })
+      .catch(err => {
+          if(err.type == "OTHER"){
+              Swal.fire({
+              icon: "error",
+              title: "載入失敗",
+              text: err?.message || "無法取得使用者資料，請稍後再試。",
+            }).then(() => {
+              navigate("/userList");
+            });
+          }
+          else navigate(err.route)
+      })
+      .finally (() =>{
+          setApiLoading(false);
+      })
+
     };
 
     fetchUserData();
@@ -101,11 +99,9 @@ const UserInfo = () => {
 
     if (result.isConfirmed) {
       setApiLoading(true);
-      try {
-        const url = `https://n7-backend.onrender.com/api/v1/admin/users/${userId}/toggle-block`;
-        const response = await axios.patch(url, {}, { headers: { Authorization: `Bearer ${userToken}` } });
 
-        if (response.data.status) {
+      blockUser(userId)
+      .then(result => {
           Swal.fire({
             title: "操作成功！",
             text: `已成功 ${actionText} 使用者。`,
@@ -114,15 +110,16 @@ const UserInfo = () => {
             showConfirmButton: false,
           });
           setUser((prevUser) => ({ ...prevUser, isBlocked: response.data.data.isBlocked }));
-        } else {
-          throw new Error(response.data.message || "操作失敗");
-        }
-      } catch (error) {
-        const errorMessage = error.response?.data?.message || "發生未知錯誤，請稍後再試。";
-        Swal.fire("操作失敗！", errorMessage, "error");
-      } finally {
-        setApiLoading(false);
-      }
+      })
+      .catch(err => {
+          if(err.type == "OTHER"){
+              Swal.fire("操作失敗！", err.message, "error");
+          }
+          else navigate(err.route)
+      })
+      .finally (() =>{
+          setApiLoading(false);
+      })
     }
   };
 

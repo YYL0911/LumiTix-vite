@@ -5,6 +5,7 @@ import withReactContent from 'sweetalert2-react-content'
 
 // Context
 import { useAuth } from "../../contexts/AuthContext";
+import {getAllEvents, cancleEvents} from '../../api/organizer'
 
 // 元件
 import Breadcrumb from "../../conponents/Breadcrumb";
@@ -29,7 +30,7 @@ const showSwal = (icon, title, info) => {
 
 
 function Events() {
-  const { userToken, loading } = useAuth(); // [變更使用者名稱, token]
+  const { loading } = useAuth(); // [變更使用者名稱, token]
   const [apiLoading, setApiLoading] = useState(false); // 使否開啟loading，傳送並等待API回傳時開啟
   const [allData, setAllData] = useState(null);
 
@@ -40,27 +41,17 @@ function Events() {
       isFirstRender.current = false; // 更新為 false，代表已執行過
       // console.log("useEffect 只執行一次");
       setApiLoading(true);
-      fetch("https://n7-backend.onrender.com/api/v1/organizer/events", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`, // token 放這
-        },
-      })
-        .then((res) => res.json())
-        .then((result) => {
-          setApiLoading(false);
 
-          if (!result.status) {
-            if (result.message == "尚未登入") navigate("/login");
-            else navigate("/");
-          } else {
-            setAllData(result.data);
-          }
-        })
-        .catch((err) => {
-          navigate("/ErrorPage");
-        });
+      getAllEvents()
+      .then(result => {
+        setAllData(result.data);
+      })
+      .catch(err => {
+        navigate(err.route)
+      })
+      .finally (() =>{
+        setApiLoading(false);
+      })
     }
   }, []);
 
@@ -123,33 +114,24 @@ function Events() {
 
   const deleteEvent = (eventId) => {
     setApiLoading(true);
-      fetch(`https://n7-backend.onrender.com/api/v1/organizer/events/${eventId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`, // token 放這
-        },
-      })
-        .then((res) => res.json())
-        .then((result) => {
-          setApiLoading(false);
-
-          if (!result.status) {
-            if (result.message == "尚未登入") navigate("/login");
-            showSwal("error", "刪除失敗", result.message)
-          } else {
-            showSwal("success", "刪除成功", "已刪除資料")
-            allData[activeState].map((item, idx) => {
-              if(item.id == eventId){
-                allData[activeState].splice(idx,1)
-              }
-            })
-            setAllData(allData);
+    cancleEvents(eventId)
+      .then(result => {
+        showSwal("success", "刪除成功", "已刪除資料")
+        allData[activeState].map((item, idx) => {
+          if(item.id == eventId){
+            allData[activeState].splice(idx,1)
           }
         })
-        .catch((err) => {
-          navigate("/ErrorPage");
-        });
+        setAllData(allData);
+      })
+      .catch(err => {
+        if(err.type == "OTHER") showSwal("error", "刪除失敗", result.message)
+        else navigate(err.route)
+      })
+      .finally (() =>{
+        setApiLoading(false);
+      })
+
   }
 
   return (

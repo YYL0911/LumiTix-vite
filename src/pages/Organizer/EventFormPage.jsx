@@ -3,8 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 // Context
 import { useAuth } from "../../contexts/AuthContext";
+import {uploadPic, getEventInfo, updateEvent, newEvent} from '../../api/organizer'
 // 元件
-import axios from "axios";
 import Swal from "sweetalert2";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -36,17 +36,20 @@ import {
 import { CSS } from "@dnd-kit/utilities"; // 用於 transform/transition 樣式
 
 // --- 在此加入新的圖片上傳輔助函式 ---
-const uploadImage = async (file, type, userToken) => {
+const uploadImage = async (file, type) => {
   const formData = new FormData();
   formData.append("image", file); // 假設後端接收的欄位名是 'image'
   formData.append("type", type); // 將 type 加入 FormData 中
-  const response = await axios.post("https://n7-backend.onrender.com/api/v1/organizer/upload_image", formData, {
-    headers: {
-      Authorization: `Bearer ${userToken}`,
-    },
-  });
-  // 重要確認：假設 API 回傳的圖片網址欄位是 'image_url'
-  return response.data.data.image_url;
+
+  uploadPic(formData)
+  .then(result => {
+    return result.data.image_url;
+  })
+  .catch(err => {
+    navigate(err.route)
+  })
+  .finally (() =>{
+  })
 };
 
 // --- 在這裡加入新的日期格式化函式 ---
@@ -312,13 +315,10 @@ const EventFormPage = () => {
     if (userToken && eventTypesOri && eventTypesOri.length > 0) {
       const fetchEventData = async () => {
         setApiLoading(true);
-        try {
-          const url = `https://n7-backend.onrender.com/api/v1/organizer/events/${eventId}`;
-          const response = await axios.get(url, { headers: { Authorization: `Bearer ${userToken}` } });
-          const eventData = response.data.data;
-          if (!eventData) {
-            throw new Error("API 回應中缺少 data 物件");
-          }
+
+        getEventInfo(eventId)
+        .then(result => {
+          const eventData = result.data;
           const { city, streetAddress } = splitAddress(eventData.address, locationData);
           const currentType = eventTypesOri.find((t) => t.name === eventData.type);
           const currentTypeId = currentType ? currentType.id : "";
@@ -349,31 +349,16 @@ const EventFormPage = () => {
             tickets: section.ticket_total.toString(), // 對應 ticket_total
           }));
           setZones(formattedZones);
-        } catch (error) {
-          // --- 建議的完整錯誤處理邏輯 ---
-          console.error("載入活動資料失敗!", error.response || error);
-          // 從 error 物件中，提取後端回傳的狀態碼和錯誤訊息
-          const statusCode = error.response?.status;
-          const errorMessage = error.response?.data?.message || "發生未知錯誤，請稍後再試。";
-          // 狀況一：401 未授權 (Token 失效或未登入)
-          if (statusCode === 401) {
-            Swal.fire("驗證失敗", "您尚未登入或登入已逾時，請重新登入。", "error").then(() => navigate("/login"));
+        })
+        .catch(err => {
+          if (err.type == "OTHER") {
+            Swal.fire("發生錯誤", err.message, "error").then(() => navigate("/events"));
           }
-          // 狀況二：403 禁止 (使用者沒有權限編輯此活動)
-          else if (statusCode === 403) {
-            Swal.fire("權限不足", "您沒有權限編輯此活動。", "error").then(() => navigate("/events"));
-          }
-          // 狀況三：404 找不到 (使用者想編輯一個不存在或已被刪除的活動)
-          else if (statusCode === 404) {
-            Swal.fire("找不到資料", "找不到您要編輯的活動，它可能已被刪除。", "error").then(() => navigate("/events"));
-          }
-          // 狀況四：其他所有錯誤 (例如 500 伺服器內部錯誤)
-          else {
-            Swal.fire("載入失敗", `發生錯誤：\n${errorMessage}`, "error").then(() => navigate("/events"));
-          }
-        } finally {
+          else navigate(err.route)
+        })
+        .finally (() =>{
           setApiLoading(false);
-        }
+        })
       };
       fetchEventData();
     }
@@ -529,20 +514,17 @@ const EventFormPage = () => {
         }),
       };
 
-      const headers = { "Content-Type": "application/json", Authorization: `Bearer ${userToken}` };
       let response;
 
       if (isEditMode) {
         // 編輯模式，使用 PUT
-        const url = `https://n7-backend.onrender.com/api/v1/organizer/events/${eventId}`;
-        response = await axios.put(url, apiData, { headers });
+        response = await updateEvent(apiData);
       } else {
         // 新增模式，使用 POST
-        const url = "https://n7-backend.onrender.com/api/v1/organizer/propose-event";
-        response = await axios.post(url, apiData, { headers });
+        response = await newEvent(apiData);
       }
       // --- 修改 onSubmit 的成功/失敗提示 ---
-      if (response.data.status) {
+      if (result.status) {
         await Swal.fire({
           title: "操作成功！",
           text: isEditMode ? "活動更新成功！" : "活動新增成功！",
